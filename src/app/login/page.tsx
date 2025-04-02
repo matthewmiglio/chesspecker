@@ -9,17 +9,46 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
+import type { User } from "@/lib/types";
+
+
+const verbose = true;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would implement actual authentication logic
-    console.log("Login attempt with:", { email, password })
-    // For now, we'll just simulate a login
-    alert("Login functionality would be implemented here")
-  }
+    e.preventDefault();
+    if (verbose) { console.log("Login attempt with:", { email, password }) }
+
+    // Fetch users
+    const getChessPeckerUsers = async (): Promise<User[]> => {
+      const res = await fetch("/api/getUsers");
+      const data: User[] = await res.json();  // Explicitly type the data
+      if (verbose) { console.log("data:", data) };
+      return data;
+    };
+
+    const chessPeckerUsers = await getChessPeckerUsers();
+    if (verbose) { console.log('chessPeckerUsers:', chessPeckerUsers) };
+
+    // Check if this user exists
+    const user = chessPeckerUsers.find(
+      (user) => user.email === email && user.pass === password
+    );
+
+    if (user) {
+      sessionStorage.setItem("user_id", user.user_id.toString());
+      alert("Logged in successfully");
+      window.location.href = "/dashboard";
+    } else {
+      alert("Invalid email or password");
+    }
+
+  };
+
 
   return (
     <div className="flex justify-center items-center min-h-[80vh]">
