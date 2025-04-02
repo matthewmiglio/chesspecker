@@ -1,122 +1,191 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export default function CreatePuzzleSetPage() {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
-    const [minRating, setMinRating] = useState([800])
-    const [maxRating, setMaxRating] = useState([2200])
-    const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+    const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([])
+    const [setSize, setSetSize] = useState<number>(300)
+    const [repeatCount, setRepeatCount] = useState<number>(8)
+    const [loggedIn, setLoggedIn] = useState<boolean>(true)
 
-    const puzzleTypes = [
-        { id: "mate", label: "Checkmate" },
-        { id: "tactics", label: "Tactics" },
-        { id: "endgame", label: "Endgame" },
-        { id: "opening", label: "Opening" },
-        { id: "middlegame", label: "Middlegame" },
-        { id: "pin", label: "Pin" },
-        { id: "fork", label: "Fork" },
-        { id: "discovery", label: "Discovery" },
-    ]
+    useEffect(() => {
+        const id = sessionStorage.getItem("user_id")
+        setLoggedIn(!!id)
+    }, [])
 
-    const handleTypeToggle = (typeId: string) => {
-        setSelectedTypes((prev) => (prev.includes(typeId) ? prev.filter((id) => id !== typeId) : [...prev, typeId]))
+    const handleDifficultyToggle = (level: string) => {
+        setSelectedDifficulties((prev) =>
+            prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+        )
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        const puzzleSet = {
-            name,
-            description,
-            minRating: minRating[0],
-            maxRating: maxRating[0],
-            types: selectedTypes,
+
+    const addNewPuzzleToDatabase = async (
+        user_id: number,
+        difficulties: string[],
+        size: number,
+        repeats: number,
+        name: string
+    ) => {
+        const res = await fetch("/api/addSet", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id,
+                difficulties,
+                size,
+                repeats,
+                name,
+                puzzle_ids: [] // default on creation
+            }),
+        });
+
+        if (!res.ok) {
+            console.error("Failed to add set:", res.status);
+            return null;
         }
-        console.log("Created puzzle set:", puzzleSet)
-        alert("Puzzle set creation would be implemented here")
+
+        return await res.json();
+    };
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (
+            selectedDifficulties.length === 0 ||
+            name.trim() === "" ||
+            description.trim() === "" ||
+            setSize <= 0 ||
+            repeatCount <= 0
+        ) {
+            console.log("Please fill out all the fields")
+            return
+        }
+
+        const user_id_raw = sessionStorage.getItem("user_id");
+        if (!user_id_raw) {
+            console.error("No user_id in session");
+            return;
+        }
+        const user_id = Number(user_id_raw);
+
+        console.log("This set name:", name)
+        console.log("This set description:", description)
+        console.log("This set size:", setSize)
+        console.log("This set repeatCount:", repeatCount)
+        console.log("This set difficulties:", selectedDifficulties)
+        console.log("This userId is", user_id)
+
+        const addResponse = await addNewPuzzleToDatabase(user_id,
+            selectedDifficulties,
+            setSize,
+            repeatCount,
+            name, )
+
+        console.log('add set response', addResponse)
+
+
+
     }
 
     return (
         <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">Create a New Puzzle Set</h1>
 
-            <Card>
-                <form onSubmit={handleSubmit}>
-                    <CardHeader>
-                        <CardTitle>Puzzle Set Details</CardTitle>
-                        <CardDescription>Customize your puzzle set parameters</CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Set Name</Label>
-                            <Input
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="My Tactical Puzzles"
-                                required
-                            />
+            <div className="relative">
+                {!loggedIn && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                        <div className="text-center text-muted-foreground text-xl font-semibold">
+                            Log in to create sets
                         </div>
+                    </div>
+                )}
 
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Input
-                                id="description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                placeholder="A collection of tactical puzzles for intermediate players"
-                            />
-                        </div>
+                <Card className={!loggedIn ? "blur-sm pointer-events-none opacity-50" : ""}>
+                    <form onSubmit={handleSubmit}>
+                        <CardHeader>
+                            <CardTitle>Puzzle Set Details</CardTitle>
+                            <CardDescription>Customize your puzzle set parameters</CardDescription>
+                        </CardHeader>
 
-                        <div className="space-y-4">
-                            <div>
-                                <Label>Minimum Rating: {minRating}</Label>
-                                <Slider value={minRating} min={0} max={3000} step={100} onValueChange={setMinRating} className="my-4" />
+                        <CardContent className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Set Name</Label>
+                                <Input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="My Tactical Puzzles"
+                                    required
+                                />
                             </div>
 
-                            <div>
-                                <Label>Maximum Rating: {maxRating}</Label>
-                                <Slider value={maxRating} min={0} max={3000} step={100} onValueChange={setMaxRating} className="my-4" />
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description</Label>
+                                <Input
+                                    id="description"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="A collection of tactical puzzles for intermediate players"
+                                />
                             </div>
-                        </div>
 
-                        <div className="space-y-3">
-                            <Label>Puzzle Types</Label>
-                            <div className="grid grid-cols-2 gap-4">
-                                {puzzleTypes.map((type) => (
-                                    <div key={type.id} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={type.id}
-                                            checked={selectedTypes.includes(type.id)}
-                                            onCheckedChange={() => handleTypeToggle(type.id)}
-                                        />
-                                        <Label htmlFor={type.id} className="cursor-pointer">
-                                            {type.label}
-                                        </Label>
-                                    </div>
-                                ))}
+                            <div className="space-y-2">
+                                <Label htmlFor="set-size">Set Size</Label>
+                                <Input
+                                    id="set-size"
+                                    type="number"
+                                    value={setSize}
+                                    min={1}
+                                    onChange={(e) => setSetSize(Number(e.target.value))}
+                                />
                             </div>
-                        </div>
-                    </CardContent>
 
-                    <CardFooter>
-                        <Button type="submit" className="ml-auto">
-                            Create Puzzle Set
-                        </Button>
-                    </CardFooter>
-                </form>
-            </Card>
+                            <div className="space-y-2">
+                                <Label htmlFor="repeat-count">Repeat Count</Label>
+                                <Input
+                                    id="repeat-count"
+                                    type="number"
+                                    value={repeatCount}
+                                    min={1}
+                                    onChange={(e) => setRepeatCount(Number(e.target.value))}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <Label>Difficulty Levels</Label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {["easiest", "easier", "normal", "harder", "hardest"].map((level) => (
+                                        <Button
+                                            key={level}
+                                            type="button"
+                                            variant={selectedDifficulties.includes(level) ? "default" : "outline"}
+                                            onClick={() => handleDifficultyToggle(level)}
+                                            className="w-full capitalize"
+                                        >
+                                            {level}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        </CardContent>
+
+                        <CardFooter>
+                            <Button type="submit" className="ml-auto">
+                                Create Puzzle Set
+                            </Button>
+                        </CardFooter>
+                    </form>
+                </Card>
+            </div>
         </div>
     )
 }
-
