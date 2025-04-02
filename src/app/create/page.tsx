@@ -88,11 +88,11 @@ export default function CreatePuzzleSetPage() {
             selectedDifficulties,
             setSize,
             repeatCount,
-            name, )
+            name,)
 
         console.log('add set response', addResponse)
 
-
+        window.location.href = "/puzzles";
 
     }
 
