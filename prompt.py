@@ -82,8 +82,8 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\addSet\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\create\page.tsx',
+        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\chess-board.tsx',
+        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\puzzles\page.tsx',
     ]
 
     ignore_folders = [
