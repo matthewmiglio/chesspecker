@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const difficulty = searchParams.get("difficulty") ?? "normal";
-  const theme = searchParams.get("theme");
+export async function POST(req: NextRequest) {
+  const { difficulty = "normal", theme } = await req.json();
 
   const url = new URL("https://lichess.org/api/puzzle/next");
   url.searchParams.set("difficulty", difficulty);
@@ -12,19 +10,19 @@ export async function GET(req: NextRequest) {
   try {
     const res = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_LICHESS_KEY}`,
+        // Authorization: `Bearer ${process.env.NEXT_PUBLIC_LICHESS_KEY}`,
         Accept: "application/json",
       },
     });
 
     if (!res.ok) {
-      return NextResponse.json({ error: "Failed to fetch puzzles" }, { status: 500 });
+      return NextResponse.json({ error: "Failed to fetch puzzle" }, { status: 500 });
     }
 
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {
-    console.error("Failed to fetch puzzles:", err);
+    console.error("Failed to fetch puzzle:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
