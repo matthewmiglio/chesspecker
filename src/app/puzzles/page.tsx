@@ -57,11 +57,17 @@ export default function PuzzlesPage() {
   const getFenAtPly = (pgn: string, initialPly: number) => {
     const chess = new Chess();
     chess.loadPgn(pgn);
-    const history = chess.history({ verbose: true }).slice(0, initialPly - 1); // 👈 Fix here
+    const history = chess.history({ verbose: true });
     const replay = new Chess();
-    for (const move of history) replay.move(move);
+
+    // Replay up to (but not including) the move at initialPly
+    for (let i = 0; i < initialPly - 1 && i < history.length; i++) {
+      replay.move(history[i]);
+    }
+
     return replay.fen();
   };
+
 
   const logVerboseSolution = (solution: string[], fen: string) => {
     const chess = new Chess(fen);
@@ -157,6 +163,38 @@ export default function PuzzlesPage() {
     }
   };
 
+  const handleNextPuzzle = async () => {
+  };
+
+  const getSetProgress = async (set_id: number) => {
+    const response = await fetch("/api/getSetProgressStats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ set_id }),
+    });
+
+    if (!response.ok) return null;
+    const result = await response.json();
+    return result.progress; // Optional: simplify result shape
+  };
+
+
+
+  const setSetProgress = async (
+    set_id: number,
+    repeat_number: number,
+    puzzle_number: number
+  ) => {
+    const response = await fetch("/api/updateSetProgressStats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ set_id, repeat_number, puzzle_number }),
+    });
+
+    return response.ok;
+  };
+
+
   const handleMove = (move: string) => {
     console.log('handling this move:', move);
     if (!isSessionActive) return;
@@ -174,6 +212,7 @@ export default function PuzzlesPage() {
       const computerMove = solution[solvedIndex + 1];
       if (computerMove) chess.move({ from: computerMove.slice(0, 2), to: computerMove.slice(2) });
       setFen(chess.fen());
+      console.log('User just inputted solution move #:', solvedIndex + 1);
     } else {
       const chess = new Chess(fen);
       const piece = chess.get(move.slice(0, 2) as Square);
@@ -243,14 +282,14 @@ export default function PuzzlesPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-center mb-6">
-                  <ChessBoard
-  fen={fen}
-  solution={solution}
-  solvedIndex={solvedIndex}
-  onMove={handleMove}
-  highlight={highlight}
-  isSessionActive={isSessionActive}
-/>
+                    <ChessBoard
+                      fen={fen}
+                      solution={solution}
+                      solvedIndex={solvedIndex}
+                      onMove={handleMove}
+                      highlight={highlight}
+                      isSessionActive={isSessionActive}
+                    />
 
                   </div>
                 </CardContent>
@@ -265,6 +304,7 @@ export default function PuzzlesPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       Show Solution
                     </Button>
+                    <Button onClick={() => handleNextPuzzle()}>Next Puzzle</Button>
                   </div>
                 </CardFooter>
               </Card>
