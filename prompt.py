@@ -78,12 +78,11 @@ def generate_copy_string(
     print("The file tree and content have been copied to the clipboard.")
 
 
-if __name__ == "__main__":                                                                              
+if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\addPuzzleToSet\route.ts",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\addSet\route.ts",
+        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
     ]
 
     ignore_folders = [

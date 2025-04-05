@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
         .from("chessPeckerSets")
-        .select("repeat_number, puzzle_number")
+        .select("repeat_index, puzzle_index, size, repeats")
         .eq("set_id", set_id)
         .single();
 

@@ -7,15 +7,15 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { set_id, repeat_number, puzzle_number } = await req.json();
+  const { set_id, repeat_index, puzzle_index } = await req.json();
 
-  if (!set_id || repeat_number === undefined || puzzle_number === undefined) {
+  if (!set_id || repeat_index === undefined || puzzle_index === undefined) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const { error } = await supabase
     .from("chessPeckerSets")
-    .update({ repeat_number, puzzle_number })
+    .update({ repeat_index, puzzle_index })
     .eq("set_id", set_id);
 
   if (error) {
