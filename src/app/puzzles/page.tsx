@@ -5,6 +5,7 @@ import { Chess, Square } from "chess.js";
 import { Eye } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import confetti from "canvas-confetti";
 import {
   Card,
   CardContent,
@@ -41,6 +42,65 @@ export default function PuzzlesPage() {
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
   const [currentPuzzleId, setCurrentPuzzleId] = useState<string>("");
+  const [sessionAccuracy, setSessionAccuracy] = useState<number>(0);
+
+  const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
+    console.log("addIncorrectAttempt()");
+    console.log("-setId", setId);
+    console.log("-repeatIndex", repeatIndex);
+    try {
+      const res = await fetch("/api/addIncorrect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok)
+        throw new Error(data.error || "Failed to add incorrect attempt");
+
+      console.log(
+        "Added incorrect attempt for set",
+        setId,
+        "repeat",
+        repeatIndex
+      );
+      return true;
+    } catch (err) {
+      console.error("Error adding incorrect attempt:", err);
+      return false;
+    }
+  };
+
+  const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
+    console.log("addCorrectAttempt()");
+    console.log("-setId", setId);
+    console.log("-repeatIndex", repeatIndex);
+    try {
+      const res = await fetch("/api/addCorrect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok)
+        throw new Error(data.error || "Failed to add correct attempt");
+
+      console.log(
+        "Added correct attempt for set",
+        setId,
+        "repeat",
+        repeatIndex
+      );
+      return true;
+    } catch (err) {
+      console.error("Error adding correct attempt:", err);
+      return false;
+    }
+  };
 
   const fetchUserSetData = async () => {
     const response = await fetch("/api/getSet", {
@@ -58,6 +118,55 @@ export default function PuzzlesPage() {
     fetchUserSetData();
   }, []);
 
+  const getSetAccuracy = async (setId: number, repeatIndex: number) => {
+    try {
+      const res = await fetch("/api/getSetAccuracy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok)
+        throw new Error(data.error || "Failed to fetch accuracy stats");
+
+      console.log(
+        `Accuracy stats for set ${setId} repeat ${repeatIndex}:`,
+        data
+      );
+      return { correct: data.correct, incorrect: data.incorrect };
+    } catch (err) {
+      console.error("Error fetching set accuracy:", err);
+      return null;
+    }
+  };
+
+  const updateSessionAccuracy = async () => {
+    console.log("updateSessionAccuracy()");
+    if (!selectedSetId || (!currentRepeatIndex && currentRepeatIndex != 0)) {
+      console.log(
+        "There is no set id or no currentRepeatIndex so cant update accuracy"
+      );
+      console.log("selectedSetId", selectedSetId);
+      console.log("currentRepeatIndex", currentRepeatIndex);
+      return;
+    }
+    const accuracy = await getSetAccuracy(selectedSetId, currentRepeatIndex);
+    console.log("accuracy", accuracy);
+    if (accuracy) {
+      const totalAttempts = accuracy.correct + accuracy.incorrect;
+      if (totalAttempts > 0) {
+        const accuracyPercentage = (accuracy.correct / totalAttempts) * 100;
+        setSessionAccuracy(accuracyPercentage);
+        console.log("Just set session accuracy to:", accuracyPercentage);
+      } else {
+        console.log("No attempts. Setting accuracy to 0%.");
+        setSessionAccuracy(0);
+      }
+    } else console.log("No accuracy data found for this set.");
+  };
+
   const handleStartSession = async () => {
     console.log("handleStartSession()");
     setIsSessionActive(true);
@@ -71,6 +180,7 @@ export default function PuzzlesPage() {
 
     setCurrentPuzzleIndex(puzzle_index);
     setCurrentRepeatIndex(repeat_index);
+    updateSessionAccuracy();
   };
 
   const removeSetGivenId = (setId: number) => async () => {
@@ -367,6 +477,7 @@ export default function PuzzlesPage() {
     if (setIsDone()) {
       console.log("This set is done. No more puzzles to solve.");
       alert("This set is done. No more puzzles to solve.");
+      handleSetFinish();
       return;
     }
 
@@ -394,6 +505,8 @@ export default function PuzzlesPage() {
     } else {
       console.log("Failed to load the next puzzle");
     }
+
+    await updateSessionAccuracy();
   };
 
   const getSetProgress = async (set_id: number) => {
@@ -422,13 +535,37 @@ export default function PuzzlesPage() {
     return response.ok;
   };
 
+  const handleInvalidMove = async () => {
+    console.log("Handle wrong move logic here!!");
+    const setId = selectedSetId;
+    if (!setId) {
+      console.log("No set selected so cant handle invalid move!");
+      return;
+    }
+    await addIncorrectAttempt(selectedSetId, currentRepeatIndex);
+    await updateSessionAccuracy();
+    await handleNextPuzzle();
+  };
+
+  const handleSetFinish = () => {
+    console.log("🎉 Set complete! Triggering confetti...");
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.6 },
+    });
+
+    alert("🎉 You finished the entire set! Great job!");
+  };
+
+
   const handleMove = (move: string) => {
     console.log("handling this move:", move);
     if (!isSessionActive) return;
 
     if (move === "invalid") {
       console.warn("User attempted an invalid move.");
-      return alert("Invalid move.");
+      handleInvalidMove();
     }
 
     if (move === solution[solvedIndex]) {
@@ -556,7 +693,7 @@ export default function PuzzlesPage() {
                 <CardFooter className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      Session accuracy: 0%
+                      Session accuracy: {sessionAccuracy}%
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Puzzles solved: {Math.floor(solvedIndex / 2)}/

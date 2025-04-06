@@ -29,6 +29,31 @@ export default function CreatePuzzleSetPage() {
     setLoggedIn(!!id);
   }, []);
 
+  const createSetAccuracy = async (setId: number, repeat_index: number) => {
+    console.log("createSetAccuracy()");
+    console.log("setId", setId);
+
+    try {
+      const res = await fetch("/api/createSetAccuracy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId, repeat_index: repeat_index }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create accuracy row");
+      }
+
+      console.log(`Created accuracy row for set ${setId}`);
+      return true;
+    } catch (err) {
+      console.error("Error creating accuracy row:", err);
+      return false;
+    }
+  };
+
   const handleDifficultyToggle = (level: string) => {
     setSelectedDifficulties((prev) =>
       prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
@@ -42,6 +67,7 @@ export default function CreatePuzzleSetPage() {
     repeats: number,
     name: string
   ) => {
+    //create the set table row
     const puzzleIds = await createNewPuzzleList(size, difficulties);
     console.log("addNewSetToDatabase()");
     console.log("puzzleIds:", puzzleIds);
@@ -63,7 +89,17 @@ export default function CreatePuzzleSetPage() {
       return null;
     }
 
-    return await res.json();
+    const response = await res.json();
+    const set = response.set;
+    console.log("set", set);
+    const setId = set.set_id;
+    console.log("This new set has an id of", setId);
+    for (let i = 0; i < repeats; i++) {
+      const success = await createSetAccuracy(setId, i);
+      if (!success) {
+        console.error("Failed to create accuracy row for repeat", i);
+      }
+    }
   };
 
   const createNewPuzzle = async (difficulty: string) => {
@@ -131,7 +167,7 @@ export default function CreatePuzzleSetPage() {
 
     console.log("add set response", addSetResponse);
 
-    window.location.href = "/puzzles";
+    // window.location.href = "/puzzles";
   };
 
   return (
