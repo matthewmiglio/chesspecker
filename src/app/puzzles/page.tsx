@@ -431,7 +431,7 @@ export default function PuzzlesPage() {
 
     if (setIsDone()) {
       console.log("This set is done. No more puzzles to solve.");
-      handleSetFinish();
+      showConfetti();
       return;
     }
 
@@ -508,13 +508,69 @@ export default function PuzzlesPage() {
     await handleNextPuzzle();
   };
 
-  const handleSetFinish = () => {
-    console.log("🎉 Set complete! Triggering confetti...");
+  const showConfetti = () => {
     confetti({
       particleCount: 150,
       spread: 80,
       origin: { y: 0.6 },
     });
+  };
+
+  const showGreenCheck = () => {
+    const div = document.createElement("div");
+    div.innerText = "✅";
+    div.className =
+      "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-green-500 text-6xl animate-ping z-[1000]";
+    document.body.appendChild(div);
+
+    setTimeout(() => {
+      document.body.removeChild(div);
+    }, 1000);
+  };
+
+  const showRedX = () => {
+    const div = document.createElement("div");
+    div.innerText = "❌";
+    div.className =
+      "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-6xl animate-ping z-[1000]";
+    document.body.appendChild(div);
+
+    setTimeout(() => {
+      document.body.removeChild(div);
+    }, 1000);
+  };
+
+  const showSparkles = () => {
+    confetti({
+      particleCount: 50,
+      spread: 50,
+      origin: { y: 0.4 },
+      colors: ["#00FF9C", "#b9fbc0", "#00FFC8"],
+      scalar: 1.2,
+    });
+  };
+
+  const dropEmoji = (emoji: string = "🥳") => {
+    const div = document.createElement("div");
+    div.innerText = emoji;
+    div.className =
+      "fixed top-0 left-1/2 transform -translate-x-1/2 text-5xl animate-bounce z-[1000]";
+    document.body.appendChild(div);
+
+    setTimeout(() => {
+      div.remove();
+    }, 1200);
+  };
+
+  const flashRedScreen = () => {
+    const flash = document.createElement("div");
+    flash.className =
+      "fixed inset-0 bg-red-500 opacity-50 animate-fade z-[999]";
+    document.body.appendChild(flash);
+
+    setTimeout(() => {
+      document.body.removeChild(flash);
+    }, 100);
   };
 
   const handleMove = (move: string, isCorrect: boolean) => {
@@ -523,11 +579,13 @@ export default function PuzzlesPage() {
 
     if (!isCorrect) {
       console.log("User made an incorrect move!");
+      showRedX();
       handleIncorrectMove();
       return;
     }
 
     // ✅ Correct move logic
+    showGreenCheck();
     console.log("User made the correct move!");
     setSolvedIndex((i) => i + 2);
     console.log("User just inputted solution move #:", solvedIndex + 1);
@@ -594,7 +652,7 @@ export default function PuzzlesPage() {
                   Set: {currentRepeatIndex} / {set.repeats}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Puzzle: {currentPuzzleIndex+1} / {set.size}
+                  Puzzle: {currentPuzzleIndex + 1} / {set.size}
                 </div>
               </CardContent>
               <CardFooter>
