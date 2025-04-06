@@ -13,13 +13,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing set_id or repeat_index" }, { status: 400 });
   }
 
-  const { error } = await supabase.rpc("increment_correct", {
-    input_set_id: set_id,
-    input_repeat_index: repeat_index,
-  });
+  // Step 1: Get the current value
+  const { data, error: fetchError } = await supabase
+    .from("chessPeckerSetAccuracies")
+    .select("correct")
+    .eq("set_id", set_id)
+    .eq("repeat_index", repeat_index)
+    .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (fetchError || !data) {
+    return NextResponse.json({ error: fetchError?.message || "Accuracy row not found" }, { status: 500 });
+  }
+
+  const newCorrect = data.correct + 1;
+
+  // Step 2: Update the value
+  const { error: updateError } = await supabase
+    .from("chessPeckerSetAccuracies")
+    .update({ correct: newCorrect })
+    .eq("set_id", set_id)
+    .eq("repeat_index", repeat_index);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
   return NextResponse.json({ message: "Correct incremented" }, { status: 200 });
