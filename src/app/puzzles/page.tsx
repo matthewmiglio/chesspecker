@@ -257,7 +257,10 @@ export default function PuzzlesPage() {
   const setIsDone = () => {
     const set = userSets.find((s) => s.set_id === selectedSetId);
     if (!set) return false;
-    if (currentRepeatIndex > set.repeats) {
+    console.log("setIsDone()");
+    console.log("set.repeats", set.repeats);
+    console.log("currentRepeatIndex", currentRepeatIndex);
+    if (currentRepeatIndex === set.repeats) {
       console.log("This set is done. No more puzzles to solve.");
       return true;
     }
@@ -404,7 +407,6 @@ export default function PuzzlesPage() {
 
     if (setIsDone()) {
       console.log("This set is done. No more puzzles to solve.");
-      alert("This set is done. No more puzzles to solve.");
       handleSetFinish();
       return;
     }
@@ -489,8 +491,6 @@ export default function PuzzlesPage() {
       spread: 80,
       origin: { y: 0.6 },
     });
-
-    alert("🎉 You finished the entire set! Great job!");
   };
 
   const handleMove = (move: string, isCorrect: boolean) => {
@@ -570,7 +570,7 @@ export default function PuzzlesPage() {
                   Set: {currentRepeatIndex} / {set.repeats}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Puzzles: {currentPuzzleIndex} / {set.size}
+                  Puzzle: {currentPuzzleIndex} / {set.size}
                 </div>
               </CardContent>
               <CardFooter>
