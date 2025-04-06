@@ -167,7 +167,7 @@ export default function CreatePuzzleSetPage() {
 
     console.log("add set response", addSetResponse);
 
-    // window.location.href = "/puzzles";
+    window.location.href = "/puzzles";
   };
 
   return (
