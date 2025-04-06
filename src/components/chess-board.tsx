@@ -93,46 +93,52 @@ export function ChessBoard({
       style={{ opacity: isSessionActive ? 1 : 0.5 }}
     >
       <p className="text-center text-muted-foreground mb-2">{turnText}</p>
-      <div
-        ref={boardRef}
-        className="grid grid-cols-8 w-full aspect-square rounded overflow-hidden border border-neutral-400"
-      >
-        {/* Render bottom-up, left-right to match white's perspective */}
-        {[...Array(8)].map((_, rowIdx) => {
-          const row = 7 - rowIdx; // flip row
-          return [...Array(8)].map((_, col) => {
-            const square = String.fromCharCode(97 + col) + (row + 1);
-            const piece = chess.get(square as Square);
-            const i = row * 8 + col;
-            const isSelected = selected === square;
-            const isHighlight = highlight === square;
 
-            return (
-              <div
-                key={square}
-                className={cn(
-                  "relative w-full h-full aspect-square cursor-pointer",
-                  getSquareColor(i),
-                  isSelected && "ring-2 ring-yellow-400",
-                  isHighlight &&
-                    "before:absolute before:inset-0 before:bg-red-500/40"
-                )}
-                onClick={() => handleSquareClick(square)}
-              >
-                {piece && (
-                  <Image
-                    src={getPieceImg(piece)}
-                    alt={`${piece.color}${piece.type}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 480px"
-                    className="object-contain select-none pointer-events-none"
-                    priority
-                  />
-                )}
-              </div>
-            );
-          });
-        })}
+      {/* Board wrapper that flips the board for Black */}
+      <div className={chess.turn() === "b" ? "rotate-180" : ""}>
+        <div
+          ref={boardRef}
+          className="grid grid-cols-8 w-full aspect-square rounded overflow-hidden border border-neutral-400"
+        >
+          {[...Array(8)].map((_, rowIdx) => {
+            const row = 7 - rowIdx;
+            return [...Array(8)].map((_, col) => {
+              const square = String.fromCharCode(97 + col) + (row + 1);
+              const piece = chess.get(square as Square);
+              const i = row * 8 + col;
+              const isSelected = selected === square;
+              const isHighlight = highlight === square;
+
+              return (
+                <div
+                  key={square}
+                  className={cn(
+                    "relative w-full h-full aspect-square cursor-pointer",
+                    getSquareColor(i),
+                    isSelected && "ring-2 ring-yellow-400",
+                    isHighlight &&
+                      "before:absolute before:inset-0 before:bg-red-500/40"
+                  )}
+                  onClick={() => handleSquareClick(square)}
+                >
+                  {piece && (
+                    <Image
+                      src={getPieceImg(piece)}
+                      alt={`${piece.color}${piece.type}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 480px"
+                      className={cn(
+                        "object-contain select-none pointer-events-none",
+                        chess.turn() === "b" && "rotate-180"
+                      )}
+                      priority
+                    />
+                  )}
+                </div>
+              );
+            });
+          })}
+        </div>
       </div>
     </div>
   );
