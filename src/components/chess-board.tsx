@@ -12,11 +12,10 @@ type Props = {
   fen: string;
   solution: string[];
   solvedIndex: number;
-  onMove: (move: string) => void;
+  onMove: (move: string, isCorrect: boolean) => void;
   highlight: string | null;
   isSessionActive: boolean;
 };
-
 
 export function ChessBoard({
   fen,
@@ -26,7 +25,6 @@ export function ChessBoard({
   highlight,
   isSessionActive,
 }: Props) {
-
   const [selected, setSelected] = useState<string | null>(null);
   const [chess, setChess] = useState(() => new Chess(fen));
   const boardRef = useRef<HTMLDivElement>(null);
@@ -47,8 +45,12 @@ export function ChessBoard({
   const getPieceImg = (piece: any) => {
     const color = piece.color === "w" ? "white" : "black";
     const typeMap: Record<string, string> = {
-      p: "pawn", n: "knight", b: "bishop",
-      r: "rook", q: "queen", k: "king",
+      p: "pawn",
+      n: "knight",
+      b: "bishop",
+      r: "rook",
+      q: "queen",
+      k: "king",
     };
     return `/piece_images/${color}_${typeMap[piece.type]}.png`;
   };
@@ -71,14 +73,14 @@ export function ChessBoard({
     const move = { from: selected, to: square, promotion: "q" };
     const moveStr = move.from + move.to;
 
-    if (moveStr === solution[solvedIndex]) {
+    const isCorrect = moveStr === solution[solvedIndex];
+
+    if (isCorrect) {
       chess.move(move);
-      onMove(moveStr);
       setChess(new Chess(chess.fen()));
-    } else {
-      alert("❌ Incorrect move. Try again.");
     }
 
+    onMove(moveStr, isCorrect); // 💥 Always call onMove
 
     setSelected(null);
   };
@@ -86,7 +88,10 @@ export function ChessBoard({
   const turnText = chess.turn() === "w" ? "White to move" : "Black to move";
 
   return (
-    <div className="w-full max-w-[480px] mx-auto transition-opacity" style={{ opacity: isSessionActive ? 1 : 0.5 }}>
+    <div
+      className="w-full max-w-[480px] mx-auto transition-opacity"
+      style={{ opacity: isSessionActive ? 1 : 0.5 }}
+    >
       <p className="text-center text-muted-foreground mb-2">{turnText}</p>
       <div
         ref={boardRef}
@@ -109,7 +114,8 @@ export function ChessBoard({
                   "relative w-full h-full aspect-square cursor-pointer",
                   getSquareColor(i),
                   isSelected && "ring-2 ring-yellow-400",
-                  isHighlight && "before:absolute before:inset-0 before:bg-red-500/40"
+                  isHighlight &&
+                    "before:absolute before:inset-0 before:bg-red-500/40"
                 )}
                 onClick={() => handleSquareClick(square)}
               >
@@ -122,7 +128,6 @@ export function ChessBoard({
                     className="object-contain select-none pointer-events-none"
                     priority
                   />
-
                 )}
               </div>
             );
