@@ -29,6 +29,27 @@ type PuzzleSet = {
   puzzle_index: number;
 };
 
+type PuzzleData = {
+  puzzle: Puzzle;
+  game: Game;
+};
+
+type Puzzle = {
+  id: string;
+  initialPly: number;
+  solution: string[];
+  set_id: number;
+  repeat_index: number;
+  puzzle_index: number;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type Game = {
+  pgn: string;
+};
+
 export default function PuzzlesPage() {
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
@@ -309,21 +330,24 @@ export default function PuzzlesPage() {
     return await response.json();
   };
 
-  const loadPuzzleAndInitialize = async (puzzle: PuzzleData) => {
-    console.log("Initializing puzzle:", puzzle);
+  const loadPuzzleAndInitialize = async (puzzleData: PuzzleData) => {
+    console.log("Initializing puzzle:", puzzleData);
 
-    const fen = getFenAtPly(puzzle.game.pgn, puzzle.puzzle.initialPly + 1);
+    const fen = getFenAtPly(
+      puzzleData.game.pgn,
+      puzzleData.puzzle.initialPly + 1
+    );
     setFen(fen);
-    setSolution(puzzle.puzzle.solution);
+    setSolution(puzzleData.puzzle.solution);
     setSolvedIndex(0);
     setHighlight(null);
-    logVerboseSolution(puzzle.puzzle.solution, fen);
+    logVerboseSolution(puzzleData.puzzle.solution, fen);
 
-    console.log("Puzzleid", puzzle.puzzle.id);
+    console.log("Puzzleid", puzzleData.puzzle.id);
     console.log("Initializing fen:", fen);
-    console.log("This is the solution:", puzzle.puzzle.solution);
-    console.log("initial play is:", puzzle.puzzle.initialPly);
-    console.log("fen is:", puzzle.puzzle.initialPly);
+    console.log("This is the solution:", puzzleData.puzzle.solution);
+    console.log("initial play is:", puzzleData.puzzle.initialPly);
+    console.log("fen is:", puzzleData.puzzle.initialPly);
   };
 
   const handleSetSelect = async (setId: number) => {
@@ -570,7 +594,7 @@ export default function PuzzlesPage() {
                   Set: {currentRepeatIndex} / {set.repeats}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Puzzle: {currentPuzzleIndex} / {set.size}
+                  Puzzle: {currentPuzzleIndex+1} / {set.size}
                 </div>
               </CardContent>
               <CardFooter>
@@ -643,9 +667,9 @@ export default function PuzzlesPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       Show Solution
                     </Button>
-                    <Button onClick={() => handleNextPuzzle()}>
+                    {/* <Button onClick={() => handleNextPuzzle()}>
                       Next Puzzle
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardFooter>
               </Card>
