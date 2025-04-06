@@ -13,7 +13,6 @@ import {
   Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 export default function AccuracyStatsPage() {
   const [userId, setUserId] = useState<string | null>(null);
