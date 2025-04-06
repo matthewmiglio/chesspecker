@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("chessPeckerProgressStats")
+    .from("chessPeckerSetAccuracies")
     .select("correct, incorrect")
     .eq("set_id", set_id)
     .eq("repeat_index", repeat_index)
