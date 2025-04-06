@@ -1,38 +1,49 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import type { User } from "@/lib/types";
-
 
 const verbose = true;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verbose) { console.log("Login attempt with:", { email, password }) }
+    if (verbose) {
+      console.log("Login attempt with:", { email, password });
+    }
 
     // Fetch users
     const getChessPeckerUsers = async (): Promise<User[]> => {
       const res = await fetch("/api/getUsers");
-      const data: User[] = await res.json();  // Explicitly type the data
-      if (verbose) { console.log("data:", data) };
+      const data: User[] = await res.json(); // Explicitly type the data
+      if (verbose) {
+        console.log("data:", data);
+      }
       return data;
     };
 
     const chessPeckerUsers = await getChessPeckerUsers();
-    if (verbose) { console.log('chessPeckerUsers:', chessPeckerUsers) };
+    if (verbose) {
+      console.log("chessPeckerUsers:", chessPeckerUsers);
+    }
 
     // Check if this user exists
     const user = chessPeckerUsers.find(
@@ -41,21 +52,20 @@ export default function LoginPage() {
 
     if (user) {
       sessionStorage.setItem("user_id", user.user_id.toString());
-      alert("Logged in successfully");
       window.location.href = "/dashboard";
     } else {
       alert("Invalid email or password");
     }
-
   };
-
 
   return (
     <div className="flex justify-center items-center min-h-[80vh]">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Log In</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -73,7 +83,10 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -100,6 +113,5 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
-

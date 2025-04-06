@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChessBoard } from "@/components/chess-board";
-import { initialize } from "next/dist/server/lib/render-server";
 
 type PuzzleSet = {
   set_id: number;
@@ -39,21 +38,68 @@ export default function PuzzlesPage() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const [solvedIndex, setSolvedIndex] = useState<number>(0);
   const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
+  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
+  const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
+  const [currentPuzzleId, setCurrentPuzzleId] = useState<string>("");
+
+  const fetchUserSetData = async () => {
+    const response = await fetch("/api/getSet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: sessionStorage.getItem("user_id") }),
+    });
+    const result = await response.json();
+    console.log("fetchUserSetData() response:", response);
+    console.log("fetchUserSetData() result:", result);
+    setUserSets(result.sets);
+  };
 
   useEffect(() => {
-    const fetchUserSetData = async () => {
-      const response = await fetch("/api/getSet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: sessionStorage.getItem("user_id") }),
-      });
-      const result = await response.json();
-      setUserSets(result.sets || []);
-      console.log("fetchUserSetData() response:", response);
-      console.log("fetchUserSetData() result:", result);
-    };
     fetchUserSetData();
   }, []);
+
+  const handleStartSession = async () => {
+    console.log("handleStartSession()");
+    setIsSessionActive(true);
+    if (!selectedSetId) {
+      console.log("no selected session so cant handle session start");
+      return;
+    }
+    var { repeat_index, puzzle_index, size, repeats } = await getSetProgress(
+      selectedSetId
+    );
+
+    setCurrentPuzzleIndex(puzzle_index);
+    setCurrentRepeatIndex(repeat_index);
+  };
+
+  const removeSetGivenId = (setId: number) => async () => {
+    try {
+      const res = await fetch("/api/removeSet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Failed to delete set");
+
+      console.log("Set deleted successfully:", setId);
+      // optionally refresh or update state here
+    } catch (err) {
+      console.error("Error deleting set:", err);
+    }
+
+    //if the set is deleted, remove it from the userSets state
+    setUserSets((prevSets) => prevSets.filter((set) => set.set_id !== setId));
+    //if the set is deleted, remove it from the selectedSetId state
+    if (selectedSetId === setId) {
+      setSelectedSetId(null);
+    }
+    //if the set is deleted, remove it from the sessionStorage
+    sessionStorage.removeItem("selected_set_id");
+  };
 
   const getFenAtPly = (pgn: string, initialPly: number) => {
     const chess = new Chess();
@@ -92,6 +138,17 @@ export default function PuzzlesPage() {
     console.log(replay.ascii());
 
     return replay.fen();
+  };
+
+  const setIsDone = () => {
+    const set = userSets.find((s) => s.set_id === selectedSetId);
+    if (!set) return false;
+    if (currentRepeatIndex > set.repeats) {
+      console.log("This set is done. No more puzzles to solve.");
+      return true;
+    }
+    console.log("This set is apparently not done. Keeping on solving...");
+    return false;
   };
 
   const logVerboseSolution = (solution: string[], fen: string) => {
@@ -170,6 +227,7 @@ export default function PuzzlesPage() {
   };
 
   const handleSetSelect = async (setId: number) => {
+    console.log("handleSetSelect()");
     console.log("selected this set id:", setId);
     setSelectedSetId(setId);
     setIsSessionActive(false);
@@ -211,8 +269,49 @@ export default function PuzzlesPage() {
     }
   };
 
+  const getPuzzleSize = () => {
+    const set = userSets.find((s) => s.set_id === selectedSetId);
+    if (!set) return 0;
+    return set.size;
+  };
+
+  const getLoadedPuzzleCount = () => {
+    const set = userSets.find((s) => s.set_id === selectedSetId);
+    if (!set) return 0;
+    return set.puzzle_ids.length;
+  };
+
+  const shouldLoadPuzzle = () => {
+    if (getLoadedPuzzleCount() < getPuzzleSize()) {
+      console.log("Loading new puzzle...");
+      return true;
+    } else {
+      console.log("No new puzzle to load.");
+      return false;
+    }
+  };
+
+  const generateAndAddPuzzle = async (setId: number) => {
+    console.log("Generating then adding a new puzzle to this set...");
+    const set = userSets.find((s) => s.set_id === setId);
+    if (!set) return;
+    const randomDiff =
+      set.difficulties[Math.floor(Math.random() * set.difficulties.length)];
+    const puzzle = await generateNewPuzzle(randomDiff);
+    const puzzleId = puzzle.puzzle.id;
+    setCurrentPuzzleId(puzzleId);
+    console.log(
+      "just updated current puzzle id to this new puzzle id:",
+      puzzleId
+    );
+    await addPuzzleIdToSetGivenId(setId, puzzleId);
+    console.log("Just added a puzzle to this sets list: puzzle ID:", puzzleId);
+  };
+
   const incrementPuzzleIndex = async () => {
     const setId = selectedSetId;
+    console.log("Incrementing puzzle index");
+
     if (!setId) {
       console.log("No set selected so cant handleNextPuzzle()!");
       return;
@@ -225,64 +324,76 @@ export default function PuzzlesPage() {
     }
     var { repeat_index, puzzle_index, size, repeats } = currentSetProgress;
 
-    //if this puzzle set is done
     if (puzzle_index + 1 == size) {
-      console.log("User finished this set!");
-      puzzle_index = 0; //reset puzzle index
-
-      //if all sets are done
-      if (repeat_index + 1 == repeats) {
-        console.log("User finished all sets!");
-        return;
-      }
-
-      //if not all sets are done
-      else {
-        console.log("User is moving to the next repeat.");
-        repeat_index = repeat_index + 1; //increment repeat index
-        await setSetProgress(setId, repeat_index + 1, 0);
-      }
+      (puzzle_index = 0), repeat_index++;
+    } else {
+      puzzle_index++;
     }
 
-    //if this puzzle set is not done
-    console.log("User is moving to the next puzzle.");
-    await setSetProgress(setId, repeat_index, puzzle_index + 1);
+    await setSetProgress(setId, repeat_index, puzzle_index);
+
+    setCurrentPuzzleIndex(puzzle_index);
+    setCurrentRepeatIndex(repeat_index); //insert set incrementing logic here
 
     return puzzle_index;
   };
 
+  const puzzleIsFinished = () => {
+    if (solution.length + 1 == solvedIndex) {
+      console.log("Puzzle is finished. Moving to next puzzle.");
+      return true;
+    } else {
+      console.log("Puzzle isn't finished. Not moving to next puzzle.");
+      return false;
+    }
+  };
+
   const handleNextPuzzle = async () => {
+    console.log(
+      "########################   NEXT PUZZLE   ########################"
+    );
+    console.log(
+      "########################   NEXT PUZZLE   ########################"
+    );
+    console.log(
+      "########################   NEXT PUZZLE   ########################"
+    );
     console.log("handleNextPuzzle():");
     console.log("-solution", solution);
     console.log("-solvedIndex", solvedIndex);
     console.log("-isSessionActive", isSessionActive);
     console.log("-Soluition length is", solution.length);
-    if (solution.length + 1 == solvedIndex) {
-      console.log("Puzzle is finished. Moving to next puzzle.");
-    } else {
+
+    if (setIsDone()) {
+      console.log("This set is done. No more puzzles to solve.");
+      alert("This set is done. No more puzzles to solve.");
+      return;
+    }
+
+    if (!puzzleIsFinished) {
       console.log("Puzzle isn't finished. Not moving to next puzzle.");
+      return;
     }
+
+    if (shouldLoadPuzzle()) {
+      console.log("Before moving to next puzzle, loading a new one...");
+      await generateAndAddPuzzle(selectedSetId!);
+      await fetchUserSetData();
+    } else {
+      console.log("No new puzzle to load before moving to next puzzle");
+    }
+    console.log("this puzzle index is", currentPuzzleIndex);
     const puzzleIndex = await incrementPuzzleIndex();
-    const setId = selectedSetId;
-    if (!setId) {
-      console.log("No set selected so cant handleNextPuzzle()!");
-      return;
-    }
+    console.log("incremented puzzle index to", puzzleIndex);
+    console.log("Here is the puzzle id were about to load", currentPuzzleId);
+    const puzzle = await getPuzzleData(currentPuzzleId);
 
-    const set = userSets.find((s) => s.set_id === setId);
-    if (!set) {
-      console.log("No set found with the selected set ID.");
-      return;
-    }
-    const puzzleId = set.puzzle_ids[puzzleIndex];
-    const puzzle = await getPuzzleData(puzzleId);
-
-    console.log("puzzleId", puzzleId);
-    console.log("puzzle", puzzle);
     if (puzzle) {
       await loadPuzzleAndInitialize(puzzle);
+      console.log("Successfully loaded the next puzzle");
+    } else {
+      console.log("Failed to load the next puzzle");
     }
-    loadPuzzleAndInitialize(puzzle);
   };
 
   const getSetProgress = async (set_id: number) => {
@@ -294,7 +405,7 @@ export default function PuzzlesPage() {
 
     if (!response.ok) return null;
     const result = await response.json();
-    return result.progress; // Optional: simplify result shape
+    return result.progress;
   };
 
   const setSetProgress = async (
@@ -393,10 +504,10 @@ export default function PuzzlesPage() {
                   ))}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Set: {set.repeat_index} / {set.repeats}
+                  Set: {currentRepeatIndex} / {set.repeats}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Puzzles: {set.puzzle_index} / {set.size}
+                  Puzzles: {currentPuzzleIndex} / {set.size}
                 </div>
               </CardContent>
               <CardFooter>
@@ -405,6 +516,15 @@ export default function PuzzlesPage() {
                   variant={selectedSetId === set.set_id ? "default" : "outline"}
                 >
                   {selectedSetId === set.set_id ? "Selected" : "Select"}
+                </Button>
+              </CardFooter>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  variant="destructive"
+                  onClick={removeSetGivenId(set.set_id)}
+                >
+                  Delete
                 </Button>
               </CardFooter>
             </Card>
@@ -444,7 +564,11 @@ export default function PuzzlesPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={() => setIsSessionActive(true)}>
+                    <Button
+                      onClick={() => {
+                        handleStartSession();
+                      }}
+                    >
                       Start Session
                     </Button>
                     <Button
