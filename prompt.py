@@ -89,10 +89,6 @@ if __name__ == "__main__":
         r"H:\my_files\my_programs\chesspecker\src\app\api\getSetAccuracy\route.ts",
         r'H:\my_files\my_programs\chesspecker\src\app\api\getSet\route.ts',
         r'H:\my_files\my_programs\chesspecker\src\app\api\getUsers\route.ts',
-        r'',
-        r'',
-        r'',
-        r'',
     ]
 
     ignore_folders = [

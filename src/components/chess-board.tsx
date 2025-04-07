@@ -13,10 +13,10 @@ type Props = {
 };
 
 type PiecePosition = {
+  id: string; // unique per piece
   square: Square;
   type: string;
   color: "w" | "b";
-  key: string;
 };
 
 export function ChessBoard({
@@ -36,7 +36,7 @@ export function ChessBoard({
   // Helpers
   const squareToCoords = (square: Square) => {
     const file = square.charCodeAt(0) - "a".charCodeAt(0);
-    const rank = parseInt(square[1]) - 1;
+    const rank = 8 - parseInt(square[1]);
     return { x: file, y: rank };
   };
 
@@ -59,16 +59,19 @@ export function ChessBoard({
     return `/piece_images/${color}_${typeMap[piece.type]}.png`;
   };
 
+  const generatePieceId = (square: Square, piece: any) =>
+    `${piece.color}${piece.type}-${square}`;
+
   const updatePiecePositions = () => {
     const newPieces: PiecePosition[] = [];
     SQUARES.forEach((square) => {
       const piece = chess.get(square);
       if (piece) {
         newPieces.push({
+          id: generatePieceId(square, piece),
           square,
           type: piece.type,
           color: piece.color,
-          key: `${square}-${piece.color}${piece.type}`,
         });
       }
     });
@@ -80,15 +83,16 @@ export function ChessBoard({
     c.load(fen);
     setChess(c);
     setSelected(null);
+
     const newPieces: PiecePosition[] = [];
     SQUARES.forEach((square) => {
       const piece = c.get(square);
       if (piece) {
         newPieces.push({
+          id: generatePieceId(square, piece),
           square,
           type: piece.type,
           color: piece.color,
-          key: `${square}-${piece.color}${piece.type}`,
         });
       }
     });
@@ -125,7 +129,6 @@ export function ChessBoard({
   };
 
   const turnText = chess.turn() === "w" ? "White to move" : "Black to move";
-
   const isFlipped = chess.turn() === "b";
 
   return (
@@ -166,16 +169,14 @@ export function ChessBoard({
           {/* Animated Pieces */}
           {pieces.map((p) => {
             const { x, y } = squareToCoords(p.square);
-            const left = `${(x / 8) * 100}%`;
-            const top = `${((7 - y) / 8) * 100}%`; // invert Y for top-to-bottom board
 
             return (
               <div
-                key={p.key}
-                className="absolute transition-all duration-300 ease-in-out pointer-events-none"
+                key={p.id}
+                className="absolute transition-transform duration-300 ease-in-out pointer-events-none"
                 style={{
-                  left,
-                  top,
+                  left: `${x * 12.5}%`,
+                  top: `${y * 12.5}%`,
                   width: "12.5%",
                   height: "12.5%",
                 }}
