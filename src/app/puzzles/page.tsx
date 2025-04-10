@@ -68,9 +68,6 @@ export default function PuzzlesPage() {
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
 
   const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
-    console.log("addIncorrectAttempt()");
-    console.log("-setId", setId);
-    console.log("-repeatIndex", repeatIndex);
     try {
       const res = await fetch("/api/addIncorrect", {
         method: "POST",
@@ -83,12 +80,6 @@ export default function PuzzlesPage() {
       if (!res.ok)
         throw new Error(data.error || "Failed to add incorrect attempt");
 
-      console.log(
-        "Added incorrect attempt for set",
-        setId,
-        "repeat",
-        repeatIndex
-      );
       return true;
     } catch (err) {
       console.error("Error adding incorrect attempt:", err);
@@ -97,9 +88,6 @@ export default function PuzzlesPage() {
   };
 
   const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
-    console.log("addCorrectAttempt()");
-    console.log("-setId", setId);
-    console.log("-repeatIndex", repeatIndex);
     try {
       const res = await fetch("/api/addCorrect", {
         method: "POST",
@@ -112,12 +100,6 @@ export default function PuzzlesPage() {
       if (!res.ok)
         throw new Error(data.error || "Failed to add correct attempt");
 
-      console.log(
-        "Added correct attempt for set",
-        setId,
-        "repeat",
-        repeatIndex
-      );
       return true;
     } catch (err) {
       console.error("Error adding correct attempt:", err);
@@ -132,8 +114,7 @@ export default function PuzzlesPage() {
       body: JSON.stringify({ user_id: sessionStorage.getItem("user_id") }),
     });
     const result = await response.json();
-    console.log("fetchUserSetData() response:", response);
-    console.log("fetchUserSetData() result:", result);
+
     setUserSets(result.sets);
   };
 
@@ -149,18 +130,11 @@ export default function PuzzlesPage() {
         body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
       });
 
-      console.log("getSetAccuracy() response", res);
-
       const data = await res.json();
-      console.log("getSetAccuracy() data", data);
 
       if (!res.ok)
         throw new Error(data.error || "Failed to fetch accuracy stats");
 
-      console.log(
-        `Accuracy stats for set ${setId} repeat ${repeatIndex}:`,
-        data
-      );
       return { correct: data.correct, incorrect: data.incorrect };
     } catch (err) {
       console.error("Error fetching set accuracy:", err);
@@ -169,39 +143,24 @@ export default function PuzzlesPage() {
   };
 
   const updateSessionAccuracy = async () => {
-    console.log("updateSessionAccuracy()");
-    console.log("-selectedSetId", selectedSetId);
-    console.log("-currentRepeatIndex", currentRepeatIndex);
     if (!selectedSetId || (!currentRepeatIndex && currentRepeatIndex != 0)) {
-      console.log(
-        "There is no set id or no currentRepeatIndex so cant update accuracy"
-      );
-      console.log("selectedSetId", selectedSetId);
-      console.log("currentRepeatIndex", currentRepeatIndex);
       return;
     }
     const accuracy = await getSetAccuracy(selectedSetId, currentRepeatIndex);
-    console.log("accuracy", accuracy);
     if (accuracy) {
       const totalAttempts = accuracy.correct + accuracy.incorrect;
       setSessionCompletedPuzzles(totalAttempts);
-      console.log("Updated sessionCompletedPuzzles with:", totalAttempts);
       if (totalAttempts > 0) {
         const accuracyPercentage = (accuracy.correct / totalAttempts) * 100;
         setSessionAccuracy(accuracyPercentage);
-        console.log("Just set session accuracy to:", accuracyPercentage);
       } else {
-        console.log("No attempts. Setting accuracy to 0%.");
         setSessionAccuracy(0);
       }
-    } else console.log("No accuracy data found for this set.");
+    }
   };
 
   const updatePuzzleProgress = async () => {
-    console.log("updatePuzzleProgress()");
-
     if (!selectedSetId) {
-      console.log("No set selected so cant update puzzle progress!");
       return;
     }
 
@@ -209,17 +168,13 @@ export default function PuzzlesPage() {
       selectedSetId
     );
 
-    console.log("setCurrentPuzzleIndex() to puzzle_index:", puzzle_index);
-    console.log("setCurrentRepeatIndex() to repeat_index:", repeat_index);
     setCurrentPuzzleIndex(puzzle_index);
     setCurrentRepeatIndex(repeat_index);
   };
 
   const handleStartSession = async () => {
-    console.log("handleStartSession()");
     setIsSessionActive(true);
     if (!selectedSetId) {
-      console.log("no selected session so cant handle session start");
       return;
     }
     await updateSessionAccuracy();
@@ -237,8 +192,6 @@ export default function PuzzlesPage() {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Failed to delete set");
-
-      console.log("Set deleted successfully:", setId);
     } catch (err) {
       console.error("Error deleting set:", err);
     }
@@ -256,21 +209,11 @@ export default function PuzzlesPage() {
     const history = chess.history({ verbose: true });
     const replay = new Chess();
 
-    console.log(
-      `Replaying ${Math.min(
-        initialPly - 1,
-        history.length
-      )} moves to reach puzzle state...`
-    );
-
     // Replay up to (but not including) the move at initialPly
     for (let i = 0; i < initialPly && i < history.length; i++) {
       const move = history[i];
       replay.move(move);
     }
-
-    console.log("Board at FEN setup:");
-    console.log(replay.ascii());
 
     return replay.fen();
   };
@@ -278,14 +221,9 @@ export default function PuzzlesPage() {
   const setIsDone = () => {
     const set = userSets.find((s) => s.set_id === selectedSetId);
     if (!set) return false;
-    console.log("setIsDone()");
-    console.log("set.repeats", set.repeats);
-    console.log("currentRepeatIndex", currentRepeatIndex);
     if (currentRepeatIndex === set.repeats) {
-      console.log("This set is done. No more puzzles to solve.");
       return true;
     }
-    console.log("This set is apparently not done. Keeping on solving...");
     return false;
   };
 
@@ -316,7 +254,6 @@ export default function PuzzlesPage() {
       const desc = `${colorName} ${typeMap[piece.type]} ${move.from} to ${
         move.to
       }`;
-      console.log(`Step ${i + 1}: ${desc}`);
       chess.move(move); // advance state
     });
   };
@@ -324,15 +261,12 @@ export default function PuzzlesPage() {
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
 
   const getPuzzleData = async (puzzleId: string) => {
-    console.log("Retrieving this puzzle ID#", puzzleId);
     const response = await fetch(`/api/getPuzzleById?id=${puzzleId}`);
     if (!response.ok) return null;
     return await response.json();
   };
 
   const loadPuzzleAndInitialize = async (puzzleData: PuzzleData) => {
-    console.log("Initializing puzzle:", puzzleData);
-
     const fen = getFenAtPly(
       puzzleData.game.pgn,
       puzzleData.puzzle.initialPly + 1
@@ -342,19 +276,10 @@ export default function PuzzlesPage() {
     setSolvedIndex(0);
     setHighlight(null);
     logVerboseSolution(puzzleData.puzzle.solution, fen);
-
-    console.log("Puzzleid", puzzleData.puzzle.id);
-    console.log("Initializing fen:", fen);
-    console.log("This is the solution:", puzzleData.puzzle.solution);
-    console.log("initial play is:", puzzleData.puzzle.initialPly);
-    console.log("fen is:", puzzleData.puzzle.initialPly);
   };
 
   const handleSetSelect = async (setId: number) => {
-    console.log("handleSetSelect()");
-    console.log("selected this set id:", setId);
     setSelectedSetId(setId);
-    console.log('Updated session with "selected_set_id":', setId);
     setIsSessionActive(false);
     sessionStorage.setItem("selected_set_id", String(setId));
     const set = userSets.find((s) => s.set_id === setId);
@@ -369,14 +294,10 @@ export default function PuzzlesPage() {
 
     const currentIndex = set.puzzle_index;
 
-    console.log("the puzzle index is at:", currentIndex);
     const puzzleIds = set.puzzle_ids;
     setPuzzleIds(puzzleIds);
-    console.log("updated puzzle ids with", puzzleIds);
     const puzzleId = puzzleIds[currentIndex];
     const puzzle = await getPuzzleData(puzzleId);
-    console.log("puzzleId", puzzleId);
-    console.log("puzzle", puzzle);
     if (puzzle) {
       await loadPuzzleAndInitialize(puzzle);
     }
@@ -384,16 +305,12 @@ export default function PuzzlesPage() {
 
   const incrementPuzzleIndex = async () => {
     const setId = selectedSetId;
-    console.log("Incrementing puzzle index");
 
     if (!setId) {
-      console.log("No set selected so cant handleNextPuzzle()!");
       return;
     }
     const currentSetProgress = await getSetProgress(selectedSetId);
-    console.log("This user's set progress:", currentSetProgress);
     if (!currentSetProgress) {
-      console.log("No set progress found for this user.");
       return;
     }
     var { repeat_index, puzzle_index, size, repeats } = currentSetProgress;
@@ -414,44 +331,28 @@ export default function PuzzlesPage() {
 
   const puzzleIsFinished = () => {
     if (solution.length + 1 == solvedIndex) {
-      console.log("Puzzle is finished. Moving to next puzzle.");
       return true;
     } else {
-      console.log("Puzzle isn't finished. Not moving to next puzzle.");
       return false;
     }
   };
 
   const handleNextPuzzle = async () => {
-    console.log("handleNextPuzzle():");
-    console.log("-solution", solution);
-    console.log("-solvedIndex", solvedIndex);
-    console.log("-isSessionActive", isSessionActive);
-    console.log("-Soluition length is", solution.length);
-
     if (setIsDone()) {
-      console.log("This set is done. No more puzzles to solve.");
       showConfetti();
       return;
     }
 
     if (!puzzleIsFinished) {
-      console.log("Puzzle isn't finished. Not moving to next puzzle.");
       return;
     }
 
-    console.log("this puzzle index is", currentPuzzleIndex);
     const puzzleIndex = await incrementPuzzleIndex();
-    console.log("incremented puzzle index to", puzzleIndex);
     const puzzleId = puzzleIds[puzzleIndex];
-    console.log("Here is the puzzle id were about to load", puzzleId);
     const puzzle = await getPuzzleData(puzzleId);
 
     if (puzzle) {
       await loadPuzzleAndInitialize(puzzle);
-      console.log("Successfully loaded the next puzzle");
-    } else {
-      console.log("Failed to load the next puzzle");
     }
 
     await updateSessionAccuracy();
@@ -485,10 +386,8 @@ export default function PuzzlesPage() {
   };
 
   const handleIncorrectMove = async () => {
-    console.log("handleIncorrectMove()");
     const setId = selectedSetId;
     if (!setId) {
-      console.log("No set selected so cant handle invalid move!");
       return;
     }
     await addIncorrectAttempt(selectedSetId, currentRepeatIndex);
@@ -497,10 +396,8 @@ export default function PuzzlesPage() {
   };
 
   const handleSuccessfulPuzzle = async () => {
-    console.log("Handle puzzle solution logic here!");
     const setId = selectedSetId;
     if (!setId) {
-      console.log("No set selected so cant handle puzzle solution move!");
       return;
     }
     await addCorrectAttempt(selectedSetId, currentRepeatIndex);
@@ -540,45 +437,10 @@ export default function PuzzlesPage() {
     }, 1000);
   };
 
-  const showSparkles = () => {
-    confetti({
-      particleCount: 50,
-      spread: 50,
-      origin: { y: 0.4 },
-      colors: ["#00FF9C", "#b9fbc0", "#00FFC8"],
-      scalar: 1.2,
-    });
-  };
-
-  const dropEmoji = (emoji: string = "🥳") => {
-    const div = document.createElement("div");
-    div.innerText = emoji;
-    div.className =
-      "fixed top-0 left-1/2 transform -translate-x-1/2 text-5xl animate-bounce z-[1000]";
-    document.body.appendChild(div);
-
-    setTimeout(() => {
-      div.remove();
-    }, 1200);
-  };
-
-  const flashRedScreen = () => {
-    const flash = document.createElement("div");
-    flash.className =
-      "fixed inset-0 bg-red-500 opacity-50 animate-fade z-[999]";
-    document.body.appendChild(flash);
-
-    setTimeout(() => {
-      document.body.removeChild(flash);
-    }, 100);
-  };
-
   const handleMove = (move: string, isCorrect: boolean) => {
-    console.log("handleMove():", move, "isCorrect:", isCorrect);
     if (!isSessionActive) return;
 
     if (!isCorrect) {
-      console.log("User made an incorrect move!");
       showRedX();
       handleIncorrectMove();
       return;
@@ -586,9 +448,7 @@ export default function PuzzlesPage() {
 
     // ✅ Correct move logic
     showGreenCheck();
-    console.log("User made the correct move!");
     setSolvedIndex((i) => i + 2);
-    console.log("User just inputted solution move #:", solvedIndex + 1);
     const chess = new Chess();
 
     //make the computer move after the solution move
@@ -607,10 +467,8 @@ export default function PuzzlesPage() {
 
     //check for puzzle completion
     if (solvedIndex + 1 === solution.length) {
-      console.log("User just solved the puzzle! 🎉");
       handleSuccessfulPuzzle();
     } else {
-      console.log("There's still more puzzle to do!");
     }
   };
 
