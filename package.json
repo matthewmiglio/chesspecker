@@ -25,6 +25,7 @@
     "next": "15.2.4",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
+    "react-chessboard": "^4.7.2",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.2",
     "supabase": "^2.20.5",

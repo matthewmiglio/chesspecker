@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChessBoard } from "@/components/chess-board";
+import  AnimatedBoard from "@/components/chess-board";
 
 type PuzzleSet = {
   set_id: number;
@@ -546,7 +546,7 @@ export default function PuzzlesPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-center mb-6">
-                    <ChessBoard
+                    <AnimatedBoard
                       fen={fen}
                       solution={solution}
                       solvedIndex={solvedIndex}
