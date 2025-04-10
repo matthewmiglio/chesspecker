@@ -210,7 +210,6 @@ export default function PuzzlesPage() {
     const history = chess.history({ verbose: true });
     const replay = new Chess();
 
-    // Replay up to (but not including) the move at initialPly
     for (let i = 0; i < initialPly && i < history.length; i++) {
       const move = history[i];
       replay.move(move);
@@ -255,7 +254,7 @@ export default function PuzzlesPage() {
       const desc = `${colorName} ${typeMap[piece.type]} ${move.from} to ${
         move.to
       }`;
-      chess.move(move); // advance state
+      chess.move(move);
     });
   };
 
@@ -278,10 +277,9 @@ export default function PuzzlesPage() {
     setHighlight(null);
     logVerboseSolution(puzzleData.puzzle.solution, fen);
 
-    // NEW: detect which side is on move initially = player's side
     const initialGame = new Chess();
     initialGame.load(fen);
-    const playerSide = initialGame.turn(); // "w" or "b"
+    const playerSide = initialGame.turn();
     setPlayerSide(playerSide);
   };
 
@@ -331,7 +329,7 @@ export default function PuzzlesPage() {
     await setSetProgress(setId, repeat_index, puzzle_index);
 
     setCurrentPuzzleIndex(puzzle_index);
-    setCurrentRepeatIndex(repeat_index); //insert set incrementing logic here
+    setCurrentRepeatIndex(repeat_index);
 
     return puzzle_index;
   };
@@ -453,12 +451,10 @@ export default function PuzzlesPage() {
       return;
     }
 
-    // ✅ Correct move logic
     showGreenCheck();
     setSolvedIndex((i) => i + 2);
     const chess = new Chess();
 
-    //make the computer move after the solution move
     chess.load(fen);
     chess.move(move);
 
@@ -472,7 +468,6 @@ export default function PuzzlesPage() {
 
     setFen(chess.fen());
 
-    //check for puzzle completion
     if (solvedIndex + 1 === solution.length) {
       handleSuccessfulPuzzle();
     } else {

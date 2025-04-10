@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
   try {
     const res = await fetch(url.toString(), {
       headers: {
-        // Authorization: `Bearer ${process.env.NEXT_PUBLIC_LICHESS_KEY}`,
         Accept: "application/json",
       },
     });

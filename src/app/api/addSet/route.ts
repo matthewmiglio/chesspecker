@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         difficulties,
         size,
         repeats,
-        puzzle_ids: puzzleIds, // <-- use the actual list
+        puzzle_ids: puzzleIds,
       },
     ])
     .select();

@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data);
   } catch (err) {
     console.error("Failed to fetch puzzle by ID:", err);
-    return NextResponse.json({ error: "Failed to fetch puzzle" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch puzzle" },
+      { status: 500 }
+    );
   }
 }

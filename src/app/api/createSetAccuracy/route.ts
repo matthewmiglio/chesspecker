@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Insert if not found
   const { data, error } = await supabase
     .from("chessPeckerSetAccuracies")
     .insert([{ set_id, repeat_index: repeat_index, correct: 0, incorrect: 0 }]);

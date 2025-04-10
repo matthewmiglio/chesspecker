@@ -30,10 +30,9 @@ export default function LoginPage() {
       console.log("Login attempt with:", { email, password });
     }
 
-    // Fetch users
     const getChessPeckerUsers = async (): Promise<User[]> => {
       const res = await fetch("/api/getUsers");
-      const data: User[] = await res.json(); // Explicitly type the data
+      const data: User[] = await res.json();
       if (verbose) {
         console.log("data:", data);
       }
@@ -45,7 +44,6 @@ export default function LoginPage() {
       console.log("chessPeckerUsers:", chessPeckerUsers);
     }
 
-    // Check if this user exists
     const user = chessPeckerUsers.find(
       (user) => user.email === email && user.pass === password
     );

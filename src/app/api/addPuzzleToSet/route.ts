@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Missing set_id or puzzle_id" }, { status: 400 });
     }
 
-    // Fetch current puzzle_ids
     const { data: setData, error: fetchError } = await supabase
         .from("chessPeckerSets")
         .select("puzzle_ids")
@@ -34,7 +33,6 @@ export async function POST(req: NextRequest) {
 
     const updatedPuzzleIds = [...(setData.puzzle_ids || []), puzzle_id];
 
-    // Update the set with the new puzzle_id
     const { error: updateError } = await supabase
         .from("chessPeckerSets")
         .update({ puzzle_ids: updatedPuzzleIds })

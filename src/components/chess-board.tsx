@@ -9,8 +9,7 @@ interface Props {
   onMove: (move: string, isCorrect: boolean) => void;
   highlight: string | null;
   isSessionActive: boolean;
-  sideOnBottom: "w" | "b"; // NEW PROP
-}
+  sideOnBottom: "w" | "b";}
 
 export default function AnimatedBoard({
   fen,

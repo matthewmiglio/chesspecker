@@ -67,7 +67,6 @@ export default function CreatePuzzleSetPage() {
     repeats: number,
     name: string
   ) => {
-    //create the set table row
     const puzzleIds = await createNewPuzzleList(size, difficulties);
     console.log("addNewSetToDatabase()");
     console.log("puzzleIds:", puzzleIds);

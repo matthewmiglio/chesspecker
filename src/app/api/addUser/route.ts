@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
         .from("chessPeckerUsers")
         .insert([{ email, pass: password }])
-        .select(); // This forces the inserted row to be returned
+        .select();
 
 
     if (verbose) { console.log('addUser: data', data) };

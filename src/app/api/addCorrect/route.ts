@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing set_id or repeat_index" }, { status: 400 });
   }
 
-  // Step 1: Get the current value
   const { data, error: fetchError } = await supabase
     .from("chessPeckerSetAccuracies")
     .select("correct")
@@ -27,7 +26,6 @@ export async function POST(req: NextRequest) {
 
   const newCorrect = data.correct + 1;
 
-  // Step 2: Update the value
   const { error: updateError } = await supabase
     .from("chessPeckerSetAccuracies")
     .update({ correct: newCorrect })

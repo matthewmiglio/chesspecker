@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing set_id" }, { status: 400 });
   }
 
-  // Delete from chessPeckerSets
   const { error: setError } = await supabase
     .from("chessPeckerSets")
     .delete()
@@ -23,7 +22,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: setError.message }, { status: 500 });
   }
 
-  // Delete from chessPeckerSetAccuracies
   const { error: accError } = await supabase
     .from("chessPeckerSetAccuracies")
     .delete()
