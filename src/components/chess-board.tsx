@@ -30,6 +30,8 @@ export function ChessBoard({
   const [selected, setSelected] = useState<string | null>(null);
   const [chess, setChess] = useState(() => new Chess(fen));
   const [pieces, setPieces] = useState<PiecePosition[]>([]);
+  const pieceIdMap = useRef<Map<string, string>>(new Map());
+  const [lastPlayerToMove, setLastPlayerToMove] = useState<"w" | "b">("w");
 
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -59,16 +61,13 @@ export function ChessBoard({
     return `/piece_images/${color}_${typeMap[piece.type]}.png`;
   };
 
-  const generatePieceId = (square: Square, piece: any) =>
-    `${piece.color}${piece.type}-${square}`;
-
   const updatePiecePositions = () => {
     const newPieces: PiecePosition[] = [];
     SQUARES.forEach((square) => {
       const piece = chess.get(square);
       if (piece) {
         newPieces.push({
-          id: generatePieceId(square, piece),
+          id: generateStablePieceId(square, piece),
           square,
           type: piece.type,
           color: piece.color,
@@ -77,8 +76,17 @@ export function ChessBoard({
     });
     setPieces(newPieces);
   };
+  const generateStablePieceId = (square: Square, piece: any): string => {
+    const key = `${piece.color}${piece.type}-${square}`;
+    if (!pieceIdMap.current.has(key)) {
+      pieceIdMap.current.set(key, crypto.randomUUID());
+    }
+    return pieceIdMap.current.get(key)!;
+  };
 
   useEffect(() => {
+    pieceIdMap.current.clear(); // 🔄 clear map on board reset
+
     const c = new Chess();
     c.load(fen);
     setChess(c);
@@ -89,7 +97,7 @@ export function ChessBoard({
       const piece = c.get(square);
       if (piece) {
         newPieces.push({
-          id: generatePieceId(square, piece),
+          id: generateStablePieceId(square, piece),
           square,
           type: piece.type,
           color: piece.color,
@@ -118,18 +126,47 @@ export function ChessBoard({
     const moveStr = move.from + move.to;
     const isCorrect = moveStr === solution[solvedIndex];
 
+    setLastPlayerToMove(chess.turn()); // Cache who's making the move
     if (isCorrect) {
+      // Player's move
       chess.move(move);
-      setChess(new Chess(chess.fen()));
-      updatePiecePositions();
+
+      // Trigger piece animation visually
+      setPieces((prev) =>
+        prev
+          .filter((p) => p.square !== move.to) // preemptively remove captured piece
+          .map((p) =>
+            p.square === move.from ? { ...p, square: move.to as Square } : p
+          )
+      );
+
+      // Delay to allow animation
+      setTimeout(() => {
+        // Handle computer reply move (optional)
+        const replyUci = solution[solvedIndex + 1];
+        if (replyUci) {
+          const replyMove = {
+            from: replyUci.slice(0, 2),
+            to: replyUci.slice(2, 4),
+            promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
+          };
+          chess.move(replyMove);
+        }
+
+        updatePiecePositions(); // refresh from real chess state
+      }, 300);
     }
 
     onMove(moveStr, isCorrect);
     setSelected(null);
   };
 
+  const puzzleIsFinished = solvedIndex >= solution.length - 1;
+  const isFlipped = puzzleIsFinished
+    ? lastPlayerToMove === "b"
+    : chess.turn() === "b";
+
   const turnText = chess.turn() === "w" ? "White to move" : "Black to move";
-  const isFlipped = chess.turn() === "b";
 
   return (
     <div
@@ -169,16 +206,15 @@ export function ChessBoard({
           {/* Animated Pieces */}
           {pieces.map((p) => {
             const { x, y } = squareToCoords(p.square);
+            const translateX = x * 100;
+            const translateY = y * 100;
 
             return (
               <div
                 key={p.id}
-                className="absolute transition-transform duration-300 ease-in-out pointer-events-none"
+                className="absolute w-[12.5%] h-[12.5%] transition-transform duration-300 ease-in-out pointer-events-none"
                 style={{
-                  left: `${x * 12.5}%`,
-                  top: `${y * 12.5}%`,
-                  width: "12.5%",
-                  height: "12.5%",
+                  transform: `translate(${translateX}%, ${translateY}%)`,
                 }}
               >
                 <Image
