@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import  AnimatedBoard from "@/components/chess-board";
+import AnimatedBoard from "@/components/chess-board";
 
 type PuzzleSet = {
   set_id: number;
@@ -66,6 +66,7 @@ export default function PuzzlesPage() {
   const [sessionCompletedPuzzles, setSessionCompletedPuzzles] =
     useState<number>(0);
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
+  const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
 
   const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
     try {
@@ -276,6 +277,12 @@ export default function PuzzlesPage() {
     setSolvedIndex(0);
     setHighlight(null);
     logVerboseSolution(puzzleData.puzzle.solution, fen);
+
+    // NEW: detect which side is on move initially = player's side
+    const initialGame = new Chess();
+    initialGame.load(fen);
+    const playerSide = initialGame.turn(); // "w" or "b"
+    setPlayerSide(playerSide);
   };
 
   const handleSetSelect = async (setId: number) => {
@@ -553,6 +560,7 @@ export default function PuzzlesPage() {
                       onMove={handleMove}
                       highlight={highlight}
                       isSessionActive={isSessionActive}
+                      sideOnBottom={playerSide}
                     />
                   </div>
                 </CardContent>

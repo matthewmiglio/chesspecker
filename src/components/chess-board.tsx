@@ -9,6 +9,7 @@ interface Props {
   onMove: (move: string, isCorrect: boolean) => void;
   highlight: string | null;
   isSessionActive: boolean;
+  sideOnBottom: "w" | "b"; // NEW PROP
 }
 
 export default function AnimatedBoard({
@@ -18,6 +19,7 @@ export default function AnimatedBoard({
   onMove,
   highlight,
   isSessionActive,
+  sideOnBottom,
 }: Props) {
   const [game, setGame] = useState(new Chess(fen));
   const [boardPosition, setBoardPosition] = useState(fen);
@@ -75,10 +77,10 @@ export default function AnimatedBoard({
       }, 300);
     }, 300);
 
-    return true; // <- Important: still return `true` synchronously
+    return true;
   };
 
-  const isFlipped = game.turn() === "b";
+  const orientation = sideOnBottom === "w" ? "white" : "black";
 
   return (
     <div
@@ -92,7 +94,7 @@ export default function AnimatedBoard({
         position={boardPosition}
         onPieceDrop={handlePieceDrop}
         animationDuration={300}
-        boardOrientation={isFlipped ? "black" : "white"}
+        boardOrientation={orientation}
         arePiecesDraggable={!isBoardLocked && isSessionActive}
         boardWidth={480}
         customSquareStyles={
