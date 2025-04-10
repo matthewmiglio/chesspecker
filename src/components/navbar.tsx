@@ -1,39 +1,40 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ModeToggle } from "./mode-toggle"
-import { Menu, X } from "lucide-react"
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "./mode-toggle";
+import LoginButton from "./LoginButton";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = sessionStorage.getItem("user_id")
-    if (!id) return
+    const id = sessionStorage.getItem("user_id");
+    if (!id) return;
 
     const fetchEmail = async () => {
       try {
-        const res = await fetch("/api/getUsers")
-        const users = await res.json()
-        const user = users.find((u: any) => u.user_id.toString() === id)
-        if (user) setUserEmail(user.email)
+        const res = await fetch("/api/getUsers");
+        const users = await res.json();
+        const user = users.find((u: any) => u.user_id.toString() === id);
+        if (user) setUserEmail(user.email);
       } catch (err) {
-        console.error("Failed to fetch user email", err)
+        console.error("Failed to fetch user email", err);
       }
-    }
+    };
 
-    fetchEmail()
-  }, [])
+    fetchEmail();
+  }, []);
 
-  const isLoggedIn = !!userEmail
+  const isLoggedIn = !!userEmail;
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user_id")
-    location.reload()
-  }
+    sessionStorage.removeItem("user_id");
+    location.reload();
+  };
 
   return (
     <nav className="border-b">
@@ -45,19 +46,30 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
-          <Link href="/puzzles" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/puzzles"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Puzzles
           </Link>
-          <Link href="/create" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/create"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Create Set
           </Link>
-          <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/dashboard"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Dashboard
           </Link>
 
           {isLoggedIn ? (
             <div className="flex items-center gap-4 ml-4">
-              <span className="text-sm text-muted-foreground">Welcome {userEmail}</span>
+              <span className="text-sm text-muted-foreground">
+                Welcome {userEmail}
+              </span>
               <Button variant="ghost" onClick={handleLogout}>
                 Logout
               </Button>
@@ -72,6 +84,7 @@ export default function Navbar() {
               </Button>
             </div>
           )}
+          <LoginButton />
 
           <ModeToggle />
         </div>
@@ -79,7 +92,11 @@ export default function Navbar() {
         {/* Mobile Navigation Toggle */}
         <div className="flex items-center gap-4 md:hidden">
           <ModeToggle />
-          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X /> : <Menu />}
           </Button>
         </div>
@@ -114,7 +131,11 @@ export default function Navbar() {
             {isLoggedIn ? (
               <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
                 <span>Welcome {userEmail}</span>
-                <Button variant="ghost" className="w-full" onClick={handleLogout}>
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={handleLogout}
+                >
                   Logout
                 </Button>
               </div>
@@ -136,5 +157,5 @@ export default function Navbar() {
         </div>
       )}
     </nav>
-  )
+  );
 }
