@@ -195,8 +195,8 @@ export default function CreatePuzzleSetPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Create a New Puzzle Set</h1>
+    <div className = "max-w-[90%] mx-auto"><div className="max-w-3xl mx-auto">
+      <h1 className=" pt-6 text-3xl font-bold mb-6">Create a New Puzzle Set</h1>
 
       <div className="relative">
         {!isLoading && !isLoggedIn && (
@@ -213,11 +213,8 @@ export default function CreatePuzzleSetPage() {
           }
         >
           <form onSubmit={handleSubmit}>
-            <CardHeader>
+            <CardHeader className = "pb-6">
               <CardTitle>Puzzle Set Details</CardTitle>
-              <CardDescription>
-                Customize your puzzle set parameters
-              </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-6">
@@ -288,14 +285,14 @@ export default function CreatePuzzleSetPage() {
               </div>
             </CardContent>
 
-            <CardFooter>
-              <Button type="submit" className="ml-auto">
+            <CardFooter className = "pt-5">
+              <Button type="submit" className=" mx-auto ml-auto">
                 Create Puzzle Set
               </Button>
             </CardFooter>
           </form>
         </Card>
       </div>
-    </div>
+    </div></div>
   );
 }
