@@ -271,24 +271,6 @@ export default function PuzzlesPage() {
     return false;
   };
 
-  const logVerboseSolution = (solution: string[], fen: string) => {
-    const chess = new Chess(fen);
-    solution.forEach((uci, i) => {
-      const move = {
-        from: uci.slice(0, 2),
-        to: uci.slice(2, 4),
-        promotion: uci.length > 4 ? uci.slice(4) : undefined,
-      };
-      const piece = chess.get(move.from as Square);
-      if (!piece) {
-        console.warn(`Move ${uci} references empty square.`);
-        return;
-      }
-
-      chess.move(move);
-    });
-  };
-
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
 
   const getPuzzleData = async (puzzleId: string) => {
@@ -306,7 +288,6 @@ export default function PuzzlesPage() {
     setSolution(puzzleData.puzzle.solution);
     setSolvedIndex(0);
     setHighlight(null);
-    logVerboseSolution(puzzleData.puzzle.solution, fen);
 
     const initialGame = new Chess();
     initialGame.load(fen);
