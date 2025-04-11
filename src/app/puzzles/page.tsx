@@ -508,84 +508,89 @@ export default function PuzzlesPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className=" grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="justify-items-center lg:col-span-1 space-y-4">
+    <div className="mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="justify-items-center lg:col-span-1 space-y-4 ">
           <h2 className="text-xl font-semibold mb-4 pt-4">Available Sets</h2>
           <Button asChild className="">
             <Link href="/create">Create New Set</Link>
           </Button>
           {userSets.map((set) => (
-            <Card
-              key={set.set_id}
-              className={`cursor-pointer transition-all ${
-                selectedSetId === set.set_id ? "border-primary" : ""
-              }`}
-              onClick={() => handleSetSelect(set.set_id)}
-            >
-              <CardHeader className="pb-2">
-                <CardTitle>{set.name}</CardTitle>
-                <CardDescription>
-                  Difficulties: {set.difficulties.join(", ")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {set.difficulties.map((diff) => (
-                    <Badge key={diff} variant="secondary">
-                      {diff}
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="text-sm text-muted-foreground">
-                  Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
-                  {set.repeats}
-                </div>
-
-                <div className="text-sm text-muted-foreground">
-                  Puzzle: {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1}{" "}
-                  / {set.size}
-                </div>
-
-                {setAccuracies[set.set_id] && (
-                  <div className="text-sm text-muted-foreground">
-                    Accuracy:{" "}
-                    {Math.round(
-                      (setAccuracies[set.set_id].correct /
-                        (setAccuracies[set.set_id].correct +
-                          setAccuracies[set.set_id].incorrect || 1)) *
-                        100
-                    )}
-                    %
+            <div key={set.set_id} className="w-[90%]">
+              <Card
+                key={set.set_id}
+                className={`cursor-pointer transition-all ${
+                  selectedSetId === set.set_id ? "border-primary" : ""
+                }`}
+                onClick={() => handleSetSelect(set.set_id)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle>{set.name}</CardTitle>
+                  <CardDescription>
+                    Difficulties: {set.difficulties.join(", ")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {set.difficulties.map((diff) => (
+                      <Badge key={diff} variant="secondary">
+                        {diff}
+                      </Badge>
+                    ))}
                   </div>
-                )}
-              </CardContent>
 
-              <CardFooter>
-                <Button
-                  className="w-full"
-                  variant={selectedSetId === set.set_id ? "default" : "outline"}
-                >
-                  {selectedSetId === set.set_id ? "Selected" : "Select"}
-                </Button>
-              </CardFooter>
-              <CardFooter>
-                <Button
-                  className="w-full"
-                  variant="destructive"
-                  onClick={removeSetGivenId(set.set_id)}
-                >
-                  Delete
-                </Button>
-              </CardFooter>
-            </Card>
+                  <div className="text-sm text-muted-foreground">
+                    Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
+                    {set.repeats}
+                  </div>
+
+                  <div className="text-sm text-muted-foreground">
+                    Puzzle:{" "}
+                    {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1} /{" "}
+                    {set.size}
+                  </div>
+
+                  {setAccuracies[set.set_id] && (
+                    <div className="text-sm text-muted-foreground">
+                      Accuracy:{" "}
+                      {Math.round(
+                        (setAccuracies[set.set_id].correct /
+                          (setAccuracies[set.set_id].correct +
+                            setAccuracies[set.set_id].incorrect || 1)) *
+                          100
+                      )}
+                      %
+                    </div>
+                  )}
+                </CardContent>
+
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    variant={
+                      selectedSetId === set.set_id ? "default" : "outline"
+                    }
+                  >
+                    {selectedSetId === set.set_id ? "Selected" : "Select"}
+                  </Button>
+                </CardFooter>
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    variant="destructive"
+                    onClick={removeSetGivenId(set.set_id)}
+                  >
+                    Delete
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
           ))}
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="mx-auto lg:col-span-2">
           {selectedSet ? (
-            <div className="space-y-6">
+            <div className=" mx-auto  rounded-xl ">
               <Card>
                 <CardHeader>
                   <CardTitle>{selectedSet.name}</CardTitle>
@@ -593,8 +598,8 @@ export default function PuzzlesPage() {
                     Solve puzzles to improve your skills
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex justify-center mb-6">
+                <CardContent className = "px-0">
+                  <div className="flex justify-center">
                     <AnimatedBoard
                       fen={fen}
                       solution={solution}

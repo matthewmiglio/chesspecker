@@ -152,11 +152,20 @@ export default function AnimatedBoard({
     return [x + 0.5, y + 0.5]; // center of square
   };
 
+  const getScreenWidth = () => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth;
+    }
+    return 0; // default value if not in browser
+  };
+
+  const dynamicBoardWidth = getScreenWidth() * 0.9;
+
   return (
     <div
-      className="w-full max-w-[480px] mx-auto transition-opacity"
+      className="w-full max-w-[400px] mx-auto transition-opacity"
       style={{ opacity: isSessionActive ? 1 : 0.5 }}
-      onContextMenu={(e) => e.preventDefault()} // disable right-click menu
+      onContextMenu={(e) => e.preventDefault()} 
       onMouseDown={handleRightMouseDown}
       onMouseUp={handleRightMouseUp}
     >
@@ -169,7 +178,8 @@ export default function AnimatedBoard({
         animationDuration={300}
         boardOrientation={orientation}
         arePiecesDraggable={!isBoardLocked && isSessionActive}
-        boardWidth={480}
+        boardWidth={dynamicBoardWidth}
+        // boardWidth={boardWidth}
         customSquareStyles={
           highlight
             ? { [highlight]: { backgroundColor: "rgba(255, 0, 0, 0.4)" } }
