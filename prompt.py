@@ -83,11 +83,8 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\components\navbar.tsx",
         r"H:\my_files\my_programs\chesspecker\src\components\chess-board.tsx",
         r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\app\create\page.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
     ]
 
     ignore_folders = [
