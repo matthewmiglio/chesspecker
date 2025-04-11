@@ -14,18 +14,12 @@ export default function LoginButton({
   const { data: session } = useSession();
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 max-w-[0.25rem] sm:max-w-full">
       {session ? (
         <>
           <span className="text-white">
             Welcome, {session.user?.name?.split(" ")[0] || "User"}
           </span>
-          {/* {session && (
-            <pre className="text-white text-sm">
-              {JSON.stringify(session.user, null, 2)}
-            </pre>
-          )} */}
-
           {showLogout && (
             <button
               onClick={() => signOut()}
