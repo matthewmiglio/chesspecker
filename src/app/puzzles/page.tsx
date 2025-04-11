@@ -509,16 +509,12 @@ export default function PuzzlesPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex py-3 justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Puzzle Sets</h1>
-        <Button asChild>
-          <Link href="/create">Create New Set</Link>
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-4">
-          <h2 className="text-xl font-semibold mb-4">Available Sets</h2>
+      <div className=" grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="justify-items-center lg:col-span-1 space-y-4">
+          <h2 className="text-xl font-semibold mb-4 pt-4">Available Sets</h2>
+          <Button asChild className="">
+            <Link href="/create">Create New Set</Link>
+          </Button>
           {userSets.map((set) => (
             <Card
               key={set.set_id}
@@ -640,15 +636,13 @@ export default function PuzzlesPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       Show Solution
                     </Button>
-                    {/* <Button onClick={() => handleNextPuzzle()}>
-                      Next Puzzle
-                    </Button> */}
+
                   </div>
                 </CardFooter>
               </Card>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full min-h-[400px] border rounded-lg bg-muted/20">
+            <div className="mx-auto flex items-center justify-center max-w-[90%] h-full min-h-[400px] border rounded-lg bg-muted/20">
               <div className="text-center p-8">
                 <h3 className="text-xl font-medium mb-2">
                   No Puzzle Set Selected
