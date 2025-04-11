@@ -636,7 +636,6 @@ export default function PuzzlesPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       Show Solution
                     </Button>
-
                   </div>
                 </CardFooter>
               </Card>
