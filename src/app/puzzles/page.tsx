@@ -509,14 +509,79 @@ export default function PuzzlesPage() {
 
   return (
     <div className="mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="justify-items-center lg:col-span-1 space-y-4 ">
-          <h2 className="text-xl font-semibold mb-4 pt-4">Available Sets</h2>
-          <Button asChild className="">
-            <Link href="/create">Create New Set</Link>
-          </Button>
+      {selectedSet ? (
+        <div className=" mx-auto  rounded-xl ">
+          <Card>
+            <CardHeader>
+              <CardTitle>{selectedSet.name}</CardTitle>
+              <CardDescription>
+                Solve puzzles to improve your skills
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-0 mx-auto">
+              <div className="flex ">
+                <AnimatedBoard
+                  fen={fen}
+                  solution={solution}
+                  solvedIndex={solvedIndex}
+                  onMove={handleMove}
+                  highlight={highlight}
+                  isSessionActive={isSessionActive}
+                  sideOnBottom={playerSide}
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="px-0">
+              <div className="px-3 text-sm text-muted-foreground">
+                Accuracy:
+                {selectedSetId !== null && setAccuracies[selectedSetId]
+                  ? ` ${Math.round(
+                      (setAccuracies[selectedSetId].correct /
+                        (setAccuracies[selectedSetId].correct +
+                          setAccuracies[selectedSetId].incorrect || 1)) *
+                        100
+                    )}%`
+                  : " N/A"}
+              </div>
+
+              <div className="flex">
+                <Button
+                  onClick={() => {
+                    handleStartSession();
+                  }}
+                >
+                  Start Session
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    setHighlight(solution[solvedIndex]?.slice(2) ?? null)
+                  }
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Show Solution
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
+      ) : (
+        <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border rounded-lg bg-muted/20">
+          <div className="text-center p-8">
+            <h3 className="text-xl font-medium mb-2">No Puzzle Set Selected</h3>
+            <p className="text-muted-foreground mb-4">
+              Select a puzzle set from the left to start solving
+            </p>
+            <Button variant="outline" asChild>
+              <Link href="/create">Create Your Own Set</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3">
           {userSets.map((set) => (
-            <div key={set.set_id} className="w-[90%]">
+            <div key={set.set_id} className="">
               <Card
                 key={set.set_id}
                 className={`cursor-pointer transition-all ${
@@ -586,81 +651,6 @@ export default function PuzzlesPage() {
               </Card>
             </div>
           ))}
-        </div>
-
-        <div className="mx-auto lg:col-span-2">
-          {selectedSet ? (
-            <div className=" mx-auto  rounded-xl ">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{selectedSet.name}</CardTitle>
-                  <CardDescription>
-                    Solve puzzles to improve your skills
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className = "px-0">
-                  <div className="flex justify-center">
-                    <AnimatedBoard
-                      fen={fen}
-                      solution={solution}
-                      solvedIndex={solvedIndex}
-                      onMove={handleMove}
-                      highlight={highlight}
-                      isSessionActive={isSessionActive}
-                      sideOnBottom={playerSide}
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">
-                    Accuracy:
-                    {selectedSetId !== null && setAccuracies[selectedSetId]
-                      ? ` ${Math.round(
-                          (setAccuracies[selectedSetId].correct /
-                            (setAccuracies[selectedSetId].correct +
-                              setAccuracies[selectedSetId].incorrect || 1)) *
-                            100
-                        )}%`
-                      : " N/A"}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        handleStartSession();
-                      }}
-                    >
-                      Start Session
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() =>
-                        setHighlight(solution[solvedIndex]?.slice(2) ?? null)
-                      }
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Show Solution
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            </div>
-          ) : (
-            <div className="mx-auto flex items-center justify-center max-w-[90%] h-full min-h-[400px] border rounded-lg bg-muted/20">
-              <div className="text-center p-8">
-                <h3 className="text-xl font-medium mb-2">
-                  No Puzzle Set Selected
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Select a puzzle set from the left to start solving
-                </p>
-                <Button variant="outline" asChild>
-                  <Link href="/create">Create Your Own Set</Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

@@ -158,18 +158,33 @@ export default function AnimatedBoard({
     }
     return 0; // default value if not in browser
   };
+  const getScreenHeight = () => {
+    if (typeof window !== "undefined") {
+      return window.innerHeight;
+    }
+    return 0; // default value if not in browser
+  }
+  const isPortrait = getScreenHeight() > getScreenWidth();
 
-  const dynamicBoardWidth = getScreenWidth() * 0.9;
+  console.log(getScreenWidth(),
+    getScreenHeight() , )
+
+  const dynamicBoardWidth = Math.min(getScreenHeight(), getScreenWidth()) * 0.7;
+
+  console.log('Width is', getScreenWidth(), 'px')
+  console.log('Height is', getScreenHeight(), 'px')
+  console.log('Portrait is', isPortrait)
+  console.log('thus board width is', dynamicBoardWidth, 'px')
 
   return (
     <div
-      className="w-full max-w-[400px] mx-auto transition-opacity"
+      className="w-full"
       style={{ opacity: isSessionActive ? 1 : 0.5 }}
-      onContextMenu={(e) => e.preventDefault()} 
+      onContextMenu={(e) => e.preventDefault()}
       onMouseDown={handleRightMouseDown}
       onMouseUp={handleRightMouseUp}
     >
-      <p className="text-center text-muted-foreground mb-2">
+      <p className="text-center mb-2">
         {game.turn() === "w" ? "White to move" : "Black to move"}
       </p>
       <Chessboard
@@ -179,7 +194,6 @@ export default function AnimatedBoard({
         boardOrientation={orientation}
         arePiecesDraggable={!isBoardLocked && isSessionActive}
         boardWidth={dynamicBoardWidth}
-        // boardWidth={boardWidth}
         customSquareStyles={
           highlight
             ? { [highlight]: { backgroundColor: "rgba(255, 0, 0, 0.4)" } }
@@ -191,7 +205,6 @@ export default function AnimatedBoard({
         width="100%"
         height="100%"
         viewBox="0 0 8 8"
-        preserveAspectRatio="none"
       >
         {arrows.map((arrow, idx) => {
           const [x1, y1] = squareToCoords(arrow.from);
