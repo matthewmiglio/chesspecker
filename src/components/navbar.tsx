@@ -82,6 +82,8 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
+          <LoginButton />
+
           </div>
         </div>
       )}
