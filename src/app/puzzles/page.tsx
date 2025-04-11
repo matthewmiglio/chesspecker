@@ -560,7 +560,7 @@ export default function PuzzlesPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex py-3 justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Puzzle Sets</h1>
         <Button asChild>
           <Link href="/create">Create New Set</Link>
