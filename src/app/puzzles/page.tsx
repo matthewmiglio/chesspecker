@@ -454,12 +454,32 @@ export default function PuzzlesPage() {
     return response.ok;
   };
 
+  const showSolution = async () => {
+    const chess = new Chess(fen);
+    const remainingSolution = solution.slice(solvedIndex);
+
+    for (let i = 0; i < remainingSolution.length; i++) {
+      const moveUci = remainingSolution[i];
+      await new Promise((resolve) => setTimeout(resolve, 600)); // delay 600ms per move
+
+      chess.move({
+        from: moveUci.slice(0, 2),
+        to: moveUci.slice(2, 4),
+        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+      });
+
+      setFen(chess.fen());
+    }
+  };
+
   const handleIncorrectMove = async () => {
     const setId = selectedSetId;
-    if (!setId) {
-      return;
-    }
-    await addIncorrectAttempt(selectedSetId, currentRepeatIndex);
+    if (!setId) return;
+
+    showRedX(); // still show the ❌
+    await addIncorrectAttempt(setId, currentRepeatIndex);
+
+    await showSolution(); // 👈 show the correct answer before progressing
     await updateSessionAccuracy();
     await handleNextPuzzle();
   };
