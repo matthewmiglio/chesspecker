@@ -9,16 +9,6 @@ import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-
-
-  const isLoggedIn = !!userEmail;
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("user_id");
-    location.reload();
-  };
 
   return (
     <nav className="border-b">
@@ -92,32 +82,6 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
-
-            {isLoggedIn ? (
-              <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-                <span>Welcome {userEmail}</span>
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2 mt-2">
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                    Log In
-                  </Link>
-                </Button>
-                <Button asChild className="w-full">
-                  <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-                    Sign Up
-                  </Link>
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       )}
