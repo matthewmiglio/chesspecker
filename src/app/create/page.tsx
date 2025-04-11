@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,11 @@ import {
 } from "@/components/ui/card";
 
 export default function CreatePuzzleSetPage() {
+  const maxSetSize = 100;
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
+  const isLoggedIn = !!session?.user?.email;
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(
@@ -22,12 +28,6 @@ export default function CreatePuzzleSetPage() {
   );
   const [setSize, setSetSize] = useState<number>(300);
   const [repeatCount, setRepeatCount] = useState<number>(8);
-  const [loggedIn, setLoggedIn] = useState<boolean>(true);
-
-  useEffect(() => {
-    const id = sessionStorage.getItem("user_id");
-    setLoggedIn(!!id);
-  }, []);
 
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
     console.log("createSetAccuracy()");
@@ -61,7 +61,7 @@ export default function CreatePuzzleSetPage() {
   };
 
   const addNewSetToDatabase = async (
-    user_id: number,
+    email: string,
     difficulties: string[],
     size: number,
     repeats: number,
@@ -74,7 +74,7 @@ export default function CreatePuzzleSetPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        user_id,
+        email,
         difficulties,
         size,
         repeats,
@@ -114,17 +114,41 @@ export default function CreatePuzzleSetPage() {
     puzzle_count: number,
     difficulties: string[]
   ): Promise<string[]> => {
+    if (puzzle_count > maxSetSize) {
+      console.log(
+        "This set is too big. Please make it smaller. Max is",
+        maxSetSize
+      );
+      console.log("Using max set size of", maxSetSize);
+      puzzle_count = maxSetSize;
+    }
+
     const puzzleIds: string[] = [];
+    const difficultyCounts: Record<string, number> = {};
+
     for (let i = 0; i < puzzle_count; i++) {
       const randomIndex = Math.floor(Math.random() * difficulties.length);
       const randomDifficulty = difficulties[randomIndex];
+
+      // Track difficulty count
+      difficultyCounts[randomDifficulty] =
+        (difficultyCounts[randomDifficulty] || 0) + 1;
+
       const puzzle = await createNewPuzzle(randomDifficulty);
-      console.log("Created puzzle:", puzzle);
       const puzzleId = puzzle.puzzle.id;
-      console.log("Created puzzle id:", puzzleId);
+
+      console.log(
+        `Created puzzle ${puzzleId} with difficulty: ${randomDifficulty}`
+      );
       puzzleIds.push(puzzleId);
     }
+
     console.log("createNewPuzzleList() yields", puzzleIds);
+    console.log("Difficulty breakdown:");
+    Object.entries(difficultyCounts).forEach(([difficulty, count]) => {
+      console.log(`  ${difficulty}: ${count}`);
+    });
+
     return puzzleIds;
   };
 
@@ -142,22 +166,23 @@ export default function CreatePuzzleSetPage() {
       return;
     }
 
-    const user_id_raw = sessionStorage.getItem("user_id");
-    if (!user_id_raw) {
-      console.error("No user_id in session");
+    const email = session?.user?.email;
+    if (!email) {
+      console.error(
+        "Skipping handleSubmit() in create set page. session?.user?.email is undefined."
+      );
       return;
     }
-    const user_id = Number(user_id_raw);
 
+    console.log("email:", email);
     console.log("This set name:", name);
     console.log("This set description:", description);
     console.log("This set size:", setSize);
     console.log("This set repeatCount:", repeatCount);
     console.log("This set difficulties:", selectedDifficulties);
-    console.log("This userId is", user_id);
 
     const addSetResponse = await addNewSetToDatabase(
-      user_id,
+      email,
       selectedDifficulties,
       setSize,
       repeatCount,
@@ -174,7 +199,7 @@ export default function CreatePuzzleSetPage() {
       <h1 className="text-3xl font-bold mb-6">Create a New Puzzle Set</h1>
 
       <div className="relative">
-        {!loggedIn && (
+        {!isLoading && !isLoggedIn && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
             <div className="text-center text-muted-foreground text-xl font-semibold">
               Log in to create sets
@@ -183,7 +208,9 @@ export default function CreatePuzzleSetPage() {
         )}
 
         <Card
-          className={!loggedIn ? "blur-sm pointer-events-none opacity-50" : ""}
+          className={
+            !isLoggedIn ? "blur-sm pointer-events-none opacity-50" : ""
+          }
         >
           <form onSubmit={handleSubmit}>
             <CardHeader>
