@@ -20,11 +20,11 @@ export default function LoginButton({
           <span className="text-white">
             Welcome, {session.user?.name?.split(" ")[0] || "User"}
           </span>
-          {session && (
+          {/* {session && (
             <pre className="text-white text-sm">
               {JSON.stringify(session.user, null, 2)}
             </pre>
-          )}
+          )} */}
 
           {showLogout && (
             <button
