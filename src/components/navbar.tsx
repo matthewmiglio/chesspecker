@@ -11,23 +11,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  useEffect(() => {
-    const id = sessionStorage.getItem("user_id");
-    if (!id) return;
 
-    const fetchEmail = async () => {
-      try {
-        const res = await fetch("/api/getUsers");
-        const users = await res.json();
-        const user = users.find((u: any) => u.user_id.toString() === id);
-        if (user) setUserEmail(user.email);
-      } catch (err) {
-        console.error("Failed to fetch user email", err);
-      }
-    };
-
-    fetchEmail();
-  }, []);
 
   const isLoggedIn = !!userEmail;
 
@@ -65,25 +49,6 @@ export default function Navbar() {
             Dashboard
           </Link>
 
-          {isLoggedIn ? (
-            <div className="flex items-center gap-4 ml-4">
-              <span className="text-sm text-muted-foreground">
-                Welcome {userEmail}
-              </span>
-              <Button variant="ghost" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4 ml-4">
-              <Button variant="outline" asChild>
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </div>
-          )}
           <LoginButton />
 
           <ModeToggle />
