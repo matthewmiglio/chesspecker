@@ -13,17 +13,20 @@ import {
   Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import type {
+  PuzzleSet,
+  RepeatAccuracy,
+} from "@/lib/types";
 
 export default function AccuracyStatsPage() {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userSets, setUserSets] = useState<any[]>([]);
-  const [accuracyData, setAccuracyData] = useState<any[]>([]);
+  const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
+  const [accuracyData, setAccuracyData] = useState<RepeatAccuracy[]>([]);
+
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
   useEffect(() => {
     const id = sessionStorage.getItem("user_id");
     if (id) {
-      setUserId(id);
       fetchUserSets(id);
     }
   }, []);
