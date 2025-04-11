@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AnimatedBoard from "@/components/chess-board";
+import { useSession } from "next-auth/react";
 
 type PuzzleSet = {
   set_id: number;
@@ -51,6 +52,8 @@ type Game = {
 };
 
 export default function PuzzlesPage() {
+  const { data: session, status: authStatus } = useSession();
+
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
   const [fen, setFen] = useState<string>(
@@ -67,6 +70,12 @@ export default function PuzzlesPage() {
     useState<number>(0);
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
+  const [setAccuracies, setSetAccuracies] = useState<
+    Record<number, { correct: number; incorrect: number }>
+  >({});
+  const [setProgressMap, setSetProgressMap] = useState<
+    Record<number, { repeat_index: number; puzzle_index: number }>
+  >({});
 
   const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
     try {
@@ -109,19 +118,73 @@ export default function PuzzlesPage() {
   };
 
   const fetchUserSetData = async () => {
+    console.log("fetchUserSetData()");
+
+    if (!session?.user?.email) {
+      console.error("User is not logged in or session is missing email");
+      return;
+    }
+
     const response = await fetch("/api/getSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: sessionStorage.getItem("user_id") }),
+      body: JSON.stringify({ email: session.user.email }),
     });
-    const result = await response.json();
 
-    setUserSets(result.sets);
+    if (!response.ok) {
+      console.error("Failed to fetch user sets");
+      return;
+    }
+    console.log("Valid /api/getSet response");
+
+    const result = await response.json();
+    const sets: PuzzleSet[] = result.sets;
+    setUserSets(sets);
+
+    const accuracies: Record<number, { correct: number; incorrect: number }> =
+      {};
+    const progressMap: Record<
+      number,
+      { repeat_index: number; puzzle_index: number }
+    > = {};
+
+    console.log("Getting accuracies for sets...");
+    for (const set of sets) {
+      console.log("Getting accuracies for set id:", set.set_id);
+      console.log("This set is on repeat index:", set.repeat_index);
+      console.log("This set size is ", set.size);
+
+      var repeat_index = set.repeat_index;
+      if (repeat_index == set.size) {
+        console.log("This set is finished so getting prev repeat index");
+        set.repeat_index--;
+      }
+
+      // Accuracy per set
+      const res = await getSetAccuracy(set.set_id, set.repeat_index);
+      if (res) {
+        accuracies[set.set_id] = res;
+      }
+
+      // Progress per set
+      const progress = await getSetProgress(set.set_id);
+      if (progress) {
+        progressMap[set.set_id] = {
+          repeat_index: progress.repeat_index,
+          puzzle_index: progress.puzzle_index,
+        };
+      }
+    }
+
+    setSetAccuracies(accuracies);
+    setSetProgressMap(progressMap);
   };
 
   useEffect(() => {
-    fetchUserSetData();
-  }, []);
+    if (authStatus === "authenticated") {
+      fetchUserSetData();
+    }
+  }, [authStatus]);
 
   const getSetAccuracy = async (setId: number, repeatIndex: number) => {
     try {
@@ -174,6 +237,7 @@ export default function PuzzlesPage() {
   };
 
   const handleStartSession = async () => {
+    console.log("handleStartSession()");
     setIsSessionActive(true);
     if (!selectedSetId) {
       return;
@@ -508,13 +572,31 @@ export default function PuzzlesPage() {
                     </Badge>
                   ))}
                 </div>
+
                 <div className="text-sm text-muted-foreground">
-                  Set: {currentRepeatIndex} / {set.repeats}
+                  Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
+                  {set.repeats}
                 </div>
+
                 <div className="text-sm text-muted-foreground">
-                  Puzzle: {currentPuzzleIndex + 1} / {set.size}
+                  Puzzle: {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1}{" "}
+                  / {set.size}
                 </div>
+
+                {setAccuracies[set.set_id] && (
+                  <div className="text-sm text-muted-foreground">
+                    Accuracy:{" "}
+                    {Math.round(
+                      (setAccuracies[set.set_id].correct /
+                        (setAccuracies[set.set_id].correct +
+                          setAccuracies[set.set_id].incorrect || 1)) *
+                        100
+                    )}
+                    %
+                  </div>
+                )}
               </CardContent>
+
               <CardFooter>
                 <Button
                   className="w-full"
@@ -560,15 +642,18 @@ export default function PuzzlesPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Session accuracy: {sessionAccuracy}%
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Puzzles solved: {sessionCompletedPuzzles}/
-                      {selectedSet.size}
-                    </p>
+                  <div className="text-sm text-muted-foreground">
+                    Accuracy:
+                    {selectedSetId !== null && setAccuracies[selectedSetId]
+                      ? ` ${Math.round(
+                          (setAccuracies[selectedSetId].correct /
+                            (setAccuracies[selectedSetId].correct +
+                              setAccuracies[selectedSetId].incorrect || 1)) *
+                            100
+                        )}%`
+                      : " N/A"}
                   </div>
+
                   <div className="flex gap-2">
                     <Button
                       onClick={() => {
