@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -169,7 +168,7 @@ export default function CreatePuzzleSetPage() {
     const email = session?.user?.email;
     if (!email) {
       console.error(
-        "Skipping handleSubmit() in create set page. session?.user?.email is undefined."
+        "Skipping handleSubmit() in create set page. session?.user?.email is undefined!"
       );
       return;
     }
@@ -195,104 +194,108 @@ export default function CreatePuzzleSetPage() {
   };
 
   return (
-    <div className = "max-w-[90%] mx-auto"><div className="max-w-3xl mx-auto">
-      <h1 className=" pt-6 text-3xl font-bold mb-6">Create a New Puzzle Set</h1>
+    <div className="max-w-[90%] mx-auto">
+      <div className="max-w-3xl mx-auto">
+        <h1 className=" pt-6 text-3xl font-bold mb-6">
+          Create a New Puzzle Set
+        </h1>
 
-      <div className="relative">
-        {!isLoading && !isLoggedIn && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-            <div className="text-center text-muted-foreground text-xl font-semibold">
-              Log in to create sets
+        <div className="relative">
+          {!isLoading && !isLoggedIn && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+              <div className="text-center text-muted-foreground text-xl font-semibold">
+                Log in to create sets
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <Card
-          className={
-            !isLoggedIn ? "blur-sm pointer-events-none opacity-50" : ""
-          }
-        >
-          <form onSubmit={handleSubmit}>
-            <CardHeader className = "pb-6">
-              <CardTitle>Puzzle Set Details</CardTitle>
-            </CardHeader>
+          <Card
+            className={
+              !isLoggedIn ? "blur-sm pointer-events-none opacity-50" : ""
+            }
+          >
+            <form onSubmit={handleSubmit}>
+              <CardHeader className="pb-6">
+                <CardTitle>Puzzle Set Details</CardTitle>
+              </CardHeader>
 
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Set Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="My Tactical Puzzles"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="A collection of tactical puzzles for intermediate players"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="set-size">Set Size</Label>
-                <Input
-                  id="set-size"
-                  type="number"
-                  value={setSize}
-                  min={1}
-                  onChange={(e) => setSetSize(Number(e.target.value))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="repeat-count">Repeat Count</Label>
-                <Input
-                  id="repeat-count"
-                  type="number"
-                  value={repeatCount}
-                  min={1}
-                  onChange={(e) => setRepeatCount(Number(e.target.value))}
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label>Difficulty Levels</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {["easiest", "easier", "normal", "harder", "hardest"].map(
-                    (level) => (
-                      <Button
-                        key={level}
-                        type="button"
-                        variant={
-                          selectedDifficulties.includes(level)
-                            ? "default"
-                            : "outline"
-                        }
-                        onClick={() => handleDifficultyToggle(level)}
-                        className="w-full capitalize"
-                      >
-                        {level}
-                      </Button>
-                    )
-                  )}
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Set Name</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="My Tactical Puzzles"
+                    required
+                  />
                 </div>
-              </div>
-            </CardContent>
 
-            <CardFooter className = "pt-5">
-              <Button type="submit" className=" mx-auto ml-auto">
-                Create Puzzle Set
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="A collection of tactical puzzles for intermediate players"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="set-size">Set Size</Label>
+                  <Input
+                    id="set-size"
+                    type="number"
+                    value={setSize}
+                    min={1}
+                    onChange={(e) => setSetSize(Number(e.target.value))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="repeat-count">Repeat Count</Label>
+                  <Input
+                    id="repeat-count"
+                    type="number"
+                    value={repeatCount}
+                    min={1}
+                    onChange={(e) => setRepeatCount(Number(e.target.value))}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Difficulty Levels</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {["easiest", "easier", "normal", "harder", "hardest"].map(
+                      (level) => (
+                        <Button
+                          key={level}
+                          type="button"
+                          variant={
+                            selectedDifficulties.includes(level)
+                              ? "default"
+                              : "outline"
+                          }
+                          onClick={() => handleDifficultyToggle(level)}
+                          className="w-full capitalize"
+                        >
+                          {level}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter className="pt-5">
+                <Button type="submit" className=" mx-auto ml-auto">
+                  Create Puzzle Set
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </div>
       </div>
-    </div></div>
+    </div>
   );
 }

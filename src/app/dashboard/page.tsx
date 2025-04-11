@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
@@ -13,29 +14,33 @@ import {
   Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
-import type {
-  PuzzleSet,
-  RepeatAccuracy,
-} from "@/lib/types";
+import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
 
 export default function AccuracyStatsPage() {
+  const { data: session, status } = useSession();
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
   const [accuracyData, setAccuracyData] = useState<RepeatAccuracy[]>([]);
 
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
   useEffect(() => {
-    const id = sessionStorage.getItem("user_id");
-    if (id) {
-      fetchUserSets(id);
+    if (status === "authenticated" && session?.user?.email) {
+      fetchUserSets(session.user.email);
     }
-  }, []);
+  }, [status, session]);
 
-  const fetchUserSets = async (uid: string) => {
+  useEffect(() => {
+    if (selectedSetId !== null) {
+      fetchAccuracy(selectedSetId);
+    }
+  }, [selectedSetId]);
+
+  const fetchUserSets = async (email: string) => {
+    console.log("fetchUserSets() email", email);
     const res = await fetch("/api/getSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: uid }),
+      body: JSON.stringify({ email: email }),
     });
     const result = await res.json();
     setUserSets(result.sets);
@@ -44,7 +49,24 @@ export default function AccuracyStatsPage() {
     }
   };
 
+  const getSetSize = async (set_id: number) => {
+    const response = await fetch("/api/getSetProgressStats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ set_id }),
+    });
+
+    if (!response.ok) return null;
+    const result = await response.json();
+    return result.size;
+  };
+
   const fetchAccuracy = async (set_id: number) => {
+    console.log("fetchAccuracy() set_)id", set_id);
+
+    const size = await getSetSize(set_id);
+    if (!size) {console.log('Cant fetch accuracy for this set because couldnt retrieve its size');return null};
+
     const responses = await Promise.all(
       Array.from({ length: 10 }, (_, i) =>
         fetch("/api/getSetAccuracy", {
@@ -65,12 +87,6 @@ export default function AccuracyStatsPage() {
 
     setAccuracyData(filtered);
   };
-
-  useEffect(() => {
-    if (selectedSetId !== null) {
-      fetchAccuracy(selectedSetId);
-    }
-  }, [selectedSetId]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
