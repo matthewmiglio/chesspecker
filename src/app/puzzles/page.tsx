@@ -63,11 +63,8 @@ export default function PuzzlesPage() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const [solvedIndex, setSolvedIndex] = useState<number>(0);
   const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
-  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
-  const [sessionAccuracy, setSessionAccuracy] = useState<number>(0);
-  const [sessionCompletedPuzzles, setSessionCompletedPuzzles] =
-    useState<number>(0);
+  useState<number>(0);
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
   const [setAccuracies, setSetAccuracies] = useState<
@@ -117,70 +114,69 @@ export default function PuzzlesPage() {
     }
   };
 
-  const fetchUserSetData = async () => {
-    console.log("fetchUserSetData()");
-
-    if (!session?.user?.email) {
-      console.error("User is not logged in or session is missing email");
-      return;
-    }
-
-    const response = await fetch("/api/getSet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: session.user.email }),
-    });
-
-    if (!response.ok) {
-      console.error("Failed to fetch user sets");
-      return;
-    }
-    console.log("Valid /api/getSet response");
-
-    const result = await response.json();
-    const sets: PuzzleSet[] = result.sets;
-    setUserSets(sets);
-
-    const accuracies: Record<number, { correct: number; incorrect: number }> =
-      {};
-    const progressMap: Record<
-      number,
-      { repeat_index: number; puzzle_index: number }
-    > = {};
-
-    console.log("Getting accuracies for sets...");
-    for (const set of sets) {
-      console.log("Getting accuracies for set id:", set.set_id);
-      console.log("This set is on repeat index:", set.repeat_index);
-      console.log("This set size is ", set.size);
-
-      var repeat_index = set.repeat_index;
-      if (repeat_index == set.size) {
-        console.log("This set is finished so getting prev repeat index");
-        set.repeat_index--;
-      }
-
-      // Accuracy per set
-      const res = await getSetAccuracy(set.set_id, set.repeat_index);
-      if (res) {
-        accuracies[set.set_id] = res;
-      }
-
-      // Progress per set
-      const progress = await getSetProgress(set.set_id);
-      if (progress) {
-        progressMap[set.set_id] = {
-          repeat_index: progress.repeat_index,
-          puzzle_index: progress.puzzle_index,
-        };
-      }
-    }
-
-    setSetAccuracies(accuracies);
-    setSetProgressMap(progressMap);
-  };
-
   useEffect(() => {
+    const fetchUserSetData = async () => {
+      console.log("fetchUserSetData()");
+
+      if (!session?.user?.email) {
+        console.error("User is not logged in or session is missing email");
+        return;
+      }
+
+      const response = await fetch("/api/getSet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session.user.email }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to fetch user sets");
+        return;
+      }
+
+      console.log("Valid /api/getSet response");
+
+      const result = await response.json();
+      const sets: PuzzleSet[] = result.sets;
+      setUserSets(sets);
+
+      const accuracies: Record<number, { correct: number; incorrect: number }> =
+        {};
+      const progressMap: Record<
+        number,
+        { repeat_index: number; puzzle_index: number }
+      > = {};
+
+      console.log("Getting accuracies for sets...");
+      for (const set of sets) {
+        console.log("Getting accuracies for set id:", set.set_id);
+        console.log("This set is on repeat index:", set.repeat_index);
+        console.log("This set size is ", set.size);
+
+        let repeat_index = set.repeat_index;
+        if (repeat_index === set.size) {
+          console.log("This set is finished so getting prev repeat index");
+          repeat_index = set.size - 1;
+        }
+
+        const res = await getSetAccuracy(set.set_id, repeat_index);
+        if (res) {
+          accuracies[set.set_id] = res;
+        }
+
+        const progress = await getSetProgress(set.set_id);
+        if (progress) {
+          progressMap[set.set_id] = {
+            repeat_index: progress.repeat_index,
+            puzzle_index: progress.puzzle_index,
+          };
+        }
+      }
+
+      setSetAccuracies(accuracies);
+      setSetProgressMap(progressMap);
+    };
+
     if (authStatus === "authenticated") {
       fetchUserSetData();
     }
@@ -206,33 +202,18 @@ export default function PuzzlesPage() {
     }
   };
 
-  const updateSessionAccuracy = async () => {
-    if (!selectedSetId || (!currentRepeatIndex && currentRepeatIndex != 0)) {
-      return;
-    }
-    const accuracy = await getSetAccuracy(selectedSetId, currentRepeatIndex);
-    if (accuracy) {
-      const totalAttempts = accuracy.correct + accuracy.incorrect;
-      setSessionCompletedPuzzles(totalAttempts);
-      if (totalAttempts > 0) {
-        const accuracyPercentage = (accuracy.correct / totalAttempts) * 100;
-        setSessionAccuracy(accuracyPercentage);
-      } else {
-        setSessionAccuracy(0);
-      }
-    }
-  };
-
   const updatePuzzleProgress = async () => {
     if (!selectedSetId) {
       return;
     }
-
-    var { repeat_index, puzzle_index, size, repeats } = await getSetProgress(
-      selectedSetId
-    );
-
-    setCurrentPuzzleIndex(puzzle_index);
+    const currentSetProgress = await getSetProgress(selectedSetId);
+    if (!currentSetProgress) {
+      return;
+    }
+    const repeat_index = currentSetProgress.repeat_index;
+    if (!repeat_index) {
+      return;
+    }
     setCurrentRepeatIndex(repeat_index);
   };
 
@@ -242,7 +223,6 @@ export default function PuzzlesPage() {
     if (!selectedSetId) {
       return;
     }
-    await updateSessionAccuracy();
     await updatePuzzleProgress();
   };
 
@@ -305,19 +285,6 @@ export default function PuzzlesPage() {
         return;
       }
 
-      const colorName = piece.color === "w" ? "White" : "Black";
-      const typeMap: Record<string, string> = {
-        p: "pawn",
-        n: "knight",
-        b: "bishop",
-        r: "rook",
-        q: "queen",
-        k: "king",
-      };
-
-      const desc = `${colorName} ${typeMap[piece.type]} ${move.from} to ${
-        move.to
-      }`;
       chess.move(move);
     });
   };
@@ -378,21 +345,25 @@ export default function PuzzlesPage() {
     if (!setId) {
       return;
     }
+
     const currentSetProgress = await getSetProgress(selectedSetId);
     if (!currentSetProgress) {
       return;
     }
-    var { repeat_index, puzzle_index, size, repeats } = currentSetProgress;
 
-    if (puzzle_index + 1 == size) {
-      (puzzle_index = 0), repeat_index++;
+    let repeat_index = currentSetProgress.repeat_index;
+    let puzzle_index = currentSetProgress.puzzle_index;
+    const size = currentSetProgress.size;
+
+    if (puzzle_index + 1 === size) {
+      puzzle_index = 0;
+      repeat_index++;
     } else {
       puzzle_index++;
     }
 
     await setSetProgress(setId, repeat_index, puzzle_index);
 
-    setCurrentPuzzleIndex(puzzle_index);
     setCurrentRepeatIndex(repeat_index);
 
     return puzzle_index;
@@ -424,7 +395,6 @@ export default function PuzzlesPage() {
       await loadPuzzleAndInitialize(puzzle);
     }
 
-    await updateSessionAccuracy();
     await updatePuzzleProgress();
   };
 
@@ -480,7 +450,6 @@ export default function PuzzlesPage() {
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
     await showSolution(); // 👈 show the correct answer before progressing
-    await updateSessionAccuracy();
     await handleNextPuzzle();
   };
 
@@ -490,7 +459,6 @@ export default function PuzzlesPage() {
       return;
     }
     await addCorrectAttempt(selectedSetId, currentRepeatIndex);
-    await updateSessionAccuracy();
     await handleNextPuzzle();
   };
 
