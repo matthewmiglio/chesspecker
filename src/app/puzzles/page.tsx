@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import AnimatedBoard from "@/components/chess-board";
 import { useSession } from "next-auth/react";
 

@@ -23,9 +23,7 @@ export default function CreatePuzzleSetPage() {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(
-    []
-  );
+
   const [setSize, setSetSize] = useState<number>(300);
   const [repeatCount, setRepeatCount] = useState<number>(8);
 
@@ -57,11 +55,7 @@ export default function CreatePuzzleSetPage() {
     }
   };
 
-  const handleDifficultyToggle = (level: string) => {
-    setSelectedDifficulties((prev) =>
-      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
-    );
-  };
+
 
   const addNewSetToDatabase = async (
     email: string,
