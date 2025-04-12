@@ -30,6 +30,11 @@ export default function CreatePuzzleSetPage() {
   const [difficultySliderValue, setDifficultySliderValue] =
     useState<number>(1500);
 
+  //progress bar popup vars
+  const [isCreatingSet, setIsCreatingSet] = useState(false);
+  const [puzzleProgress, setPuzzleProgress] = useState(0);
+  const [accuracyProgress, setAccuracyProgress] = useState(0);
+
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
     console.log("createSetAccuracy()");
     console.log("setId", setId);
@@ -55,8 +60,6 @@ export default function CreatePuzzleSetPage() {
     }
   };
 
-
-
   const addNewSetToDatabase = async (
     email: string,
     elo: number,
@@ -64,38 +67,36 @@ export default function CreatePuzzleSetPage() {
     repeats: number,
     name: string
   ) => {
-    const puzzleIds = await createNewPuzzleList(size, elo);
-    console.log("addNewSetToDatabase()");
-    console.log("puzzleIds:", puzzleIds);
+    setIsCreatingSet(true);
+    setPuzzleProgress(0);
+    setAccuracyProgress(0);
+
+    const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
     const res = await fetch("/api/addSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        elo,
-        size,
-        repeats,
-        name,
-        puzzleIds,
-      }),
+      body: JSON.stringify({ email, elo, size, repeats, name, puzzleIds }),
     });
 
     if (!res.ok) {
       console.error("Failed to add set:", res.status);
+      setIsCreatingSet(false);
       return null;
     }
 
     const response = await res.json();
     const set = response.set;
-    console.log("set", set);
     const setId = set.set_id;
-    console.log("This new set has an id of", setId);
+
     for (let i = 0; i < repeats; i++) {
       const success = await createSetAccuracy(setId, i);
       if (!success) {
         console.error("Failed to create accuracy row for repeat", i);
       }
+      setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
     }
+
+    setIsCreatingSet(false);
   };
 
   const createNewPuzzle = async (difficulty: string) => {
@@ -117,7 +118,8 @@ export default function CreatePuzzleSetPage() {
 
   const createNewPuzzleList = async (
     puzzle_count: number,
-    targetElo: number
+    targetElo: number,
+    onProgress: (progress: number) => void
   ): Promise<string[]> => {
     const difficultyEloMap: Record<string, number> = {
       easiest: 499,
@@ -187,6 +189,7 @@ export default function CreatePuzzleSetPage() {
       totalElo += difficultyEloMap[selectedDifficulty];
       difficultyCounts[selectedDifficulty] =
         (difficultyCounts[selectedDifficulty] || 0) + 1;
+      onProgress(Math.floor((puzzleIds.size / puzzle_count) * 100));
     }
 
     const finalAvg = totalElo / puzzleIds.size;
@@ -200,7 +203,7 @@ export default function CreatePuzzleSetPage() {
       console.log(`   • ${diff.padEnd(8)}: ${count} puzzle(s)`);
     }
 
-    const allPuzzleIds =  Array.from(puzzleIds);
+    const allPuzzleIds = Array.from(puzzleIds);
     const shuffledPuzzleIds = shuffleStringList(allPuzzleIds);
     console.log("All puzzle IDs:", allPuzzleIds);
     console.log("Shuffled puzzle IDs:", shuffledPuzzleIds);
@@ -224,13 +227,6 @@ export default function CreatePuzzleSetPage() {
       return;
     }
 
-    console.log("email:", email);
-    console.log("This set name:", name);
-    console.log("This set description:", description);
-    console.log("This set size:", setSize);
-    console.log("This set repeatCount:", repeatCount);
-    console.log("This slider value:", difficultySliderValue);
-
     await addNewSetToDatabase(
       email,
       difficultySliderValue,
@@ -239,7 +235,7 @@ export default function CreatePuzzleSetPage() {
       name
     );
 
-    // window.location.href = "/puzzles";
+    window.location.href = "/puzzles";
   };
 
   return (
@@ -351,6 +347,37 @@ export default function CreatePuzzleSetPage() {
             </form>
           </Card>
         </div>
+        {isCreatingSet && (
+          <div className=" text-black fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm">
+            <div className="w-md max-w-[90%] p-6 bg-white rounded-xl shadow-lg space-y-6">
+              <h2 className="text-xl font-semibold text-center">
+                Creating Puzzle Set...
+              </h2>
+
+              <div>
+                <p className="text-sm font-medium">Generating Puzzles</p>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-blue-600 h-4 rounded-full transition-all duration-300"
+                    style={{ width: `${puzzleProgress}%` }}
+                  />
+                </div>
+                <p className="text-right text-xs mt-1">{puzzleProgress}%</p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium">Creating Accuracy Rows</p>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-green-600 h-4 rounded-full transition-all duration-300"
+                    style={{ width: `${accuracyProgress}%` }}
+                  />
+                </div>
+                <p className="text-right text-xs mt-1">{accuracyProgress}%</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
