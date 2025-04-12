@@ -44,9 +44,6 @@ export default function AnimatedBoard({
     const expectedMoveStr = solution[solvedIndex];
     const expectedMoveNoPromotion = expectedMoveStr.slice(0, 4);
 
-    console.log("\tmoveStr", moveStr);
-    console.log("\texpectedMoveStr", expectedMoveStr);
-    console.log("\expectedMoveNoPromotion", expectedMoveNoPromotion);
     const isCorrect = moveStr === expectedMoveNoPromotion;
 
     if (!isCorrect) {
