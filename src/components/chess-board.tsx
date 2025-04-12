@@ -163,18 +163,23 @@ export default function AnimatedBoard({
       return window.innerHeight;
     }
     return 0; // default value if not in browser
-  }
+  };
   const isPortrait = getScreenHeight() > getScreenWidth();
 
-  console.log(getScreenWidth(),
-    getScreenHeight() , )
+  console.log(getScreenWidth(), getScreenHeight());
 
-  const dynamicBoardWidth = Math.min(getScreenHeight(), getScreenWidth()) * 0.7;
+  let factor = 1;
+  if (getScreenWidth() > 600) {
+    factor = 0.7;
+  }
 
-  console.log('Width is', getScreenWidth(), 'px')
-  console.log('Height is', getScreenHeight(), 'px')
-  console.log('Portrait is', isPortrait)
-  console.log('thus board width is', dynamicBoardWidth, 'px')
+  const dynamicBoardWidth = Math.min(getScreenHeight(), getScreenWidth()) * factor;
+
+  console.log("Width is", getScreenWidth(), "px");
+  console.log("Height is", getScreenHeight(), "px");
+  console.log("Portrait is", isPortrait);
+  console.log("factor is", factor);
+  console.log("thus board width is", dynamicBoardWidth, "px");
 
   return (
     <div
