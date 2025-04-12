@@ -9,10 +9,7 @@ import confetti from "canvas-confetti";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import AnimatedBoard from "@/components/chess-board";
 import { useSession } from "next-auth/react";
