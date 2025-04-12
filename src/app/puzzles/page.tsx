@@ -6,11 +6,7 @@ import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/chess-board";
 import { useSession } from "next-auth/react";
 
@@ -211,9 +207,7 @@ export default function PuzzlesPage() {
 
       const data = await res.json();
 
-      if (!res.ok)
-        return { correct: 0, incorrect: 0 };
-
+      if (!res.ok) return { correct: 0, incorrect: 0 };
 
       return { correct: data.correct, incorrect: data.incorrect };
     } catch (err) {
@@ -546,7 +540,7 @@ export default function PuzzlesPage() {
     console.log("\tpuzzle_index:", puzzle_index);
     console.log("\tcorrect:", correct);
     console.log("\tincorrect:", incorrect);
-    console.log('\tAccuracy:', correct / incorrect);
+    console.log("\tAccuracy:", correct / incorrect);
 
     if (accuracyStats) {
       setAccuracies[selectedSetId] = { correct, incorrect };
