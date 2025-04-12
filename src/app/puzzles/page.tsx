@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
-import { Eye } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
@@ -314,6 +314,7 @@ export default function PuzzlesPage() {
       await loadPuzzleAndInitialize(puzzle);
     }
     handleStartSession();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const incrementPuzzleIndex = async () => {
@@ -527,7 +528,10 @@ export default function PuzzlesPage() {
                 />
               </div>
             </CardContent>
+
+            {/*info below the puzzle*/}
             <CardFooter className="px-0">
+              {/*accuracy*/}
               <div className="px-3 text-sm text-muted-foreground">
                 Accuracy:
                 {selectedSetId !== null && setAccuracies[selectedSetId]
@@ -540,6 +544,19 @@ export default function PuzzlesPage() {
                   : " N/A"}
               </div>
 
+              {/*puzzle index / size*/}
+              <div className="px-3 flex gap-4px-3 text-sm text-muted-foreground">
+                <div className = "px-1"><PuzzleIcon className="w-4 h-4" /></div>{" "}
+                {selectedSet.puzzle_index + 1} / {selectedSet.size}
+              </div>
+
+              {/*repeat index / repeat count*/}
+              <div className="px-3 flex gap-4px-3 text-sm text-muted-foreground">
+                <div className = "px-1"><RepeatIcon className="w-4 h-4" /></div> {currentRepeatIndex + 1} /{" "}
+                {selectedSet.repeats}
+              </div>
+
+              {/*show hint*/}
               <div className="flex">
                 <Button
                   variant="ghost"
