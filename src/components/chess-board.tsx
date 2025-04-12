@@ -173,13 +173,8 @@ export default function AnimatedBoard({
     factor = 0.7;
   }
 
-  const dynamicBoardWidth = Math.min(getScreenHeight(), getScreenWidth()) * factor;
-
-  console.log("Width is", getScreenWidth(), "px");
-  console.log("Height is", getScreenHeight(), "px");
-  console.log("Portrait is", isPortrait);
-  console.log("factor is", factor);
-  console.log("thus board width is", dynamicBoardWidth, "px");
+  const dynamicBoardWidth =
+    Math.min(getScreenHeight(), getScreenWidth()) * factor;
 
   return (
     <div
