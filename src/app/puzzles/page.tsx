@@ -56,6 +56,7 @@ export default function PuzzlesPage() {
   const [solvedIndex, setSolvedIndex] = useState<number>(0);
   const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
+  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
   useState<number>(0);
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
@@ -225,10 +226,12 @@ export default function PuzzlesPage() {
       return;
     }
     const repeat_index = currentSetProgress.repeat_index;
-    if (!repeat_index) {
+    const puzzle_index = currentSetProgress.puzzle_index;
+    if (!repeat_index || !puzzle_index) {
       return;
     }
     setCurrentRepeatIndex(repeat_index);
+    setCurrentPuzzleIndex(puzzle_index);
   };
 
   const handleStartSession = async () => {
@@ -334,9 +337,16 @@ export default function PuzzlesPage() {
     }
     handleStartSession();
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const thisSetProgress = await getSetProgress(setId);
+    if (thisSetProgress) {
+      setCurrentRepeatIndex(thisSetProgress.repeat_index);
+      setCurrentPuzzleIndex(thisSetProgress.puzzle_index);
+    }
   };
 
   const incrementPuzzleIndex = async () => {
+    console.log("incrementPuzzleIndex()");
     const setId = selectedSetId;
 
     if (!setId) {
@@ -361,7 +371,9 @@ export default function PuzzlesPage() {
 
     await setSetProgress(setId, repeat_index, puzzle_index);
 
+    console.log("Updating puzzle/repeat with", puzzle_index, "/", repeat_index);
     setCurrentRepeatIndex(repeat_index);
+    setCurrentPuzzleIndex(puzzle_index);
 
     return puzzle_index;
   };
@@ -375,6 +387,7 @@ export default function PuzzlesPage() {
   };
 
   const handleNextPuzzle = async () => {
+    console.log("handleNextPuzzle()");
     if (setIsDone()) {
       showConfetti();
       return;
@@ -448,6 +461,7 @@ export default function PuzzlesPage() {
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
     await showSolution(); // 👈 show the correct answer before progressing
+    console.log("This puzzle was unsuccessful!");
     await handleNextPuzzle();
   };
 
@@ -457,6 +471,7 @@ export default function PuzzlesPage() {
       return;
     }
     await addCorrectAttempt(selectedSetId, currentRepeatIndex);
+    console.log("This puzzle was successful!");
     await handleNextPuzzle();
   };
 
@@ -567,47 +582,52 @@ export default function PuzzlesPage() {
             </CardContent>
 
             {/*info below the puzzle*/}
-            <CardFooter className="px-0">
-              {/*accuracy*/}
-              <div className="px-3 text-sm text-muted-foreground">
-                Accuracy:
-                {selectedSetId !== null && setAccuracies[selectedSetId]
-                  ? ` ${Math.round(
-                      (setAccuracies[selectedSetId].correct /
-                        (setAccuracies[selectedSetId].correct +
-                          setAccuracies[selectedSetId].incorrect || 1)) *
-                        100
-                    )}%`
-                  : " N/A"}
-              </div>
+            <CardFooter className="px-3 py-2 flex justify-center">
+              <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
+                {/* Accuracy */}
+                <div className="flex items-center gap-1">
+                  <span className="whitespace-nowrap">Accuracy:</span>
+                  <span className="font-medium">
+                    {selectedSetId !== null && setAccuracies[selectedSetId]
+                      ? `${Math.round(
+                          (setAccuracies[selectedSetId].correct /
+                            (setAccuracies[selectedSetId].correct +
+                              setAccuracies[selectedSetId].incorrect || 1)) *
+                            100
+                        )}%`
+                      : "N/A"}
+                  </span>
+                </div>
 
-              {/*puzzle index / size*/}
-              <div className="px-3 flex gap-4 text-sm text-muted-foreground">
-                <div className="px-1">
+                {/* Puzzle Progress */}
+                <div className="flex items-center gap-1">
                   <PuzzleIcon className="w-4 h-4" />
-                </div>{" "}
-                {selectedSet.puzzle_index} / {selectedSet.size}
-              </div>
+                  <span>
+                    {currentPuzzleIndex} / {selectedSet.size}
+                  </span>
+                </div>
 
-              {/*repeat index / repeat count*/}
-              <div className="px-3 flex gap-4 text-sm text-muted-foreground">
-                <div className="px-1">
+                {/* Repeat Progress */}
+                <div className="flex items-center gap-1">
                   <RepeatIcon className="w-4 h-4" />
-                </div>{" "}
-                {currentRepeatIndex} / {selectedSet.repeats}
-              </div>
+                  <span>
+                    {currentRepeatIndex} / {selectedSet.repeats}
+                  </span>
+                </div>
 
-              {/*show hint*/}
-              <div className="flex">
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    setHighlight(solution[solvedIndex]?.slice(2) ?? null)
-                  }
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Hint
-                </Button>
+                {/* Hint Button */}
+                <div className="flex items-center">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center p-0"
+                    onClick={() =>
+                      setHighlight(solution[solvedIndex]?.slice(2) ?? null)
+                    }
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Hint
+                  </Button>
+                </div>
               </div>
             </CardFooter>
           </Card>
@@ -676,18 +696,23 @@ export default function PuzzlesPage() {
                     {" "}
                     {setProgressMap[set.set_id]?.puzzle_index ?? 0} / {set.size}
                   </div>
-                  {setAccuracies[set.set_id] && (
-                    <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {" "}
-                      {Math.round(
-                        (setAccuracies[set.set_id].correct /
-                          (setAccuracies[set.set_id].correct +
-                            setAccuracies[set.set_id].incorrect || 1)) *
-                          100
-                      )}
-                      %
-                    </div>
-                  )}
+
+                  <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                    {setAccuracies[set.set_id] ? (
+                      <>
+                        {Math.round(
+                          (setAccuracies[set.set_id].correct /
+                            (setAccuracies[set.set_id].correct +
+                              setAccuracies[set.set_id].incorrect || 1)) *
+                            100
+                        )}
+                        %
+                      </>
+                    ) : (
+                      <>N/A</>
+                    )}
+                  </div>
+
                   {/* set selection buttons */}
                   <div className="flex flex-col md:flex-row sm:gap-4 justify-end items-center border-r border-b border-grey">
                     <div className="flex w-full md:w-auto">
