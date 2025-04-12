@@ -113,31 +113,48 @@ export default function PuzzlesPage() {
     }
   };
 
-  useEffect(() => {
-    const fetchUserSetData = async () => {
-      console.log("fetchUserSetData()");
+  const getAllSetData = async (email: string) => {
+    const response = await fetch("/api/getSet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email }),
+    });
 
+    if (!response.ok) {
+      console.error("Failed to fetch user sets");
+      return;
+    }
+    console.log("Valid response for this user's set data");
+
+    const result = await response.json();
+    const sets: PuzzleSet[] = result.sets;
+    return sets;
+  };
+
+  useEffect(() => {
+    const updateUserSetData = async () => {
+      console.log("updateUserSetData()");
+
+      //get logged in email
       if (!session?.user?.email) {
         console.error("User is not logged in or session is missing email");
         return;
       }
+      const email = session.user.email;
 
-      const response = await fetch("/api/getSet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session.user.email }),
-      });
-
-      if (!response.ok) {
+      //grab set data
+      const sets = await getAllSetData(email);
+      if (!sets) {
         console.error("Failed to fetch user sets");
         return;
       }
-
-      console.log("Valid /api/getSet response");
-
-      const result = await response.json();
-      const sets: PuzzleSet[] = result.sets;
       setUserSets(sets);
+      console.log("This is the set data:");
+      for (const set of sets) {
+        console.log(
+          `\tSet ID: ${set.set_id}, Name: ${set.name}, Elo: ${set.elo}, Size: ${set.size}, Repeat index: ${set.repeat_index}, Puzzle index: ${set.puzzle_index}`
+        );
+      }
 
       const accuracies: Record<number, { correct: number; incorrect: number }> =
         {};
@@ -146,6 +163,7 @@ export default function PuzzlesPage() {
         { repeat_index: number; puzzle_index: number }
       > = {};
 
+      console.log("getting set accuracies...");
       for (const set of sets) {
         let repeat_index = set.repeat_index;
         if (repeat_index === set.size) {
@@ -157,6 +175,16 @@ export default function PuzzlesPage() {
         if (res) {
           accuracies[set.set_id] = res;
         }
+        console.log(
+          "\tSet accuracy request result: set id:",
+          set.set_id,
+          " repeat index:",
+          set.repeat_index,
+          " correct:",
+          res?.correct,
+          " incorrect:",
+          res?.incorrect
+        );
 
         const progress = await getSetProgress(set.set_id);
         if (progress) {
@@ -172,7 +200,7 @@ export default function PuzzlesPage() {
     };
 
     if (authStatus === "authenticated") {
-      fetchUserSetData();
+      updateUserSetData();
     }
   }, [authStatus]);
 
@@ -187,7 +215,8 @@ export default function PuzzlesPage() {
       const data = await res.json();
 
       if (!res.ok)
-        throw new Error(data.error || "Failed to fetch accuracy stats");
+        return { correct: 0, incorrect: 0 };
+
 
       return { correct: data.correct, incorrect: data.incorrect };
     } catch (err) {
@@ -373,6 +402,7 @@ export default function PuzzlesPage() {
     }
 
     await updatePuzzleProgress();
+    await updateThisSetAccuracy();
   };
 
   const getSetProgress = async (set_id: number) => {
@@ -499,7 +529,30 @@ export default function PuzzlesPage() {
 
     if (solvedIndex + 1 === solution.length) {
       handleSuccessfulPuzzle();
-    } else {
+    }
+  };
+
+  const updateThisSetAccuracy = async () => {
+    if (!selectedSetId) {
+      console.log("No selected set id");
+      return;
+    }
+    const { repeat_index, puzzle_index } = await getSetProgress(selectedSetId);
+
+    const accuracyStats = await getSetAccuracy(selectedSetId, repeat_index);
+    const correct = accuracyStats?.correct || 0;
+    const incorrect = accuracyStats?.incorrect || 0;
+
+    console.log("\tUpdating this puzzle:", selectedSetId);
+    console.log("\taccuracyStats:", accuracyStats);
+    console.log("\trepeat_index:", repeat_index);
+    console.log("\tpuzzle_index:", puzzle_index);
+    console.log("\tcorrect:", correct);
+    console.log("\tincorrect:", incorrect);
+    console.log('\tAccuracy:', correct / incorrect);
+
+    if (accuracyStats) {
+      setAccuracies[selectedSetId] = { correct, incorrect };
     }
   };
 
@@ -542,7 +595,7 @@ export default function PuzzlesPage() {
                 <div className="px-1">
                   <PuzzleIcon className="w-4 h-4" />
                 </div>{" "}
-                {selectedSet.puzzle_index + 1} / {selectedSet.size}
+                {selectedSet.puzzle_index} / {selectedSet.size}
               </div>
 
               {/*repeat index / repeat count*/}
@@ -550,7 +603,7 @@ export default function PuzzlesPage() {
                 <div className="px-1">
                   <RepeatIcon className="w-4 h-4" />
                 </div>{" "}
-                {currentRepeatIndex + 1} / {selectedSet.repeats}
+                {currentRepeatIndex} / {selectedSet.repeats}
               </div>
 
               {/*show hint*/}
@@ -584,6 +637,7 @@ export default function PuzzlesPage() {
 
       {/*User sets*/}
       <div className=" grid grid-cols-1 ">
+        {/*Sets Table header row*/}
         <div className="border  rounded-t-lg bg-black">
           <div className="text-xs grid grid-cols-6 ">
             <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
@@ -605,6 +659,7 @@ export default function PuzzlesPage() {
           </div>
         </div>
 
+        {/*Sets Table data*/}
         <div className=" border rounded-b-lg bg-muted/20">
           {userSets.map((set) => (
             <div key={set.set_id} className="">
@@ -628,8 +683,7 @@ export default function PuzzlesPage() {
                   </div>
                   <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
                     {" "}
-                    {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1} /{" "}
-                    {set.size}
+                    {setProgressMap[set.set_id]?.puzzle_index ?? 0} / {set.size}
                   </div>
                   {setAccuracies[set.set_id] && (
                     <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
