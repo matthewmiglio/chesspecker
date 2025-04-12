@@ -164,9 +164,6 @@ export default function AnimatedBoard({
     }
     return 0; // default value if not in browser
   };
-  const isPortrait = getScreenHeight() > getScreenWidth();
-
-  console.log(getScreenWidth(), getScreenHeight());
 
   let factor = 1;
   if (getScreenWidth() > 600) {
