@@ -643,32 +643,29 @@ export default function PuzzlesPage() {
                       %
                     </div>
                   )}
-                {/* set selection buttons */}
-<div className="flex flex-col md:flex-row sm:gap-4 justify-end items-center border-r border-b border-grey">
-  <div className="flex w-full md:w-auto">
-    <Button
-      className="w-full px-0 sm:px-5 rounded-none"
-      variant={selectedSetId === set.set_id ? "default" : "outline"}
-    >
-      {selectedSetId === set.set_id ? "Selected" : "Select"}
-    </Button>
-  </div>
+                  {/* set selection buttons */}
+                  <div className="flex flex-col md:flex-row sm:gap-4 justify-end items-center border-r border-b border-grey">
+                    <div className="flex w-full md:w-auto">
+                      <Button
+                        className="w-full px-0 sm:px-5 rounded-none"
+                        variant={
+                          selectedSetId === set.set_id ? "default" : "outline"
+                        }
+                      >
+                        {selectedSetId === set.set_id ? "Selected" : "Select"}
+                      </Button>
+                    </div>
 
-  <div className="flex w-full md:w-auto justify-end">
-    <Button
-      className="w-full px-0 sm:px-5 rounded-none"
-      variant="destructive"
-      onClick={() => removeSetGivenId(set.set_id)}
-    >
-      Delete
-    </Button>
-  </div>
-</div>
-
-
-
-
-
+                    <div className="flex w-full md:w-auto justify-end">
+                      <Button
+                        className="w-full px-0 sm:px-5 rounded-none"
+                        variant="destructive"
+                        onClick={() => removeSetGivenId(set.set_id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </Card>
             </div>
