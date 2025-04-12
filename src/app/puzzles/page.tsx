@@ -318,6 +318,7 @@ export default function PuzzlesPage() {
     if (puzzle) {
       await loadPuzzleAndInitialize(puzzle);
     }
+    handleStartSession();
   };
 
   const incrementPuzzleIndex = async () => {
@@ -546,20 +547,13 @@ export default function PuzzlesPage() {
 
               <div className="flex">
                 <Button
-                  onClick={() => {
-                    handleStartSession();
-                  }}
-                >
-                  Start Session
-                </Button>
-                <Button
                   variant="ghost"
                   onClick={() =>
                     setHighlight(solution[solvedIndex]?.slice(2) ?? null)
                   }
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Show Solution
+                  Hint
                 </Button>
               </div>
             </CardFooter>
@@ -580,77 +574,74 @@ export default function PuzzlesPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3">
-          {userSets.map((set) => (
-            <div key={set.set_id} className="">
-              <Card
-                key={set.set_id}
-                className={`cursor-pointer transition-all ${
-                  selectedSetId === set.set_id ? "border-primary" : ""
-                }`}
-                onClick={() => handleSetSelect(set.set_id)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle>{set.name}</CardTitle>
-                  <CardDescription>
-                    Difficulties: {set.difficulties.join(", ")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {set.difficulties.map((diff) => (
-                      <Badge key={diff} variant="secondary">
-                        {diff}
-                      </Badge>
-                    ))}
-                  </div>
+        {userSets.map((set) => (
+          <div key={set.set_id} className="">
+            <Card
+              key={set.set_id}
+              className={`cursor-pointer transition-all ${
+                selectedSetId === set.set_id ? "border-primary" : ""
+              }`}
+              onClick={() => handleSetSelect(set.set_id)}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle>{set.name}</CardTitle>
+                <CardDescription>
+                  Difficulties: {set.difficulties.join(", ")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {set.difficulties.map((diff) => (
+                    <Badge key={diff} variant="secondary">
+                      {diff}
+                    </Badge>
+                  ))}
+                </div>
 
+                <div className="text-sm text-muted-foreground">
+                  Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
+                  {set.repeats}
+                </div>
+
+                <div className="text-sm text-muted-foreground">
+                  Puzzle: {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1}{" "}
+                  / {set.size}
+                </div>
+
+                {setAccuracies[set.set_id] && (
                   <div className="text-sm text-muted-foreground">
-                    Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
-                    {set.repeats}
+                    Accuracy:{" "}
+                    {Math.round(
+                      (setAccuracies[set.set_id].correct /
+                        (setAccuracies[set.set_id].correct +
+                          setAccuracies[set.set_id].incorrect || 1)) *
+                        100
+                    )}
+                    %
                   </div>
+                )}
+              </CardContent>
 
-                  <div className="text-sm text-muted-foreground">
-                    Puzzle:{" "}
-                    {(setProgressMap[set.set_id]?.puzzle_index ?? 0) + 1} /{" "}
-                    {set.size}
-                  </div>
-
-                  {setAccuracies[set.set_id] && (
-                    <div className="text-sm text-muted-foreground">
-                      Accuracy:{" "}
-                      {Math.round(
-                        (setAccuracies[set.set_id].correct /
-                          (setAccuracies[set.set_id].correct +
-                            setAccuracies[set.set_id].incorrect || 1)) *
-                          100
-                      )}
-                      %
-                    </div>
-                  )}
-                </CardContent>
-
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    variant={
-                      selectedSetId === set.set_id ? "default" : "outline"
-                    }
-                  >
-                    {selectedSetId === set.set_id ? "Selected" : "Select"}
-                  </Button>
-                </CardFooter>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    variant="destructive"
-                    onClick={removeSetGivenId(set.set_id)}
-                  >
-                    Delete
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          ))}
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  variant={selectedSetId === set.set_id ? "default" : "outline"}
+                >
+                  {selectedSetId === set.set_id ? "Selected" : "Select"}
+                </Button>
+              </CardFooter>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  variant="destructive"
+                  onClick={removeSetGivenId(set.set_id)}
+                >
+                  Delete
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        ))}
       </div>
     </div>
   );
