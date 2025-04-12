@@ -10,17 +10,22 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ChessPecker",
-  description: "An online tool for creating and sharing and practicing personalized chess puzzle sets.",
+  description:
+    "An online tool for creating and sharing and practicing personalized chess puzzle sets.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <Navbar/>
+          <Navbar />
           {children}
-          <Footer/>
+          <Footer />
         </Providers>
       </body>
     </html>
