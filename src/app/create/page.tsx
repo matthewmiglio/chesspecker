@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import {
   Card,
   CardContent,
@@ -27,6 +28,9 @@ export default function CreatePuzzleSetPage() {
   );
   const [setSize, setSetSize] = useState<number>(300);
   const [repeatCount, setRepeatCount] = useState<number>(8);
+
+  const [difficultySliderValue, setDifficultySliderValue] =
+    useState<number>(1500);
 
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
     console.log("createSetAccuracy()");
@@ -61,12 +65,12 @@ export default function CreatePuzzleSetPage() {
 
   const addNewSetToDatabase = async (
     email: string,
-    difficulties: string[],
+    elo: number,
     size: number,
     repeats: number,
     name: string
   ) => {
-    const puzzleIds = await createNewPuzzleList(size, difficulties);
+    const puzzleIds = await createNewPuzzleList(size, elo);
     console.log("addNewSetToDatabase()");
     console.log("puzzleIds:", puzzleIds);
     const res = await fetch("/api/addSet", {
@@ -74,7 +78,7 @@ export default function CreatePuzzleSetPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        difficulties,
+        elo,
         size,
         repeats,
         name,
@@ -109,66 +113,119 @@ export default function CreatePuzzleSetPage() {
     return await response.json();
   };
 
+  const shuffleStringList = (list: string[]) => {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
+
   const createNewPuzzleList = async (
     puzzle_count: number,
-    difficulties: string[]
+    targetElo: number
   ): Promise<string[]> => {
+    const difficultyEloMap: Record<string, number> = {
+      easiest: 499,
+      easier: 999,
+      normal: 1499,
+      harder: 2249,
+      hardest: 3001,
+    };
+
+    const difficulties = Object.keys(difficultyEloMap);
+
     if (puzzle_count > maxSetSize) {
-      console.log(
-        "This set is too big. Please make it smaller. Max is",
-        maxSetSize
-      );
-      console.log("Using max set size of", maxSetSize);
+      console.log("⚠️ Requested set size exceeds max. Capping to", maxSetSize);
       puzzle_count = maxSetSize;
     }
 
-    const puzzleIds: string[] = [];
+    const getRandom = (list: string[]) =>
+      list[Math.floor(Math.random() * list.length)];
+
+    const easierDifficulties = difficulties.filter(
+      (d) => difficultyEloMap[d] < targetElo
+    );
+    const harderDifficulties = difficulties.filter(
+      (d) => difficultyEloMap[d] >= targetElo
+    );
+
+    const puzzleIds: Set<string> = new Set();
     const difficultyCounts: Record<string, number> = {};
+    let totalElo = 0;
 
-    for (let i = 0; i < puzzle_count; i++) {
-      const randomIndex = Math.floor(Math.random() * difficulties.length);
-      const randomDifficulty = difficulties[randomIndex];
+    console.log("🔧 Starting puzzle generation...");
+    console.log(`🎯 Target average ELO: ${targetElo}`);
+    console.log(`📦 Total puzzles to generate: ${puzzle_count}`);
 
-      // Track difficulty count
-      difficultyCounts[randomDifficulty] =
-        (difficultyCounts[randomDifficulty] || 0) + 1;
+    while (puzzleIds.size < puzzle_count) {
+      const currentAvg = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
 
-      const puzzle = await createNewPuzzle(randomDifficulty);
-      const puzzleId = puzzle.puzzle.id;
+      const pool =
+        currentAvg >= targetElo ? easierDifficulties : harderDifficulties;
+
+      if (pool.length === 0) {
+        console.warn("⚠️ No suitable difficulty options based on target ELO.");
+        break;
+      }
+
+      const selectedDifficulty = getRandom(pool);
 
       console.log(
-        `Created puzzle ${puzzleId} with difficulty: ${randomDifficulty}`
+        `➕ Adding puzzle ${
+          puzzleIds.size + 1
+        } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
+          2
+        )})`
       );
-      puzzleIds.push(puzzleId);
+
+      const puzzle = await createNewPuzzle(selectedDifficulty);
+      const puzzleId = puzzle.puzzle.id;
+
+      if (puzzleIds.has(puzzleId)) {
+        console.log(
+          `♻️ Duplicate detected for difficulty "${selectedDifficulty}". Retrying...`
+        );
+        continue;
+      }
+
+      puzzleIds.add(puzzleId);
+      totalElo += difficultyEloMap[selectedDifficulty];
+      difficultyCounts[selectedDifficulty] =
+        (difficultyCounts[selectedDifficulty] || 0) + 1;
     }
 
-    console.log("createNewPuzzleList() yields", puzzleIds);
-    console.log("Difficulty breakdown:");
-    Object.entries(difficultyCounts).forEach(([difficulty, count]) => {
-      console.log(`  ${difficulty}: ${count}`);
-    });
+    const finalAvg = totalElo / puzzleIds.size;
 
-    return puzzleIds;
+    console.log("\n✅ Puzzle generation complete!");
+    console.log(`🎯 Target average ELO: ${targetElo}`);
+    console.log("📈 Final Average ELO:", finalAvg.toFixed(2));
+    console.log("📊 Difficulty Breakdown:");
+    for (const diff of difficulties) {
+      const count = difficultyCounts[diff] || 0;
+      console.log(`   • ${diff.padEnd(8)}: ${count} puzzle(s)`);
+    }
+
+    const allPuzzleIds =  Array.from(puzzleIds);
+    const shuffledPuzzleIds = shuffleStringList(allPuzzleIds);
+    console.log("All puzzle IDs:", allPuzzleIds);
+    console.log("Shuffled puzzle IDs:", shuffledPuzzleIds);
+    return shuffledPuzzleIds;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateSetButton = async (e: React.FormEvent) => {
+    console.log();
     e.preventDefault();
 
-    if (
-      selectedDifficulties.length === 0 ||
-      name.trim() === "" ||
-      description.trim() === "" ||
-      setSize <= 0 ||
-      repeatCount <= 0
-    ) {
-      console.log("Please fill out all the fields");
+    if (name.trim() === "" || setSize <= 0 || repeatCount <= 0) {
+      console.log("Please fill out name size and repeat count");
       return;
     }
 
     const email = session?.user?.email;
     if (!email) {
       console.error(
-        "Skipping handleSubmit() in create set page. session?.user?.email is undefined!"
+        "Skipping handleCreateSetButton() in create set page. session?.user?.email is undefined!"
       );
       return;
     }
@@ -178,19 +235,17 @@ export default function CreatePuzzleSetPage() {
     console.log("This set description:", description);
     console.log("This set size:", setSize);
     console.log("This set repeatCount:", repeatCount);
-    console.log("This set difficulties:", selectedDifficulties);
+    console.log("This slider value:", difficultySliderValue);
 
-    const addSetResponse = await addNewSetToDatabase(
+    await addNewSetToDatabase(
       email,
-      selectedDifficulties,
+      difficultySliderValue,
       setSize,
       repeatCount,
       name
     );
 
-    console.log("add set response", addSetResponse);
-
-    window.location.href = "/puzzles";
+    // window.location.href = "/puzzles";
   };
 
   return (
@@ -214,7 +269,7 @@ export default function CreatePuzzleSetPage() {
               !isLoggedIn ? "blur-sm pointer-events-none opacity-50" : ""
             }
           >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleCreateSetButton}>
               <CardHeader className="pb-6">
                 <CardTitle>Puzzle Set Details</CardTitle>
               </CardHeader>
@@ -252,6 +307,7 @@ export default function CreatePuzzleSetPage() {
                   />
                 </div>
 
+                {/*Repeat count input*/}
                 <div className="space-y-2">
                   <Label htmlFor="repeat-count">Repeat Count</Label>
                   <Input
@@ -263,26 +319,32 @@ export default function CreatePuzzleSetPage() {
                   />
                 </div>
 
+                {/*Difficulty slider*/}
                 <div className="space-y-3">
-                  <Label>Difficulty Levels</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {["easiest", "easier", "normal", "harder", "hardest"].map(
-                      (level) => (
-                        <Button
-                          key={level}
-                          type="button"
-                          variant={
-                            selectedDifficulties.includes(level)
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() => handleDifficultyToggle(level)}
-                          className="w-full capitalize"
-                        >
-                          {level}
-                        </Button>
-                      )
-                    )}
+                  <Label>ELO</Label>
+                  <Slider
+                    defaultValue={[1500]}
+                    min={500}
+                    max={2900}
+                    step={50}
+                    onValueChange={(value) => {
+                      console.log("Slider value:", value[0]);
+                      setDifficultySliderValue(value[0]);
+                    }}
+                  />
+                  <div className="flex gap-4">
+                    <div className="flex-1 flex items-center justify-center">
+                      700
+                    </div>
+                    <div className="flex-1 flex items-center justify-center">
+                      1400
+                    </div>
+                    <div className="flex-1 flex items-center justify-center">
+                      2000
+                    </div>
+                    <div className="flex-1 flex items-center justify-center">
+                      2700
+                    </div>
                   </div>
                 </div>
               </CardContent>

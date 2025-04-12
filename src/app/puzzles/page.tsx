@@ -22,7 +22,7 @@ type PuzzleSet = {
   set_id: number;
   name: string;
   user_id: string;
-  difficulties: string[];
+  elo: number;
   size: number;
   repeats: number;
   puzzle_ids: string[];
@@ -147,12 +147,7 @@ export default function PuzzlesPage() {
         { repeat_index: number; puzzle_index: number }
       > = {};
 
-      console.log("Getting accuracies for sets...");
       for (const set of sets) {
-        console.log("Getting accuracies for set id:", set.set_id);
-        console.log("This set is on repeat index:", set.repeat_index);
-        console.log("This set size is ", set.size);
-
         let repeat_index = set.repeat_index;
         if (repeat_index === set.size) {
           console.log("This set is finished so getting prev repeat index");
@@ -303,7 +298,7 @@ export default function PuzzlesPage() {
 
     if (
       !set ||
-      !set.difficulties ||
+      !set.elo ||
       !set.size ||
       (!set.puzzle_index && set.puzzle_index != 0)
     )
@@ -583,21 +578,13 @@ export default function PuzzlesPage() {
               }`}
               onClick={() => handleSetSelect(set.set_id)}
             >
-              <CardHeader className="pb-2">
+              <CardHeader className="py-0">
                 <CardTitle>{set.name}</CardTitle>
-                <CardDescription>
-                  Difficulties: {set.difficulties.join(", ")}
-                </CardDescription>
               </CardHeader>
               <CardContent className="pb-2">
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {set.difficulties.map((diff) => (
-                    <Badge key={diff} variant="secondary">
-                      {diff}
-                    </Badge>
-                  ))}
+                <div className="text-sm text-muted-foreground">
+                  ELO: {set.elo}
                 </div>
-
                 <div className="text-sm text-muted-foreground">
                   Set: {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
                   {set.repeats}

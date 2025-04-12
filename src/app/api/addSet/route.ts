@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { name, email, difficulties, size, repeats, puzzleIds } =
+  const { name, email, elo, size, repeats, puzzleIds } =
     await req.json();
 
   const { data, error } = await supabase
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       {
         name,
         email,
-        difficulties,
+        elo,
         size,
         repeats,
         puzzle_ids: puzzleIds,

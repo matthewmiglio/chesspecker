@@ -6,6 +6,7 @@ export async function POST(req: NextRequest) {
   const url = new URL("https://lichess.org/api/puzzle/next");
   url.searchParams.set("difficulty", difficulty);
   if (theme) url.searchParams.set("theme", theme);
+  console.log("Fetching puzzle with params:", url.toString());
 
   try {
     const res = await fetch(url.toString(), {
