@@ -527,7 +527,8 @@ export default function PuzzlesPage() {
     if (computerMove) {
       chess.move({
         from: computerMove.slice(0, 2),
-        to: computerMove.slice(2),
+        to: computerMove.slice(2, 4),
+        promotion: computerMove.length > 4 ? computerMove.slice(4) : undefined,
       });
     }
 
