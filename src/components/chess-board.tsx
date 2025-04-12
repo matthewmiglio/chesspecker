@@ -37,10 +37,17 @@ export default function AnimatedBoard({
     sourceSquare: Square,
     targetSquare: Square
   ): boolean => {
+    console.log("handlePieceDrop()");
     if (!isSessionActive || isBoardLocked) return false;
 
     const moveStr = sourceSquare + targetSquare;
-    const isCorrect = moveStr === solution[solvedIndex];
+    const expectedMoveStr = solution[solvedIndex];
+    const expectedMoveNoPromotion = expectedMoveStr.slice(0, 4);
+
+    console.log("\tmoveStr", moveStr);
+    console.log("\texpectedMoveStr", expectedMoveStr);
+    console.log("\expectedMoveNoPromotion", expectedMoveNoPromotion);
+    const isCorrect = moveStr === expectedMoveNoPromotion;
 
     if (!isCorrect) {
       onMove(moveStr, false);
