@@ -36,7 +36,6 @@ export default function AccuracyStatsPage() {
   }, [selectedSetId]);
 
   const fetchUserSets = async (email: string) => {
-    console.log("fetchUserSets() email", email);
     const res = await fetch("/api/getSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -58,14 +57,15 @@ export default function AccuracyStatsPage() {
 
     if (!response.ok) return null;
     const result = await response.json();
-    return result.size;
+
+    return result.progress.size;
   };
 
   const fetchAccuracy = async (set_id: number) => {
-    console.log("fetchAccuracy() set_)id", set_id);
-
     const size = await getSetSize(set_id);
-    if (!size) {console.log('Cant fetch accuracy for this set because couldnt retrieve its size');return null};
+    if (!size) {
+      return null;
+    }
 
     const responses = await Promise.all(
       Array.from({ length: 10 }, (_, i) =>
