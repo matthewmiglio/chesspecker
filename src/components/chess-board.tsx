@@ -25,7 +25,27 @@ export default function AnimatedBoard({
   const [boardPosition, setBoardPosition] = useState(fen);
   const [isBoardLocked, setIsBoardLocked] = useState(false);
   const [arrows, setArrows] = useState<{ from: Square; to: Square }[]>([]);
+  const [boardWidth, setBoardWidth] = useState(() => {
+    if (typeof window !== "undefined") {
+      const factor = window.innerWidth > 600 ? 0.7 : 1;
+      return Math.min(window.innerWidth, window.innerHeight) * factor;
+    }
+    return 300; // fallback
+  });
+  useEffect(() => {
+    const updateBoardSize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const factor = width > 600 ? 0.7 : 1;
+      setBoardWidth(Math.min(width, height) * factor);
+    };
 
+    // Call it once in case dimensions change before React effect runs
+    updateBoardSize();
+
+    window.addEventListener("resize", updateBoardSize);
+    return () => window.removeEventListener("resize", updateBoardSize);
+  }, []);
   useEffect(() => {
     const updated = new Chess();
     updated.load(fen);
@@ -143,6 +163,7 @@ export default function AnimatedBoard({
 
     setArrowStart(null);
   };
+
   const squareToCoords = (square: Square): [number, number] => {
     const files = sideOnBottom === "w" ? "abcdefgh" : "hgfedcba";
     const ranks = sideOnBottom === "w" ? "87654321" : "12345678";
@@ -169,14 +190,6 @@ export default function AnimatedBoard({
     return 0; // default value if not in browser
   };
 
-  let factor = 1;
-  if (getScreenWidth() > 600) {
-    factor = 0.7;
-  }
-
-  const dynamicBoardWidth =
-    Math.min(getScreenHeight(), getScreenWidth()) * factor;
-
   return (
     <div
       className="w-full"
@@ -194,7 +207,7 @@ export default function AnimatedBoard({
         animationDuration={300}
         boardOrientation={orientation}
         arePiecesDraggable={!isBoardLocked && isSessionActive}
-        boardWidth={dynamicBoardWidth}
+        boardWidth={boardWidth}
         customSquareStyles={
           highlight
             ? { [highlight]: { backgroundColor: "rgba(255, 0, 0, 0.4)" } }
