@@ -5,43 +5,13 @@ import { Chess } from "chess.js";
 import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import confetti from "canvas-confetti";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/chess-board";
 import { useSession } from "next-auth/react";
 
-type PuzzleSet = {
-  set_id: number;
-  name: string;
-  user_id: string;
-  elo: number;
-  size: number;
-  repeats: number;
-  puzzle_ids: string[];
-  repeat_index: number;
-  puzzle_index: number;
-};
+import { showConfetti, showGreenCheck, showRedX } from "@/lib/visuals";
 
-type PuzzleData = {
-  puzzle: Puzzle;
-  game: Game;
-};
-
-type Puzzle = {
-  id: string;
-  initialPly: number;
-  solution: string[];
-  set_id: number;
-  repeat_index: number;
-  puzzle_index: number;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type Game = {
-  pgn: string;
-};
+import { PuzzleSet, PuzzleData } from "@/lib/types";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
@@ -473,38 +443,6 @@ export default function PuzzlesPage() {
     await addCorrectAttempt(selectedSetId, currentRepeatIndex);
     console.log("This puzzle was successful!");
     await handleNextPuzzle();
-  };
-
-  const showConfetti = () => {
-    confetti({
-      particleCount: 150,
-      spread: 80,
-      origin: { y: 0.6 },
-    });
-  };
-
-  const showGreenCheck = () => {
-    const div = document.createElement("div");
-    div.innerText = "✅";
-    div.className =
-      "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-green-500 text-6xl animate-ping z-[1000]";
-    document.body.appendChild(div);
-
-    setTimeout(() => {
-      document.body.removeChild(div);
-    }, 1000);
-  };
-
-  const showRedX = () => {
-    const div = document.createElement("div");
-    div.innerText = "❌";
-    div.className =
-      "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-6xl animate-ping z-[1000]";
-    document.body.appendChild(div);
-
-    setTimeout(() => {
-      document.body.removeChild(div);
-    }, 1000);
   };
 
   const handleMove = (move: string, isCorrect: boolean) => {
