@@ -177,19 +177,6 @@ export default function AnimatedBoard({
     return [x + 0.5, y + 0.5]; // center of square
   };
 
-  const getScreenWidth = () => {
-    if (typeof window !== "undefined") {
-      return window.innerWidth;
-    }
-    return 0; // default value if not in browser
-  };
-  const getScreenHeight = () => {
-    if (typeof window !== "undefined") {
-      return window.innerHeight;
-    }
-    return 0; // default value if not in browser
-  };
-
   return (
     <div
       className="w-full"
