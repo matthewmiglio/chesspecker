@@ -19,7 +19,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="md:px-4 hidden md:flex items-center gap-6">
           <Link
             href="/puzzles"
             className="text-muted-foreground hover:text-foreground transition-colors"

@@ -503,6 +503,7 @@ export default function PuzzlesPage() {
 
   return (
     <div className="mx-auto">
+      {/*Chess board*/}
       {selectedSet ? (
         <div className=" mx-auto  rounded-xl ">
           <Card>
@@ -586,10 +587,10 @@ export default function PuzzlesPage() {
       )}
 
       {/*User sets*/}
-      <div className=" grid grid-cols-1 ">
+      <div className="mt-10 grid grid-cols-1 ">
         {/*Sets Table header row*/}
         <div className="border  rounded-t-lg bg-black">
-          <div className="text-xs grid grid-cols-6 ">
+          <div className="text-md grid grid-cols-6 ">
             <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
               Name
             </div>
@@ -600,10 +601,10 @@ export default function PuzzlesPage() {
               Set #
             </div>
             <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-              Puzzle #
+              <PuzzleIcon/>
             </div>
             <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-              Accuracy
+            <RepeatIcon/>
             </div>
             <div> </div>
           </div>
@@ -620,7 +621,7 @@ export default function PuzzlesPage() {
                 }`}
                 onClick={() => handleSetSelect(set.set_id)}
               >
-                <div className="text-xs grid grid-cols-6 rounded-2xl">
+                <div className="min-h-[70px] text-xs grid grid-cols-6 rounded-2xl">
                   <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-grey py-3">
                     {set.name}
                   </div>
@@ -653,27 +654,23 @@ export default function PuzzlesPage() {
                   </div>
 
                   {/* set selection buttons */}
-                  <div className="flex flex-col md:flex-row sm:gap-4 justify-end items-center border-r border-b border-grey">
-                    <div className="flex w-full md:w-auto">
-                      <Button
-                        className="w-full px-0 sm:px-5 rounded-none"
-                        variant={
-                          selectedSetId === set.set_id ? "default" : "outline"
-                        }
-                      >
-                        {selectedSetId === set.set_id ? "Selected" : "Select"}
-                      </Button>
-                    </div>
+                  <div className="flex flex-col md:flex-row w-full border-b border-grey">
+                    <Button
+                      className="h-auto  py-0 gap-0 flex-1 rounded-none  md:border-r border-grey"
+                      variant={
+                        selectedSetId === set.set_id ? "default" : "outline"
+                      }
+                    >
+                      {selectedSetId === set.set_id ? "Selected" : "Select"}
+                    </Button>
 
-                    <div className="flex w-full md:w-auto justify-end">
-                      <Button
-                        className="w-full px-0 sm:px-5 rounded-none"
-                        variant="destructive"
-                        onClick={() => removeSetGivenId(set.set_id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
+                    <Button
+                      className="h-auto py-0 gap-0 flex-1 rounded-none "
+                      variant="destructive"
+                      onClick={() => removeSetGivenId(set.set_id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </Card>
