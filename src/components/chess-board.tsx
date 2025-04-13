@@ -99,8 +99,8 @@ export default function AnimatedBoard({
       setTimeout(() => {
         setGame(newGame);
         setIsBoardLocked(false);
-      }, 300);
-    }, 300);
+      }, 0);
+    }, 0);
 
     return true;
   };
