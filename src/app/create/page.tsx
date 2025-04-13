@@ -241,9 +241,7 @@ export default function CreatePuzzleSetPage() {
   return (
     <div className="max-w-[90%] mx-auto">
       <div className="max-w-3xl mx-auto">
-        <h1 className=" pt-6 text-3xl font-bold mb-6">
-          Create a New Puzzle Set
-        </h1>
+        <h1 className=" pt-6 text-3xl font-bold mb-6">New Puzzle</h1>
 
         <div className="relative">
           {!isLoading && !isLoggedIn && (
@@ -256,10 +254,12 @@ export default function CreatePuzzleSetPage() {
 
           <Card
             className={
-              !isLoggedIn ? "blur-sm pointer-events-none opacity-50" : ""
+              !isLoggedIn
+                ? "blur-sm pointer-events-none opacity-50 "
+                : "rounded-xl"
             }
           >
-            <form onSubmit={handleCreateSetButton}>
+            <form className="" onSubmit={handleCreateSetButton}>
               <CardHeader className="pb-6">
                 <CardTitle>Puzzle Set Details</CardTitle>
               </CardHeader>
