@@ -697,6 +697,7 @@ export default function PuzzlesPage() {
                     {/* set selection buttons */}
                     <div className="flex flex-col md:flex-row w-full border-b border-grey">
                       <Button
+                        onClick={() => handleSetSelect(set.set_id)}
                         className="h-auto  py-0 gap-0 flex-1 rounded-none  md:border-r border-grey"
                         variant={
                           selectedSetId === set.set_id ? "default" : "outline"
