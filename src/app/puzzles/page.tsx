@@ -627,7 +627,7 @@ export default function PuzzlesPage() {
       {userIsLoggedIn && userSets.length != 0 ? (
         <div className="mt-10 grid grid-cols-1 ">
           {/*Sets Table header row*/}
-          <div className="border  rounded-t-lg bg-black">
+          <div className="border  rounded-t-lg bg-muted/90">
             <div className="text-md grid grid-cols-6 ">
               <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
                 Name
