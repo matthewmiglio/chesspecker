@@ -14,7 +14,7 @@ export default function LoginButton({
   const { data: session } = useSession();
 
   return (
-    <div className="flex items-center gap-3 max-w-[0.25rem] sm:max-w-full">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
       {session ? (
         <>
           <span className="text-white">
