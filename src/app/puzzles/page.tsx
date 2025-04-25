@@ -17,7 +17,6 @@ import LoginButton from "@/components/LoginButton";
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
 
-
   const [userIsLoggedIn, setUserIsLoggedIn] = useState(false);
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
@@ -28,6 +27,7 @@ export default function PuzzlesPage() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const [solvedIndex, setSolvedIndex] = useState<number>(0);
   const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
+  const [isFinishedLoading, setIsFinishedLoading] = useState<boolean>(false);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
   useState<number>(0);
@@ -98,8 +98,6 @@ export default function PuzzlesPage() {
     return sets;
   };
 
-
-
   useEffect(() => {
     const updateUserSetData = async () => {
       console.log("updateUserSetData()");
@@ -119,7 +117,7 @@ export default function PuzzlesPage() {
       }
       setUserSets(sets);
       console.log("This is the set data:");
-      console.log('Got', sets.length, 'for this user!')
+      console.log("Got", sets.length, "for this user!");
       for (const set of sets) {
         console.log(
           `\tSet ID: ${set.set_id}, Name: ${set.name}, Elo: ${set.elo}, Size: ${set.size}, Repeat index: ${set.repeat_index}, Puzzle index: ${set.puzzle_index}`
@@ -172,8 +170,11 @@ export default function PuzzlesPage() {
     if (authStatus === "authenticated") {
       setUserIsLoggedIn(true);
       updateUserSetData();
+    } else {
+      setUserIsLoggedIn(false);
     }
-    else { setUserIsLoggedIn(false) };
+
+    setIsFinishedLoading(true);
   }, [authStatus]);
 
   const getSetAccuracy = async (setId: number, repeatIndex: number) => {
@@ -220,8 +221,6 @@ export default function PuzzlesPage() {
     }
     await updatePuzzleProgress();
   };
-
-
 
   const getFenAtPly = (pgn: string, initialPly: number) => {
     const chess = new Chess();
@@ -271,7 +270,7 @@ export default function PuzzlesPage() {
   };
 
   const handleSetSelect = async (setId: number) => {
-    console.log('handleSetSelect()')
+    console.log("handleSetSelect()");
     setSelectedSetId(setId);
     setIsSessionActive(false);
     sessionStorage.setItem("selected_set_id", String(setId));
@@ -305,15 +304,17 @@ export default function PuzzlesPage() {
   };
 
   const handleSetDelete = async (setId: number) => {
-    console.log('User clicked remove on this set:', setId)
+    console.log("User clicked remove on this set:", setId);
     const res = await fetch("/api/removeSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id: setId }),
     });
 
-
-    if (!res.ok) { console.log('Failed to delete set'); return };
+    if (!res.ok) {
+      console.log("Failed to delete set");
+      return;
+    }
     setUserSets((prevSets) => prevSets.filter((set) => set.set_id !== setId));
     if (selectedSetId === setId) {
       setSelectedSetId(null);
@@ -451,6 +452,12 @@ export default function PuzzlesPage() {
     await handleNextPuzzle();
   };
 
+  const parseUCIMove = (uci: string) => ({
+    from: uci.slice(0, 2),
+    to: uci.slice(2, 4),
+    promotion: uci.length > 4 ? uci.slice(4) : undefined,
+  });
+
   const handleMove = (move: string, isCorrect: boolean) => {
     if (!isSessionActive) return;
 
@@ -462,18 +469,16 @@ export default function PuzzlesPage() {
 
     showGreenCheck();
     setSolvedIndex((i) => i + 2);
-    const chess = new Chess();
 
+    const chess = new Chess();
     chess.load(fen);
-    chess.move(move);
+
+    // ✅ Use solution move instead of player input
+    chess.move(parseUCIMove(solution[solvedIndex]));
 
     const computerMove = solution[solvedIndex + 1];
     if (computerMove) {
-      chess.move({
-        from: computerMove.slice(0, 2),
-        to: computerMove.slice(2, 4),
-        promotion: computerMove.length > 4 ? computerMove.slice(4) : undefined,
-      });
+      chess.move(parseUCIMove(computerMove));
     }
 
     setFen(chess.fen());
@@ -508,230 +513,250 @@ export default function PuzzlesPage() {
   };
 
   return (
-    <div className="mx-auto">
-      {/*Chess board*/}
-      {selectedSet && userIsLoggedIn ? (
-        <div className=" mx-auto  rounded-xl ">
-          <Card>
-            <CardContent className="px-0 mx-auto">
-              <div className="flex ">
-                <AnimatedBoard
-                  fen={fen}
-                  solution={solution}
-                  solvedIndex={solvedIndex}
-                  onMove={handleMove}
-                  highlight={highlight}
-                  isSessionActive={isSessionActive}
-                  sideOnBottom={playerSide}
-                />
-              </div>
-            </CardContent>
+    <div>
+      {isFinishedLoading ? (
+        <div className="mx-auto">
+          {/*Chess board*/}
+          {selectedSet && userIsLoggedIn ? (
+            <div className=" mx-auto  rounded-xl ">
+              <Card>
+                <CardContent className="px-0 mx-auto">
+                  <div className="flex ">
+                    <AnimatedBoard
+                      fen={fen}
+                      solution={solution}
+                      solvedIndex={solvedIndex}
+                      onMove={handleMove}
+                      highlight={highlight}
+                      isSessionActive={isSessionActive}
+                      sideOnBottom={playerSide}
+                    />
+                  </div>
+                </CardContent>
 
-            {/*info below the puzzle*/}
-            <CardFooter className="px-3 py-2 flex justify-center">
-              <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
-                {/* Accuracy */}
-                <div className="flex items-center gap-1">
-                  <span className="whitespace-nowrap">Accuracy:</span>
-                  <span className="font-medium">
-                    {selectedSetId !== null && setAccuracies[selectedSetId]
-                      ? `${Math.round(
-                        (setAccuracies[selectedSetId].correct /
-                          (setAccuracies[selectedSetId].correct +
-                            setAccuracies[selectedSetId].incorrect || 1)) *
-                        100
-                      )}%`
-                      : "N/A"}
-                  </span>
-                </div>
-
-                {/* Puzzle Progress */}
-                <div className="flex items-center gap-1">
-                  <PuzzleIcon className="w-4 h-4" />
-                  <span>
-                    {currentPuzzleIndex} / {selectedSet.size}
-                  </span>
-                </div>
-
-                {/* Repeat Progress */}
-                <div className="flex items-center gap-1">
-                  <RepeatIcon className="w-4 h-4" />
-                  <span>
-                    {currentRepeatIndex} / {selectedSet.repeats}
-                  </span>
-                </div>
-
-                {/* Hint Button */}
-                <div className="flex items-center">
-                  <Button
-                    variant="ghost"
-                    className="flex items-center p-0"
-                    onClick={() =>
-                      setHighlight(solution[solvedIndex]?.slice(2) ?? null)
-                    }
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Hint
-                  </Button>
-                </div>
-              </div>
-            </CardFooter>
-          </Card>
-        </div>
-      ) : (
-        <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border rounded-lg bg-muted/20">
-          <div className="text-center p-8">
-
-
-            {/*Show no sets button if there are no sets AND logged in */}
-            {userSets.length === 0 && userIsLoggedIn ? (
-              <Button
-                className=''
-                variant="outline" asChild>
-                <Link href="/create">Create Your First Set</Link>
-              </Button>
-            ) :
-              (
-                <></>
-              )}
-
-            {/*Show user not logged in message if not logged in */}
-            {!userIsLoggedIn ? (
-              <div className='text-red-500 grid-cols-1 flex justify-center items-center'>
-                You must sign in to pratice!
-                <div className='px-5'> <LoginButton /></div>
-
-              </div>
-            ) :
-              (
-                <></>
-              )}
-
-            {/*If user has sets and is logged in, but a set isnt selected */}
-            {userIsLoggedIn && !selectedSet && userSets.length != 0 ? (
-              <div>
-
-                <p> Select a set to being practicing!</p>
-              </div>
-            ) :
-              (
-                <></>
-              )}
-          </div>
-        </div>
-      )}
-
-
-
-      {/*User sets*/}
-      {userIsLoggedIn && userSets.length != 0 ? (
-        <div className="mt-10 grid grid-cols-1 ">
-          {/*Sets Table header row*/}
-          <div className="border  rounded-t-lg bg-muted/90">
-            <div className="text-md grid grid-cols-6 ">
-              <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                Name
-              </div>
-              <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                ELO
-              </div>
-              <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                Set #
-              </div>
-              <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                <PuzzleIcon />
-              </div>
-              <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                <RepeatIcon />
-              </div>
-              <div> </div>
-            </div>
-          </div>
-
-          {/*Sets Table data*/}
-
-
-
-
-
-          <div className=" border rounded-b-lg bg-muted/20">
-            {userSets.map((set) => (
-              <div key={set.set_id} className="">
-                <div
-                  key={set.set_id}
-                  className={`cursor-pointer bg-transparent transition-all py-0 ${selectedSetId === set.set_id ? "border-primary" : ""
-                    }`}
-                >
-                  <div className="min-h-[70px] text-xs grid grid-cols-6 rounded-2xl">
-                    <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {set.name}
-                    </div>
-                    <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {set.elo}
-                    </div>
-                    <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
-                      {set.repeats}
-                    </div>
-                    <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {" "}
-                      {setProgressMap[set.set_id]?.puzzle_index ?? 0} / {set.size}
+                {/*info below the puzzle*/}
+                <CardFooter className="px-3 py-2 flex justify-center">
+                  <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
+                    {/* Accuracy */}
+                    <div className="flex items-center gap-1">
+                      <span className="whitespace-nowrap">Accuracy:</span>
+                      <span className="font-medium">
+                        {selectedSetId !== null && setAccuracies[selectedSetId]
+                          ? `${Math.round(
+                              (setAccuracies[selectedSetId].correct /
+                                (setAccuracies[selectedSetId].correct +
+                                  setAccuracies[selectedSetId].incorrect ||
+                                  1)) *
+                                100
+                            )}%`
+                          : "N/A"}
+                      </span>
                     </div>
 
-                    <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
-                      {setAccuracies[set.set_id] ? (
-                        <>
-                          {Math.round(
-                            (setAccuracies[set.set_id].correct /
-                              (setAccuracies[set.set_id].correct +
-                                setAccuracies[set.set_id].incorrect || 1)) *
-                            100
-                          )}
-                          %
-                        </>
-                      ) : (
-                        <>N/A</>
-                      )}
+                    {/* Puzzle Progress */}
+                    <div className="flex items-center gap-1">
+                      <PuzzleIcon className="w-4 h-4" />
+                      <span>
+                        {currentPuzzleIndex} / {selectedSet.size}
+                      </span>
                     </div>
 
-                    {/* set selection buttons */}
-                    <div className="flex flex-col md:flex-row w-full border-b border-grey ">
+                    {/* Repeat Progress */}
+                    <div className="flex items-center gap-1">
+                      <RepeatIcon className="w-4 h-4" />
+                      <span>
+                        {currentRepeatIndex} / {selectedSet.repeats}
+                      </span>
+                    </div>
+
+                    {/* Hint Button */}
+                    <div className="flex items-center">
                       <Button
-                        onClick={() => handleSetSelect(set.set_id)}
-                        className="h-auto  py-0 gap-0 flex-1 rounded-none  md:border-r border-grey"
-                        variant={
-                          selectedSetId === set.set_id ? "default" : "outline"
+                        variant="ghost"
+                        className="flex items-center p-0"
+                        onClick={() =>
+                          setHighlight(solution[solvedIndex]?.slice(2) ?? null)
                         }
                       >
-                        {selectedSetId === set.set_id ? "Selected" : "Select"}
-                      </Button>
-
-                      <Button
-                        className="h-auto py-0 gap-0 flex-1 rounded-none bg-red-500 hover:bg-red-900"
-                        variant="destructive"
-                        onClick={() => handleSetDelete(set.set_id)}
-                      >
-                        Delete
+                        <Eye className="h-4 w-4 mr-2" />
+                        Hint
                       </Button>
                     </div>
-
                   </div>
+                </CardFooter>
+              </Card>
+            </div>
+          ) : (
+            <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border rounded-lg bg-muted/20">
+              <div className="text-center p-8">
+                {/*Show no sets button if there are no sets AND logged in */}
+                {userSets.length === 0 && userIsLoggedIn ? (
+                  <Button className="" variant="outline" asChild>
+                    <Link href="/create">Create Your First Set</Link>
+                  </Button>
+                ) : (
+                  <></>
+                )}
 
+                {/*Show user not logged in message if not logged in */}
+                {!userIsLoggedIn ? (
+                  <div className="text-red-500 grid-cols-1 flex justify-center items-center">
+                    You must sign in to pratice!
+                    <div className="px-5">
+                      {" "}
+                      <LoginButton />
+                    </div>
+                  </div>
+                ) : (
+                  <></>
+                )}
 
+                {/*If user has sets and is logged in, but a set isnt selected */}
+                {userIsLoggedIn && !selectedSet && userSets.length != 0 ? (
+                  <div>
+                    <p> Select a set to being practicing!</p>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/*User sets*/}
+          {userIsLoggedIn && userSets.length != 0 ? (
+            <div className="mt-10 grid grid-cols-1 ">
+              {/*Sets Table header row*/}
+              <div className="border  rounded-t-lg bg-muted/90">
+                <div className="text-md grid grid-cols-6 ">
+                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
+                    Name
+                  </div>
+                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
+                    ELO
+                  </div>
+                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
+                    Set #
+                  </div>
+                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
+                    <PuzzleIcon />
+                  </div>
+                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
+                    <RepeatIcon />
+                  </div>
+                  <div> </div>
                 </div>
               </div>
+
+              {/*Sets Table data*/}
+
+              <div className=" border rounded-b-lg bg-muted/20">
+                {userSets.map((set) => (
+                  <div key={set.set_id} className="">
+                    <div
+                      key={set.set_id}
+                      className={`cursor-pointer bg-transparent transition-all py-0 ${
+                        selectedSetId === set.set_id ? "border-primary" : ""
+                      }`}
+                    >
+                      <div className="min-h-[70px] text-xs grid grid-cols-6 rounded-2xl">
+                        <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                          {set.name}
+                        </div>
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                          {set.elo}
+                        </div>
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                          {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
+                          {set.repeats}
+                        </div>
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                          {" "}
+                          {setProgressMap[set.set_id]?.puzzle_index ?? 0} /{" "}
+                          {set.size}
+                        </div>
+
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                          {setAccuracies[set.set_id] ? (
+                            <>
+                              {Math.round(
+                                (setAccuracies[set.set_id].correct /
+                                  (setAccuracies[set.set_id].correct +
+                                    setAccuracies[set.set_id].incorrect || 1)) *
+                                  100
+                              )}
+                              %
+                            </>
+                          ) : (
+                            <>N/A</>
+                          )}
+                        </div>
+
+                        {/* set selection buttons */}
+                        <div className="flex flex-col md:flex-row w-full border-b border-grey ">
+                          <Button
+                            onClick={() => handleSetSelect(set.set_id)}
+                            className="h-auto  py-0 gap-0 flex-1 rounded-none  md:border-r border-grey"
+                            variant={
+                              selectedSetId === set.set_id
+                                ? "default"
+                                : "outline"
+                            }
+                          >
+                            {selectedSetId === set.set_id
+                              ? "Selected"
+                              : "Select"}
+                          </Button>
+
+                          <Button
+                            className="h-auto py-0 gap-0 flex-1 rounded-none bg-red-500 hover:bg-red-900"
+                            variant="destructive"
+                            onClick={() => handleSetDelete(set.set_id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="mb-50"></div>
+          )}
+        </div>
+      ) : (
+        <div className="mx-auto max-w-3xl px-4 py-8 animate-pulse">
+          <Card>
+            <CardContent className="space-y-6">
+              {/* Skeleton board area */}
+              <div className="h-[360px] w-full bg-muted rounded-lg" />
+
+              {/* Info section */}
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 justify-center items-center">
+                <div className="h-4 w-24 bg-muted rounded" />
+                <div className="h-4 w-20 bg-muted rounded" />
+                <div className="h-4 w-20 bg-muted rounded" />
+                <div className="h-6 w-16 bg-muted rounded" />
+              </div>
+            </CardContent>
+            <CardFooter className="justify-center">
+              <div className="h-10 w-32 bg-muted rounded" />
+            </CardFooter>
+          </Card>
+
+          {/* Skeleton set list */}
+          <div className="mt-10 space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="h-20 w-full bg-muted rounded-lg shadow-inner"
+              />
             ))}
           </div>
         </div>
-      ) :
-        (
-          <div className='mb-50'></div>
-        )}
-
-
-
-
-
+      )}
     </div>
   );
 }

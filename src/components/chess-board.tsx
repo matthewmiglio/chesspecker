@@ -64,6 +64,8 @@ export default function AnimatedBoard({
     const expectedMoveStr = solution[solvedIndex];
     const expectedMoveNoPromotion = expectedMoveStr.slice(0, 4);
 
+    const expectedPromotion =
+      expectedMoveStr.length === 5 ? expectedMoveStr[4] : undefined;
     const isCorrect = moveStr === expectedMoveNoPromotion;
 
     if (!isCorrect) {
@@ -75,7 +77,12 @@ export default function AnimatedBoard({
     onMove(moveStr, true);
 
     const newGame = new Chess(game.fen());
-    newGame.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
+    newGame.move({
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: expectedPromotion || "q", // fallback if missing
+    });
+
     setBoardPosition(newGame.fen());
 
     setTimeout(() => {
