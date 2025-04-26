@@ -99,82 +99,81 @@ export default function PuzzlesPage() {
   };
 
   useEffect(() => {
-    const updateUserSetData = async () => {
-      console.log("updateUserSetData()");
+    console.log("puzzles page useEffect()");
 
-      //get logged in email
-      if (!session?.user?.email) {
-        console.error("User is not logged in or session is missing email");
-        return;
-      }
-      const email = session.user.email;
+    const run = async () => {
+      const updateUserSetData = async () => {
+        console.log("updateUserSetData()");
 
-      //grab set data
-      const sets = await getAllSetData(email);
-      if (!sets) {
-        console.error("Failed to fetch user sets");
-        return;
-      }
-      setUserSets(sets);
-      console.log("This is the set data:");
-      console.log("Got", sets.length, "for this user!");
-      for (const set of sets) {
-        console.log(
-          `\tSet ID: ${set.set_id}, Name: ${set.name}, Elo: ${set.elo}, Size: ${set.size}, Repeat index: ${set.repeat_index}, Puzzle index: ${set.puzzle_index}`
-        );
-      }
+        // get logged in email
+        if (!session?.user?.email) {
+          console.error("User is not logged in or session is missing email");
+          return;
+        }
+        const email = session.user.email;
 
-      const accuracies: Record<number, { correct: number; incorrect: number }> =
-        {};
-      const progressMap: Record<
-        number,
-        { repeat_index: number; puzzle_index: number }
-      > = {};
+        // grab set data
+        const sets = await getAllSetData(email);
+        if (!sets) {
+          console.error("Failed to fetch user sets");
+          return;
+        }
+        setUserSets(sets);
+        console.log("Got", sets.length, "sets for this user!");
 
-      console.log("getting set accuracies...");
-      for (const set of sets) {
-        let repeat_index = set.repeat_index;
-        if (repeat_index === set.size) {
-          console.log("This set is finished so getting prev repeat index");
-          repeat_index = set.size - 1;
+        const accuracies: Record<
+          number,
+          { correct: number; incorrect: number }
+        > = {};
+        const progressMap: Record<
+          number,
+          { repeat_index: number; puzzle_index: number }
+        > = {};
+
+        console.log("getting set accuracies...");
+        for (const set of sets) {
+          console.log("\tGetting set accuracy for set id:", set.set_id, "...");
+
+          let repeat_index = set.repeat_index;
+          if (repeat_index === set.size) {
+            console.log("Set is finished, using previous repeat index");
+            repeat_index = set.size - 1;
+          }
+
+          const res = await getSetAccuracy(set.set_id, repeat_index);
+          if (res) {
+            accuracies[set.set_id] = res;
+          }
+
+          const progress = await getSetProgress(set.set_id);
+          if (progress) {
+            progressMap[set.set_id] = {
+              repeat_index: progress.repeat_index,
+              puzzle_index: progress.puzzle_index,
+            };
+          }
         }
 
-        const res = await getSetAccuracy(set.set_id, repeat_index);
-        if (res) {
-          accuracies[set.set_id] = res;
-        }
-        console.log(
-          "\tSet accuracy request result: set id:",
-          set.set_id,
-          " repeat index:",
-          set.repeat_index,
-          " correct:",
-          res?.correct,
-          " incorrect:",
-          res?.incorrect
-        );
+        setSetAccuracies(accuracies);
+        setSetProgressMap(progressMap);
+        console.log("Updated setAccuracies & setProgressMap!");
+      };
 
-        const progress = await getSetProgress(set.set_id);
-        if (progress) {
-          progressMap[set.set_id] = {
-            repeat_index: progress.repeat_index,
-            puzzle_index: progress.puzzle_index,
-          };
-        }
+      if (authStatus === "authenticated") {
+        await updateUserSetData();
+        setUserIsLoggedIn(true);
+        console.log("Set userIsLoggedIn to true");
+      } else {
+        setUserIsLoggedIn(false);
+        console.log("Set userIsLoggedIn to false");
       }
 
-      setSetAccuracies(accuracies);
-      setSetProgressMap(progressMap);
+      setIsFinishedLoading(true);
+      console.log("Set isFinishedLoading to true");
+      console.log("End of puzzles page useEffect()");
     };
 
-    if (authStatus === "authenticated") {
-      setUserIsLoggedIn(true);
-      updateUserSetData();
-    } else {
-      setUserIsLoggedIn(false);
-    }
-
-    setIsFinishedLoading(true);
+    run();
   }, [authStatus]);
 
   const getSetAccuracy = async (setId: number, repeatIndex: number) => {
