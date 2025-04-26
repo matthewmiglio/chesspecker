@@ -95,7 +95,8 @@ export default function PuzzlesPage() {
     const result = await response.json();
     const sets: PuzzleSet[] = result.sets;
     return sets;
-  };  const getSetAccuracy = async (setId: number, repeatIndex: number) => {
+  };
+  const getSetAccuracy = async (setId: number, repeatIndex: number) => {
     try {
       const res = await fetch("/api/getSetAccuracy", {
         method: "POST",
@@ -113,8 +114,195 @@ export default function PuzzlesPage() {
       return null;
     }
   };
+  const getPuzzleData = async (puzzleId: string) => {
+    const response = await fetch(`/api/getPuzzleById?id=${puzzleId}`);
+    if (!response.ok) return null;
+    return await response.json();
+  };
+  const getSetProgress = async (set_id: number) => {
+    const response = await fetch("/api/getSetProgressStats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ set_id }),
+    });
+
+    if (!response.ok) return null;
+    const result = await response.json();
+    return result.progress;
+  };
 
   //puzzle interaction functions
+  const handleIncorrectMove = async () => {
+    const setId = selectedSetId;
+    if (!setId) return;
+    showRedX();
+    await addIncorrectAttempt(setId, currentRepeatIndex);
+
+    await showSolution();
+    console.log("This puzzle was unsuccessful!");
+    await handleNextPuzzle();
+  };
+
+  const handleSuccessfulPuzzle = async () => {
+    const setId = selectedSetId;
+    if (!setId) {
+      return;
+    }
+    await addCorrectAttempt(selectedSetId, currentRepeatIndex);
+    console.log("This puzzle was successful!");
+    await handleNextPuzzle();
+  };
+  const parseUCIMove = (uci: string) => ({
+    from: uci.slice(0, 2),
+    to: uci.slice(2, 4),
+    promotion: uci.length > 4 ? uci.slice(4) : undefined,
+  });
+
+  const handleMove = (move: string, isCorrect: boolean) => {
+    if (!isSessionActive) return;
+
+    if (!isCorrect) {
+      handleIncorrectMove();
+      return;
+    }
+
+    showGreenCheck();
+    setSolvedIndex((i) => i + 2);
+
+    const chess = new Chess();
+    chess.load(fen);
+
+    // ✅ Use solution move instead of player input
+    chess.move(parseUCIMove(solution[solvedIndex]));
+
+    const computerMove = solution[solvedIndex + 1];
+    if (computerMove) {
+      chess.move(parseUCIMove(computerMove));
+    }
+
+    setFen(chess.fen());
+
+    if (solvedIndex + 1 === solution.length) {
+      handleSuccessfulPuzzle();
+    }
+  };
+  const updateThisSetAccuracy = async () => {
+    if (!selectedSetId) {
+      console.log("No selected set id");
+      return;
+    }
+    const { repeat_index, puzzle_index } = await getSetProgress(selectedSetId);
+
+    const accuracyStats = await getSetAccuracy(selectedSetId, repeat_index);
+    const correct = accuracyStats?.correct || 0;
+    const incorrect = accuracyStats?.incorrect || 0;
+
+    console.log("\tUpdating this puzzle:", selectedSetId);
+    console.log("\taccuracyStats:", accuracyStats);
+    console.log("\trepeat_index:", repeat_index);
+    console.log("\tpuzzle_index:", puzzle_index);
+    console.log("\tcorrect:", correct);
+    console.log("\tincorrect:", incorrect);
+    console.log("\tAccuracy:", correct / incorrect);
+
+    if (accuracyStats) {
+      setAccuracies[selectedSetId] = { correct, incorrect };
+    }
+  };
+  const setSetProgress = async (
+    set_id: number,
+    repeat_index: number,
+    puzzle_index: number
+  ) => {
+    const response = await fetch("/api/updateSetProgressStats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
+    });
+
+    return response.ok;
+  };
+
+  const showSolution = async () => {
+    const chess = new Chess(fen);
+    const remainingSolution = solution.slice(solvedIndex);
+
+    for (let i = 0; i < remainingSolution.length; i++) {
+      const moveUci = remainingSolution[i];
+      await new Promise((resolve) => setTimeout(resolve, 600)); // delay 600ms per move
+
+      chess.move({
+        from: moveUci.slice(0, 2),
+        to: moveUci.slice(2, 4),
+        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+      });
+
+      setFen(chess.fen());
+    }
+  };
+  const incrementPuzzleIndex = async () => {
+    console.log("incrementPuzzleIndex()");
+    const setId = selectedSetId;
+
+    if (!setId) {
+      return;
+    }
+
+    const currentSetProgress = await getSetProgress(selectedSetId);
+    if (!currentSetProgress) {
+      return;
+    }
+
+    let repeat_index = currentSetProgress.repeat_index;
+    let puzzle_index = currentSetProgress.puzzle_index;
+    const size = currentSetProgress.size;
+
+    if (puzzle_index + 1 === size) {
+      puzzle_index = 0;
+      repeat_index++;
+    } else {
+      puzzle_index++;
+    }
+
+    await setSetProgress(setId, repeat_index, puzzle_index);
+
+    console.log("Updating puzzle/repeat with", puzzle_index, "/", repeat_index);
+    setCurrentRepeatIndex(repeat_index);
+    setCurrentPuzzleIndex(puzzle_index);
+
+    return puzzle_index;
+  };
+
+  const puzzleIsFinished = () => {
+    if (solution.length + 1 == solvedIndex) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleNextPuzzle = async () => {
+    console.log("handleNextPuzzle()");
+    if (setIsDone()) {
+      showConfetti();
+      return;
+    }
+
+    if (!puzzleIsFinished) {
+      return;
+    }
+
+    const puzzleIndex = await incrementPuzzleIndex();
+    const puzzleId = puzzleIds[puzzleIndex];
+    const puzzle = await getPuzzleData(puzzleId);
+
+    if (puzzle) {
+      await loadPuzzleAndInitialize(puzzle);
+    }
+
+    await updatePuzzleProgress();
+    await updateThisSetAccuracy();
+  };
   const updatePuzzleProgress = async () => {
     console.log("Updating puzzle progress...");
     if (!selectedSetId) {
@@ -172,99 +360,6 @@ export default function PuzzlesPage() {
     }
     return false;
   };
-
-  //stays here
-
-  useEffect(() => {
-    console.log("puzzles page useEffect()");
-
-    const run = async () => {
-      const updateUserSetData = async () => {
-        console.log("updateUserSetData()");
-
-        // get logged in email
-        if (!session?.user?.email) {
-          console.error("User is not logged in or session is missing email");
-          return;
-        }
-        const email = session.user.email;
-
-        // grab set data
-        const sets = await getAllSetData(email);
-        if (!sets) {
-          console.error("Failed to fetch user sets");
-          return;
-        }
-        setUserSets(sets);
-        console.log("Got", sets.length, "sets for this user!");
-
-        const accuracies: Record<
-          number,
-          { correct: number; incorrect: number }
-        > = {};
-        const progressMap: Record<
-          number,
-          { repeat_index: number; puzzle_index: number }
-        > = {};
-
-        console.log("getting set accuracies...");
-        for (const set of sets) {
-          console.log("\tGetting set accuracy for set id:", set.set_id, "...");
-
-          let repeat_index = set.repeat_index;
-          if (repeat_index === set.size) {
-            console.log("Set is finished, using previous repeat index");
-            repeat_index = set.size - 1;
-          }
-
-          const res = await getSetAccuracy(set.set_id, repeat_index);
-          if (res) {
-            accuracies[set.set_id] = res;
-          }
-
-          const progress = await getSetProgress(set.set_id);
-          if (progress) {
-            progressMap[set.set_id] = {
-              repeat_index: progress.repeat_index,
-              puzzle_index: progress.puzzle_index,
-            };
-          }
-        }
-
-        setSetAccuracies(accuracies);
-        setSetProgressMap(progressMap);
-        console.log("Updated setAccuracies & setProgressMap!");
-      };
-
-      if (authStatus === "authenticated") {
-        await updateUserSetData();
-        setUserIsLoggedIn(true);
-        console.log("Set userIsLoggedIn to true");
-      } else {
-        setUserIsLoggedIn(false);
-        console.log("Set userIsLoggedIn to false");
-      }
-
-      setIsFinishedLoading(true);
-      console.log("Set isFinishedLoading to true");
-      console.log("End of puzzles page useEffect()");
-    };
-
-    run();
-  }, [authStatus]);
-
-
-
-
-
-  const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
-
-  const getPuzzleData = async (puzzleId: string) => {
-    const response = await fetch(`/api/getPuzzleById?id=${puzzleId}`);
-    if (!response.ok) return null;
-    return await response.json();
-  };
-
   const loadPuzzleAndInitialize = async (puzzleData: PuzzleData) => {
     const fen = getFenAtPly(
       puzzleData.game.pgn,
@@ -448,193 +543,86 @@ export default function PuzzlesPage() {
     sessionStorage.removeItem("selected_set_id");
   };
 
-  const incrementPuzzleIndex = async () => {
-    console.log("incrementPuzzleIndex()");
-    const setId = selectedSetId;
+  //stays here
 
-    if (!setId) {
-      return;
-    }
+  useEffect(() => {
+    console.log("puzzles page useEffect()");
 
-    const currentSetProgress = await getSetProgress(selectedSetId);
-    if (!currentSetProgress) {
-      return;
-    }
+    const run = async () => {
+      const updateUserSetData = async () => {
+        console.log("updateUserSetData()");
 
-    let repeat_index = currentSetProgress.repeat_index;
-    let puzzle_index = currentSetProgress.puzzle_index;
-    const size = currentSetProgress.size;
+        // get logged in email
+        if (!session?.user?.email) {
+          console.error("User is not logged in or session is missing email");
+          return;
+        }
+        const email = session.user.email;
 
-    if (puzzle_index + 1 === size) {
-      puzzle_index = 0;
-      repeat_index++;
-    } else {
-      puzzle_index++;
-    }
+        // grab set data
+        const sets = await getAllSetData(email);
+        if (!sets) {
+          console.error("Failed to fetch user sets");
+          return;
+        }
+        setUserSets(sets);
+        console.log("Got", sets.length, "sets for this user!");
 
-    await setSetProgress(setId, repeat_index, puzzle_index);
+        const accuracies: Record<
+          number,
+          { correct: number; incorrect: number }
+        > = {};
+        const progressMap: Record<
+          number,
+          { repeat_index: number; puzzle_index: number }
+        > = {};
 
-    console.log("Updating puzzle/repeat with", puzzle_index, "/", repeat_index);
-    setCurrentRepeatIndex(repeat_index);
-    setCurrentPuzzleIndex(puzzle_index);
+        console.log("getting set accuracies...");
+        for (const set of sets) {
+          console.log("\tGetting set accuracy for set id:", set.set_id, "...");
 
-    return puzzle_index;
-  };
+          let repeat_index = set.repeat_index;
+          if (repeat_index === set.size) {
+            console.log("Set is finished, using previous repeat index");
+            repeat_index = set.size - 1;
+          }
 
-  const puzzleIsFinished = () => {
-    if (solution.length + 1 == solvedIndex) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+          const res = await getSetAccuracy(set.set_id, repeat_index);
+          if (res) {
+            accuracies[set.set_id] = res;
+          }
 
-  const handleNextPuzzle = async () => {
-    console.log("handleNextPuzzle()");
-    if (setIsDone()) {
-      showConfetti();
-      return;
-    }
+          const progress = await getSetProgress(set.set_id);
+          if (progress) {
+            progressMap[set.set_id] = {
+              repeat_index: progress.repeat_index,
+              puzzle_index: progress.puzzle_index,
+            };
+          }
+        }
 
-    if (!puzzleIsFinished) {
-      return;
-    }
+        setSetAccuracies(accuracies);
+        setSetProgressMap(progressMap);
+        console.log("Updated setAccuracies & setProgressMap!");
+      };
 
-    const puzzleIndex = await incrementPuzzleIndex();
-    const puzzleId = puzzleIds[puzzleIndex];
-    const puzzle = await getPuzzleData(puzzleId);
+      if (authStatus === "authenticated") {
+        await updateUserSetData();
+        setUserIsLoggedIn(true);
+        console.log("Set userIsLoggedIn to true");
+      } else {
+        setUserIsLoggedIn(false);
+        console.log("Set userIsLoggedIn to false");
+      }
 
-    if (puzzle) {
-      await loadPuzzleAndInitialize(puzzle);
-    }
+      setIsFinishedLoading(true);
+      console.log("Set isFinishedLoading to true");
+      console.log("End of puzzles page useEffect()");
+    };
 
-    await updatePuzzleProgress();
-    await updateThisSetAccuracy();
-  };
-
-  const getSetProgress = async (set_id: number) => {
-    const response = await fetch("/api/getSetProgressStats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id }),
-    });
-
-    if (!response.ok) return null;
-    const result = await response.json();
-    return result.progress;
-  };
-
-  const setSetProgress = async (
-    set_id: number,
-    repeat_index: number,
-    puzzle_index: number
-  ) => {
-    const response = await fetch("/api/updateSetProgressStats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
-    });
-
-    return response.ok;
-  };
-
-  const showSolution = async () => {
-    const chess = new Chess(fen);
-    const remainingSolution = solution.slice(solvedIndex);
-
-    for (let i = 0; i < remainingSolution.length; i++) {
-      const moveUci = remainingSolution[i];
-      await new Promise((resolve) => setTimeout(resolve, 600)); // delay 600ms per move
-
-      chess.move({
-        from: moveUci.slice(0, 2),
-        to: moveUci.slice(2, 4),
-        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
-      });
-
-      setFen(chess.fen());
-    }
-  };
-
-  const handleIncorrectMove = async () => {
-    const setId = selectedSetId;
-    if (!setId) return;
-    showRedX();
-    await addIncorrectAttempt(setId, currentRepeatIndex);
-
-    await showSolution();
-    console.log("This puzzle was unsuccessful!");
-    await handleNextPuzzle();
-  };
-
-  const handleSuccessfulPuzzle = async () => {
-    const setId = selectedSetId;
-    if (!setId) {
-      return;
-    }
-    await addCorrectAttempt(selectedSetId, currentRepeatIndex);
-    console.log("This puzzle was successful!");
-    await handleNextPuzzle();
-  };
-
-  const parseUCIMove = (uci: string) => ({
-    from: uci.slice(0, 2),
-    to: uci.slice(2, 4),
-    promotion: uci.length > 4 ? uci.slice(4) : undefined,
-  });
-
-  const handleMove = (move: string, isCorrect: boolean) => {
-    if (!isSessionActive) return;
-
-    if (!isCorrect) {
-      handleIncorrectMove();
-      return;
-    }
-
-    showGreenCheck();
-    setSolvedIndex((i) => i + 2);
-
-    const chess = new Chess();
-    chess.load(fen);
-
-    // ✅ Use solution move instead of player input
-    chess.move(parseUCIMove(solution[solvedIndex]));
-
-    const computerMove = solution[solvedIndex + 1];
-    if (computerMove) {
-      chess.move(parseUCIMove(computerMove));
-    }
-
-    setFen(chess.fen());
-
-    if (solvedIndex + 1 === solution.length) {
-      handleSuccessfulPuzzle();
-    }
-  };
-
-  const updateThisSetAccuracy = async () => {
-    if (!selectedSetId) {
-      console.log("No selected set id");
-      return;
-    }
-    const { repeat_index, puzzle_index } = await getSetProgress(selectedSetId);
-
-    const accuracyStats = await getSetAccuracy(selectedSetId, repeat_index);
-    const correct = accuracyStats?.correct || 0;
-    const incorrect = accuracyStats?.incorrect || 0;
-
-    console.log("\tUpdating this puzzle:", selectedSetId);
-    console.log("\taccuracyStats:", accuracyStats);
-    console.log("\trepeat_index:", repeat_index);
-    console.log("\tpuzzle_index:", puzzle_index);
-    console.log("\tcorrect:", correct);
-    console.log("\tincorrect:", incorrect);
-    console.log("\tAccuracy:", correct / incorrect);
-
-    if (accuracyStats) {
-      setAccuracies[selectedSetId] = { correct, incorrect };
-    }
-  };
+    run();
+  }, [authStatus]);
+  const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
 
   return (
     <div>
