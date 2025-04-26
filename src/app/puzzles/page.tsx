@@ -327,8 +327,107 @@ export default function PuzzlesPage() {
     }
   };
 
+  const showConfirmDeletePopup = async (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      // Create the overlay
+      const overlay = document.createElement("div");
+      overlay.className = `
+        fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]
+        opacity-0 transition-opacity duration-300
+      `;
+
+      // Create the popup box
+      const popup = document.createElement("div");
+      popup.className = `
+        bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center space-y-4
+        transform scale-90 opacity-0 transition-all duration-300
+      `;
+
+      // Message
+      const message = document.createElement("p");
+      message.innerText = "Are you sure you want to delete this set?";
+      message.className = "text-lg text-gray-800";
+
+      // Buttons container
+      const buttons = document.createElement("div");
+      buttons.className = "flex space-x-4";
+
+      // Confirm button
+      const confirmButton = document.createElement("button");
+      confirmButton.innerText = "Delete";
+      confirmButton.className = `
+        bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition
+      `;
+      confirmButton.onclick = () => {
+        cleanup();
+        resolve(true);
+      };
+
+      // Cancel button
+      const cancelButton = document.createElement("button");
+      cancelButton.innerText = "Cancel";
+      cancelButton.className = `
+        bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition
+      `;
+      cancelButton.onclick = () => {
+        cleanup();
+        resolve(false);
+      };
+
+      // Assemble
+      buttons.appendChild(confirmButton);
+      buttons.appendChild(cancelButton);
+      popup.appendChild(message);
+      popup.appendChild(buttons);
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+
+      // Animate overlay and popup in
+      requestAnimationFrame(() => {
+        overlay.classList.remove("opacity-0");
+        overlay.classList.add("opacity-100");
+
+        popup.classList.remove("scale-90", "opacity-0");
+        popup.classList.add("scale-100", "opacity-100");
+      });
+
+      // Cleanup
+      const cleanup = () => {
+        overlay.classList.remove("opacity-100");
+        overlay.classList.add("opacity-0");
+
+        popup.classList.remove("scale-100", "opacity-100");
+        popup.classList.add("scale-90", "opacity-0");
+
+        popup.addEventListener(
+          "transitionend",
+          () => {
+            document.body.removeChild(overlay);
+          },
+          { once: true }
+        );
+      };
+
+      // Optional: Escape key closes popup
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          cleanup();
+          resolve(false);
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown, { once: true });
+    });
+  };
+
   const handleSetDelete = async (setId: number) => {
     console.log("User clicked remove on this set:", setId);
+    const confirmed = await showConfirmDeletePopup();
+    if (!confirmed) {
+      console.log("User cancelled set deletion.");
+      return;
+    }
+    console.log("User confirmed set deletion.");
+
     const res = await fetch("/api/removeSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -457,11 +556,10 @@ export default function PuzzlesPage() {
   const handleIncorrectMove = async () => {
     const setId = selectedSetId;
     if (!setId) return;
-
-    showRedX(); // still show the ❌
+    showRedX();
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
-    await showSolution(); // 👈 show the correct answer before progressing
+    await showSolution();
     console.log("This puzzle was unsuccessful!");
     await handleNextPuzzle();
   };
@@ -486,7 +584,6 @@ export default function PuzzlesPage() {
     if (!isSessionActive) return;
 
     if (!isCorrect) {
-      showRedX();
       handleIncorrectMove();
       return;
     }
@@ -611,7 +708,7 @@ export default function PuzzlesPage() {
               </Card>
             </div>
           ) : (
-            <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border rounded-lg bg-muted/20">
+            <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border bg-muted/20">
               <div className="text-center p-8">
                 {/*Show no sets button if there are no sets AND logged in */}
                 {userSets.length === 0 && userIsLoggedIn ? (
@@ -649,9 +746,19 @@ export default function PuzzlesPage() {
 
           {/*User sets*/}
           {userIsLoggedIn && userSets.length != 0 ? (
-            <div className="mt-10 grid grid-cols-1 ">
+            <div
+              className="w-[100%] sm:w-[90%] mx-auto
+             sm:mt-10
+             mt-0
+             grid grid-cols-1 "
+            >
               {/*Sets Table header row*/}
-              <div className="border  rounded-t-lg bg-muted/90">
+              <div
+                className="border
+              sm:rounded-t-lg
+              rounded-none
+              bg-muted/90"
+              >
                 <div className="text-md grid grid-cols-6 ">
                   <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
                     Name
@@ -673,8 +780,10 @@ export default function PuzzlesPage() {
               </div>
 
               {/*Sets Table data*/}
-
-              <div className=" border rounded-b-lg bg-muted/20">
+              <div
+                className=" border  bg-muted/20 sm:rounded-b-lg
+              rounded-none"
+              >
                 {userSets.map((set) => (
                   <div key={set.set_id} className="">
                     <div
@@ -771,7 +880,10 @@ export default function PuzzlesPage() {
           </Card>
 
           {/* Skeleton set list */}
-          <div className="mt-10 space-y-4">
+          <div
+            className="sm:mt-10
+             mt-0 space-y-4"
+          >
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
