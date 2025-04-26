@@ -22,7 +22,7 @@ export default function AboutPage() {
           <strong className="text-foreground">ChessPecker</strong> is a
           lightweight tactical training platform built to help players sharpen
           their skills through custom puzzle sets and repeat-based mastery.
-          Whether you're grinding openings or drilling game-winning tactics,
+          Whether you&apos;re grinding openings or drilling game-winning tactics,
           ChessPecker is designed for serious improvement.
         </p>
       </div>
