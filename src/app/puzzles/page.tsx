@@ -40,6 +40,7 @@ export default function PuzzlesPage() {
     Record<number, { repeat_index: number; puzzle_index: number }>
   >({});
 
+  //puzzle api functions
   const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
     try {
       const res = await fetch("/api/addIncorrect", {
@@ -59,7 +60,6 @@ export default function PuzzlesPage() {
       return false;
     }
   };
-
   const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
     try {
       const res = await fetch("/api/addCorrect", {
@@ -79,7 +79,6 @@ export default function PuzzlesPage() {
       return false;
     }
   };
-
   const getAllSetData = async (email: string) => {
     const response = await fetch("/api/getSet", {
       method: "POST",
@@ -96,7 +95,85 @@ export default function PuzzlesPage() {
     const result = await response.json();
     const sets: PuzzleSet[] = result.sets;
     return sets;
+  };  const getSetAccuracy = async (setId: number, repeatIndex: number) => {
+    try {
+      const res = await fetch("/api/getSetAccuracy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return { correct: 0, incorrect: 0 };
+
+      return { correct: data.correct, incorrect: data.incorrect };
+    } catch (err) {
+      console.error("Error fetching set accuracy:", err);
+      return null;
+    }
   };
+
+  //puzzle interaction functions
+  const updatePuzzleProgress = async () => {
+    console.log("Updating puzzle progress...");
+    if (!selectedSetId) {
+      console.log(
+        "No set is currently selected, so skipping updating puzzle progress."
+      );
+      return;
+    }
+    const currentSetProgress = await getSetProgress(selectedSetId);
+    if (!currentSetProgress) {
+      console.log(
+        "Faiiled to get set progress for selected set id:",
+        selectedSetId,
+        "so cannot update puzzle progress."
+      );
+      return;
+    }
+    const repeat_index = currentSetProgress.repeat_index;
+    const puzzle_index = currentSetProgress.puzzle_index;
+    if (!repeat_index || !puzzle_index) {
+      return;
+    }
+    setCurrentRepeatIndex(repeat_index);
+    setCurrentPuzzleIndex(puzzle_index);
+  };
+
+  const handleStartSession = async () => {
+    console.log("handleStartSession()");
+    setIsSessionActive(true);
+    if (!selectedSetId) {
+      return;
+    }
+    await updatePuzzleProgress();
+  };
+
+  const getFenAtPly = (pgn: string, initialPly: number) => {
+    const chess = new Chess();
+    chess.loadPgn(pgn);
+    const history = chess.history({ verbose: true });
+    const replay = new Chess();
+
+    for (let i = 0; i < initialPly && i < history.length; i++) {
+      const move = history[i];
+      replay.move(move);
+    }
+
+    return replay.fen();
+  };
+
+  const setIsDone = () => {
+    const set = userSets.find((s) => s.set_id === selectedSetId);
+    if (!set) return false;
+    if (currentRepeatIndex === set.repeats) {
+      return true;
+    }
+    return false;
+  };
+
+  //stays here
 
   useEffect(() => {
     console.log("puzzles page useEffect()");
@@ -176,82 +253,9 @@ export default function PuzzlesPage() {
     run();
   }, [authStatus]);
 
-  const getSetAccuracy = async (setId: number, repeatIndex: number) => {
-    try {
-      const res = await fetch("/api/getSetAccuracy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
-      });
 
-      const data = await res.json();
 
-      if (!res.ok) return { correct: 0, incorrect: 0 };
 
-      return { correct: data.correct, incorrect: data.incorrect };
-    } catch (err) {
-      console.error("Error fetching set accuracy:", err);
-      return null;
-    }
-  };
-
-  const updatePuzzleProgress = async () => {
-    console.log("Updating puzzle progress...");
-    if (!selectedSetId) {
-      console.log(
-        "No set is currently selected, so skipping updating puzzle progress."
-      );
-      return;
-    }
-    const currentSetProgress = await getSetProgress(selectedSetId);
-    if (!currentSetProgress) {
-      console.log(
-        "Faiiled to get set progress for selected set id:",
-        selectedSetId,
-        "so cannot update puzzle progress."
-      );
-      return;
-    }
-    const repeat_index = currentSetProgress.repeat_index;
-    const puzzle_index = currentSetProgress.puzzle_index;
-    if (!repeat_index || !puzzle_index) {
-      return;
-    }
-    setCurrentRepeatIndex(repeat_index);
-    setCurrentPuzzleIndex(puzzle_index);
-  };
-
-  const handleStartSession = async () => {
-    console.log("handleStartSession()");
-    setIsSessionActive(true);
-    if (!selectedSetId) {
-      return;
-    }
-    await updatePuzzleProgress();
-  };
-
-  const getFenAtPly = (pgn: string, initialPly: number) => {
-    const chess = new Chess();
-    chess.loadPgn(pgn);
-    const history = chess.history({ verbose: true });
-    const replay = new Chess();
-
-    for (let i = 0; i < initialPly && i < history.length; i++) {
-      const move = history[i];
-      replay.move(move);
-    }
-
-    return replay.fen();
-  };
-
-  const setIsDone = () => {
-    const set = userSets.find((s) => s.set_id === selectedSetId);
-    if (!set) return false;
-    if (currentRepeatIndex === set.repeats) {
-      return true;
-    }
-    return false;
-  };
 
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
 
@@ -746,17 +750,21 @@ export default function PuzzlesPage() {
           {/*User sets*/}
           {userIsLoggedIn && userSets.length != 0 ? (
             <div
-              className="w-[100%] sm:w-[90%] mx-auto
-             sm:mt-10
-             mt-0
-             grid grid-cols-1 "
+              className="
+            w-[100%]
+            sm:w-[90%] mx-auto
+            sm:mt-10
+            mt-0
+            grid
+            grid-cols-1 "
             >
               {/*Sets Table header row*/}
               <div
-                className="border
+                className="
               sm:rounded-t-lg
               rounded-none
-              bg-muted/90"
+              bg-foreground/30
+              "
               >
                 <div className="text-md grid grid-cols-6 ">
                   <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
@@ -780,8 +788,10 @@ export default function PuzzlesPage() {
 
               {/*Sets Table data*/}
               <div
-                className=" border  bg-muted/20 sm:rounded-b-lg
-              rounded-none"
+                className="
+                sm:rounded-b-lg
+                bg-foreground/10
+                rounded-none"
               >
                 {userSets.map((set) => (
                   <div key={set.set_id} className="">
@@ -792,23 +802,23 @@ export default function PuzzlesPage() {
                       }`}
                     >
                       <div className="min-h-[70px] text-xs grid grid-cols-6 rounded-2xl">
-                        <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                        <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-white py-3">
                           {set.name}
                         </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
                           {set.elo}
                         </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
                           {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
                           {set.repeats}
                         </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
                           {" "}
                           {setProgressMap[set.set_id]?.puzzle_index ?? 0} /{" "}
                           {set.size}
                         </div>
 
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-grey py-3">
+                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
                           {setAccuracies[set.set_id] ? (
                             <>
                               {Math.round(
