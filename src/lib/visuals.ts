@@ -7,26 +7,44 @@ export async function showConfetti() {
   });
 }
 
+function createFloatingIcon(
+  icon: "✅" | "❌",
+  color: "text-green-500" | "text-red-500"
+) {
+  const div = document.createElement("div");
+  div.innerText = icon;
+  div.className = `
+    fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+    ${color} text-6xl opacity-0 scale-75
+    transition-all duration-300 ease-out z-[1000]
+  `;
+
+  document.body.appendChild(div);
+
+  // Trigger transition
+  requestAnimationFrame(() => {
+    div.classList.remove("opacity-0", "scale-75");
+    div.classList.add("opacity-100", "scale-100");
+  });
+
+  setTimeout(() => {
+    div.classList.remove("opacity-100", "scale-100");
+    div.classList.add("opacity-0", "scale-75");
+
+    div.addEventListener(
+      "transitionend",
+      () => {
+        document.body.removeChild(div);
+      },
+      { once: true }
+    );
+  }, 1000);
+}
+
 export async function showGreenCheck() {
-  const div = document.createElement("div");
-  div.innerText = "✅";
-  div.className =
-    "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-green-500 text-6xl animate-ping z-[1000]";
-  document.body.appendChild(div);
-
-  setTimeout(() => {
-    document.body.removeChild(div);
-  }, 1000);
+  createFloatingIcon("✅", "text-green-500");
 }
+
 export async function showRedX() {
-  const div = document.createElement("div");
-  div.innerText = "❌";
-  div.className =
-    "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-6xl animate-ping z-[1000]";
-  document.body.appendChild(div);
-
-  setTimeout(() => {
-    document.body.removeChild(div);
-  }, 1000);
+  createFloatingIcon("❌", "text-red-500");
 }
-
