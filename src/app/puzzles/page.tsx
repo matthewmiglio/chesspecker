@@ -197,11 +197,20 @@ export default function PuzzlesPage() {
   };
 
   const updatePuzzleProgress = async () => {
+    console.log("Updating puzzle progress...");
     if (!selectedSetId) {
+      console.log(
+        "No set is currently selected, so skipping updating puzzle progress."
+      );
       return;
     }
     const currentSetProgress = await getSetProgress(selectedSetId);
     if (!currentSetProgress) {
+      console.log(
+        "Faiiled to get set progress for selected set id:",
+        selectedSetId,
+        "so cannot update puzzle progress."
+      );
       return;
     }
     const repeat_index = currentSetProgress.repeat_index;
@@ -272,7 +281,9 @@ export default function PuzzlesPage() {
   const handleSetSelect = async (setId: number) => {
     console.log("handleSetSelect()");
     setSelectedSetId(setId);
+    console.log("User just selected set id:", setId);
     setIsSessionActive(false);
+    console.log("Just set session to inactive");
     sessionStorage.setItem("selected_set_id", String(setId));
     const set = userSets.find((s) => s.set_id === setId);
 
@@ -281,17 +292,27 @@ export default function PuzzlesPage() {
       !set.elo ||
       !set.size ||
       (!set.puzzle_index && set.puzzle_index != 0)
-    )
+    ) {
+      console.log("Invlaid set data:", set, "Cannot handle set select!");
       return;
+    }
 
     const currentIndex = set.puzzle_index;
-
     const puzzleIds = set.puzzle_ids;
     setPuzzleIds(puzzleIds);
+    console.log("Updated puzzle ids with", puzzleIds.length, "puzzles!");
     const puzzleId = puzzleIds[currentIndex];
+    console.log("This puzzle id is", puzzleId);
     const puzzle = await getPuzzleData(puzzleId);
     if (puzzle) {
       await loadPuzzleAndInitialize(puzzle);
+    } else {
+      console.log(
+        "failed to load puzzle data for puzzle id:",
+        puzzleId,
+        "Cannot handle set select!"
+      );
+      return;
     }
     handleStartSession();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -300,6 +321,9 @@ export default function PuzzlesPage() {
     if (thisSetProgress) {
       setCurrentRepeatIndex(thisSetProgress.repeat_index);
       setCurrentPuzzleIndex(thisSetProgress.puzzle_index);
+    } else {
+      console.log("WARNING: Failed to get set progress for set id:", setId);
+      console.log("This is the set progress:", thisSetProgress);
     }
   };
 

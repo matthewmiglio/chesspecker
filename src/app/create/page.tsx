@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 
 export default function CreatePuzzleSetPage() {
-  const maxSetSize = 100;
+  const maxSetSize = 200;
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
   const isLoggedIn = !!session?.user?.email;
@@ -265,79 +265,77 @@ export default function CreatePuzzleSetPage() {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Set Name</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="My Tactical Puzzles"
-                    required
-                  />
-                </div>
+  {/* Set Name */}
+  <div className="space-y-1">
+    <Label htmlFor="name" className="text-sm font-medium">Set Name</Label>
+    <Input
+      id="name"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      placeholder="My Tactical Puzzles"
+      required
+    />
+  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="A collection of tactical puzzles for intermediate players"
-                  />
-                </div>
+  {/* Description */}
+  <div className="space-y-1">
+    <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+    <Input
+      id="description"
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      placeholder="A collection of tactical puzzles for intermediate players"
+    />
+  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="set-size">Set Size</Label>
-                  <Input
-                    id="set-size"
-                    type="number"
-                    value={setSize}
-                    min={1}
-                    onChange={(e) => setSetSize(Number(e.target.value))}
-                  />
-                </div>
+  {/* Repeat Count */}
+  <div className="space-y-1">
+    <Label htmlFor="repeat-count" className="text-sm font-medium">Repeat Count</Label>
+    <Input
+      id="repeat-count"
+      type="number"
+      value={repeatCount}
+      min={1}
+      onChange={(e) => setRepeatCount(Number(e.target.value))}
+    />
+  </div>
 
-                {/*Repeat count input*/}
-                <div className="space-y-2">
-                  <Label htmlFor="repeat-count">Repeat Count</Label>
-                  <Input
-                    id="repeat-count"
-                    type="number"
-                    value={repeatCount}
-                    min={1}
-                    onChange={(e) => setRepeatCount(Number(e.target.value))}
-                  />
-                </div>
+  {/* Set Size Slider */}
+  <div className="space-y-1">
+    <Label className="text-sm font-medium">Set Size</Label>
+    <Slider
+      value={[setSize]}
+      min={1}
+      max={200}
+      step={1}
+      onValueChange={(value) => setSetSize(value[0])}
+    />
+    <p className="text-sm text-center text-muted-foreground mt-1">
+      {setSize} puzzles
+    </p>
+  </div>
 
-                {/*Difficulty slider*/}
-                <div className="space-y-3">
-                  <Label>ELO</Label>
-                  <Slider
-                    defaultValue={[1500]}
-                    min={500}
-                    max={2900}
-                    step={50}
-                    onValueChange={(value) => {
-                      console.log("Slider value:", value[0]);
-                      setDifficultySliderValue(value[0]);
-                    }}
-                  />
-                  <div className="flex gap-4">
-                    <div className="flex-1 flex items-center justify-center">
-                      700
-                    </div>
-                    <div className="flex-1 flex items-center justify-center">
-                      1400
-                    </div>
-                    <div className="flex-1 flex items-center justify-center">
-                      2000
-                    </div>
-                    <div className="flex-1 flex items-center justify-center">
-                      2700
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
+  {/* ELO Slider */}
+  <div className="space-y-1">
+    <Label className="text-sm font-medium">ELO Target</Label>
+    <Slider
+      value={[difficultySliderValue]}
+      min={500}
+      max={2900}
+      step={50}
+      onValueChange={(value) => setDifficultySliderValue(value[0])}
+    />
+    <div className="flex justify-between text-xs text-muted-foreground px-1 pt-1">
+      <span>700</span>
+      <span>1400</span>
+      <span>2000</span>
+      <span>2700</span>
+    </div>
+    <p className="text-sm text-center text-muted-foreground mt-1">
+      Targeting: <span className="font-semibold">{difficultySliderValue} ELO</span>
+    </p>
+  </div>
+</CardContent>
 
               <CardFooter className="pt-5">
                 <Button type="submit" className=" mx-auto ml-auto">
