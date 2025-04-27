@@ -24,7 +24,7 @@ export default function CreatePuzzleSetPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const [setSize, setSetSize] = useState<number>(300);
+  const [setSize, setSetSize] = useState<number>(100);
   const [repeatCount, setRepeatCount] = useState<number>(8);
 
   const [difficultySliderValue, setDifficultySliderValue] =
