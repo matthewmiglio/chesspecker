@@ -312,8 +312,8 @@ export default function PuzzlesPage() {
                       <Image
                         src={heroImage}
                         alt="Chess Hero"
-                        layout="fill"
-                        objectFit="contain"
+                        fill
+                        style={{ objectFit: "contain" }}
                         priority
                         className="rounded-xl"
                       />
