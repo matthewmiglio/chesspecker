@@ -18,7 +18,10 @@ type SetSelectTableProps = {
   setSolvedIndex: (index: number) => void;
   setHighlight: (highlight: string | null) => void;
   setPlayerSide: (side: "w" | "b") => void;
-  setProgressMap: Record<number, { repeat_index: number; puzzle_index: number }>;
+  setProgressMap: Record<
+    number,
+    { repeat_index: number; puzzle_index: number }
+  >;
   setAccuracies: Record<number, { correct: number; incorrect: number }>;
   puzzleSession: { handleStartSession: () => Promise<void> };
   handleSetDelete: (id: number) => void;
@@ -41,16 +44,38 @@ export default function SetSelectTable({
   handleSetDelete,
   selectedSetId,
 }: SetSelectTableProps) {
+  const sortedSets = [...userSets].sort((a, b) => {
+    const aSolved =
+      (setProgressMap[a.set_id]?.repeat_index ?? 0) * a.size +
+      (setProgressMap[a.set_id]?.puzzle_index ?? 0);
+    const bSolved =
+      (setProgressMap[b.set_id]?.repeat_index ?? 0) * b.size +
+      (setProgressMap[b.set_id]?.puzzle_index ?? 0);
+    const aTotal = a.repeats * a.size;
+    const bTotal = b.repeats * b.size;
+    const aPercent = aTotal > 0 ? aSolved / aTotal : 0;
+    const bPercent = bTotal > 0 ? bSolved / bTotal : 0;
+    return aPercent - bPercent;
+  });
+
   return (
     <div className="w-[90%] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 py-8">
-      {userSets.map((set) => {
+      {sortedSets.map((set) => {
         const solvedPuzzles =
           (setProgressMap[set.set_id]?.repeat_index ?? 0) * set.size +
           (setProgressMap[set.set_id]?.puzzle_index ?? 0);
         const totalPuzzles = set.repeats * set.size;
-        const progressPercent = totalPuzzles > 0 ? (solvedPuzzles / totalPuzzles) * 100 : 0;
+        const progressPercent =
+          totalPuzzles > 0 ? (solvedPuzzles / totalPuzzles) * 100 : 0;
 
         const isSelected = selectedSetId === set.set_id;
+
+        let progressColor = "bg-red-500";
+        if (progressPercent >= 80) {
+          progressColor = "bg-green-500";
+        } else if (progressPercent >= 40) {
+          progressColor = "bg-yellow-400";
+        }
 
         return (
           <div
@@ -85,17 +110,21 @@ export default function SetSelectTable({
             )}
           >
             <div className="mb-4">
-              <div className="text-lg font-bold mb-1 leading-tight line-clamp-2">{set.name}</div>
+              <div className="text-lg font-bold mb-1 leading-tight line-clamp-2">
+                {set.name}
+              </div>
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
 
             <Progress
               value={progressPercent}
-              className="h-3 rounded-full bg-muted/50 [&>div]:bg-primary"
+              className="h-3 rounded-full bg-muted/50"
+              barClassName={cn(progressColor)}
             />
 
             <div className="mt-3 text-xs text-muted-foreground">
-              {solvedPuzzles} / {totalPuzzles} puzzles solved ({Math.round(progressPercent)}%)
+              {solvedPuzzles} / {totalPuzzles} puzzles solved (
+              {Math.round(progressPercent)}%)
             </div>
 
             <div className="flex justify-end mt-4">

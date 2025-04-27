@@ -83,9 +83,9 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board-wrapper.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleSession.ts",
+        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-select-table.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\ui\progress.tsx",
     ]
 
     ignore_folders = [
