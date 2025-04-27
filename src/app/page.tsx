@@ -1,17 +1,37 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const { resolvedTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  const heroImage =
+    resolvedTheme === "dark"
+      ? "/heros/chess_duel_white.png"
+      : "/heros/chess_duel_black.png";
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-16 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
         <Link href="/puzzles" className="group">
-          <div className="relative w-75 h-75 md:w-92 md:h-92 transition-transform group-hover:scale-105 cursor-pointer">
+          <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform group-hover:scale-105 cursor-pointer">
             <Image
-              src="/chesspecker-hero.png"
-              alt="ChessPecker Logo"
+              src={heroImage}
+              alt="Chess Thinker Hero"
               layout="fill"
               objectFit="contain"
               priority
@@ -31,7 +51,7 @@ export default function Home() {
             <Link href="/login">Start Training</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-          <Link href="/about">Learn More</Link>
+            <Link href="/about">Learn More</Link>
           </Button>
         </div>
       </div>
