@@ -45,7 +45,7 @@ export default function NoDataCard() {
 
       {/* Subheading */}
       <p className="text-muted-foreground text-base sm:text-lg max-w-md mb-8">
-        You haven't practiced any puzzles yet. Start solving to track your
+        You haven&apos;t practiced any puzzles yet. Start solving to track your
         progress!
       </p>
 
