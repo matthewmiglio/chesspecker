@@ -41,7 +41,7 @@ export default function PuzzlesPage() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
   const puzzleSession = usePuzzleSession({
-    selectedSetId,
+    getSelectedSetId: () => selectedSetId,
     currentRepeatIndex,
     puzzleIds,
     fen,
@@ -267,17 +267,6 @@ export default function PuzzlesPage() {
   const selectedSetIsDone =
     !!selectedSet && currentRepeatIndex >= (selectedSet?.repeats ?? Infinity);
 
-  console.log(
-    "🧩 [render] selectedSetId:",
-    selectedSetId,
-    "currentRepeatIndex:",
-    currentRepeatIndex,
-    "set.repeats:",
-    selectedSet?.repeats,
-    "selectedSetIsDone:",
-    selectedSetIsDone
-  );
-
   return (
     <div>
       {isFinishedLoading ? (
@@ -296,11 +285,11 @@ export default function PuzzlesPage() {
                   highlight={highlight}
                   setHighlight={setHighlight}
                   playerSide={playerSide}
-                  selectedSetId={selectedSetId}
                   setAccuracies={setAccuracies}
                   currentPuzzleIndex={currentPuzzleIndex}
                   currentRepeatIndex={currentRepeatIndex}
                   selectedSet={selectedSet}
+                  selectedSetId={selectedSetId}
                 />
               )}
             </div>
