@@ -13,7 +13,7 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, 
   },
   cookies: {
     sessionToken: {
@@ -23,7 +23,8 @@ const handler = NextAuth({
         sameSite: "lax",
         path: "/",
         secure: isProduction,
-        maxAge: 30 * 24 * 60 * 60, 
+        maxAge: 30 * 24 * 60 * 60,
+        domain: "chesspecker.org",
       },
     },
   },
