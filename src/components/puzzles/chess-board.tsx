@@ -132,7 +132,6 @@ export default function AnimatedBoard({
     return true;
   };
 
-
   const orientation = sideOnBottom === "w" ? "white" : "black";
 
   const [arrowStart, setArrowStart] = useState<Square | null>(null);
