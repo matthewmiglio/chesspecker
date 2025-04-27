@@ -1,10 +1,17 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 import MoveIndicator from "@/components/puzzles/MoveIndicator";
 import ArrowOverlay from "@/components/puzzles/ArrowOverlay";
-import { getSquareFromMouseEvent } from "@/lib/utils/chessBoardHelpers";
+import {
+  getSquareFromMouseEvent,
+  handlePieceDropHelper,
+  handleRightMouseDownHelper,
+  handleRightMouseUpHelper,
+} from "@/lib/utils/chessBoardHelpers";
 
 interface Props {
   fen: string;
@@ -62,80 +69,63 @@ export default function AnimatedBoard({
     sourceSquare: Square,
     targetSquare: Square
   ): boolean => {
-    if (!isSessionActive || isBoardLocked) return false;
+    const result = handlePieceDropHelper({
+      sourceSquare,
+      targetSquare,
+      game,
+      solution,
+      solvedIndex,
+      isSessionActive,
+      isBoardLocked,
+    });
 
-    const tempGame = new Chess(game.fen());
-    try {
-      tempGame.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
-    } catch (error) {
-      console.warn(
-        "[handlePieceDrop] Illegal move attempted:",
-        { sourceSquare, targetSquare },
-        error
-      );
-      return false;
-    }
+    if (!result.valid) return false;
 
-    const moveStr = sourceSquare + targetSquare;
-    const expectedMoveStr = solution[solvedIndex].slice(0, 4);
-    const isCorrect = moveStr === expectedMoveStr;
-
-    if (!isCorrect) {
-      onMove(moveStr, false);
+    if (!result.moveWasCorrect) {
+      onMove(sourceSquare + targetSquare, false);
       return false;
     }
 
     setIsBoardLocked(true);
-    onMove(moveStr, true);
+    onMove(sourceSquare + targetSquare, true);
 
-    const newGame = new Chess(game.fen());
-    newGame.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
+    if (result.newFen) {
+      setBoardPosition(result.newFen);
+    }
 
-    setBoardPosition(newGame.fen());
-
-    setTimeout(() => {
-      const replyUci = solution[solvedIndex + 1];
-      if (replyUci) {
-        const replyMove = {
-          from: replyUci.slice(0, 2) as Square,
-          to: replyUci.slice(2, 4) as Square,
-          promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
-        };
-        newGame.move(replyMove);
-      }
-      setBoardPosition(newGame.fen());
-      setGame(newGame);
-      setIsBoardLocked(false);
-    }, 0);
+    if (result.nextGame) {
+      setTimeout(() => {
+        const replyUci = solution[solvedIndex + 1];
+        if (replyUci) {
+          const replyMove = {
+            from: replyUci.slice(0, 2) as Square,
+            to: replyUci.slice(2, 4) as Square,
+            promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
+          };
+          result.nextGame.move(replyMove);
+        }
+        setBoardPosition(result.nextGame.fen());
+        setGame(result.nextGame);
+        setIsBoardLocked(false);
+      }, 0);
+    }
 
     return true;
   };
 
   const handleRightMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 2) return;
-    const square = getSquareFromMouseEvent(e, sideOnBottom);
-    if (square) {
-      setArrowStart(square);
-    }
+    const square = handleRightMouseDownHelper(e, sideOnBottom);
+    if (square) setArrowStart(square);
   };
 
   const handleRightMouseUp = (e: React.MouseEvent) => {
-    if (e.button !== 2 || !arrowStart) return;
-    const square = getSquareFromMouseEvent(e, sideOnBottom);
-    if (square && square !== arrowStart) {
-      const newArrow = { from: arrowStart, to: square };
-      setArrows((prev) =>
-        prev.some(
-          (arrow) => arrow.from === newArrow.from && arrow.to === newArrow.to
-        )
-          ? prev.filter(
-              (arrow) =>
-                !(arrow.from === newArrow.from && arrow.to === newArrow.to)
-            )
-          : [...prev, newArrow]
-      );
-    }
-    setArrowStart(null);
+    handleRightMouseUpHelper(
+      e,
+      sideOnBottom,
+      arrowStart,
+      setArrows,
+      setArrowStart
+    );
   };
 
   return (
