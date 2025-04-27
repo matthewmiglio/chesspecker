@@ -94,6 +94,8 @@ export default function AnimatedBoard({
     }
 
     if (result.nextGame) {
+      const nextGame = result.nextGame; // <- capture it here safely!
+
       setTimeout(() => {
         const replyUci = solution[solvedIndex + 1];
         if (replyUci) {
@@ -102,10 +104,11 @@ export default function AnimatedBoard({
             to: replyUci.slice(2, 4) as Square,
             promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
           };
-          result.nextGame.move(replyMove);
+          nextGame.move(replyMove);
         }
-        setBoardPosition(result.nextGame.fen());
-        setGame(result.nextGame);
+
+        setBoardPosition(nextGame.fen());
+        setGame(nextGame);
         setIsBoardLocked(false);
       }, 0);
     }
