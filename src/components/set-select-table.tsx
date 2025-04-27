@@ -37,7 +37,6 @@ export default function SetSelectTable({
   setHighlight,
   setPlayerSide,
   setProgressMap,
-  setAccuracies,
   puzzleSession,
   handleSetDelete,
   selectedSetId,
