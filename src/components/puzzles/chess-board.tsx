@@ -7,7 +7,6 @@ import { Chessboard } from "react-chessboard";
 import MoveIndicator from "@/components/puzzles/MoveIndicator";
 import ArrowOverlay from "@/components/puzzles/ArrowOverlay";
 import {
-  getSquareFromMouseEvent,
   handlePieceDropHelper,
   handleRightMouseDownHelper,
   handleRightMouseUpHelper,
