@@ -37,99 +37,97 @@ export default function CreateSetForm({
   setDifficultySliderValue,
   handleCreateSetButton,
 }: CreateSetFormProps) {
-  return <form className="" onSubmit={handleCreateSetButton}>
-  <CardHeader className="pb-6">
-    <CardTitle>Puzzle Set Details</CardTitle>
-  </CardHeader>
+  return (
+    <form className="" onSubmit={handleCreateSetButton}>
+      <CardHeader className="pb-6">
+        <CardTitle>Puzzle Set Details</CardTitle>
+      </CardHeader>
 
-  <CardContent className="space-y-6">
-    {/* Set Name */}
-    <div className="space-y-1">
-      <Label htmlFor="name" className="text-sm font-medium">
-        Set Name
-      </Label>
-      <Input
-        id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="My Tactical Puzzles"
-        required
-      />
-    </div>
+      <CardContent className="space-y-6">
+        {/* Set Name */}
+        <div className="space-y-1">
+          <Label htmlFor="name" className="text-sm font-medium">
+            Set Name
+          </Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="My Tactical Puzzles"
+            required
+          />
+        </div>
 
-    {/* Description */}
-    <div className="space-y-1">
-      <Label htmlFor="description" className="text-sm font-medium">
-        Description
-      </Label>
-      <Input
-        id="description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="A collection of tactical puzzles for intermediate players"
-      />
-    </div>
+        {/* Description */}
+        <div className="space-y-1">
+          <Label htmlFor="description" className="text-sm font-medium">
+            Description
+          </Label>
+          <Input
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="A collection of tactical puzzles for intermediate players"
+          />
+        </div>
 
-    {/* Repeat Count */}
-    <div className="space-y-1">
-      <Label htmlFor="repeat-count" className="text-sm font-medium">
-        Repeat Count
-      </Label>
-      <Input
-        id="repeat-count"
-        type="number"
-        value={repeatCount}
-        min={1}
-        onChange={(e) => setRepeatCount(Number(e.target.value))}
-      />
-    </div>
+        {/* Repeat Count */}
+        <div className="space-y-1">
+          <Label htmlFor="repeat-count" className="text-sm font-medium">
+            Repeat Count
+          </Label>
+          <Input
+            id="repeat-count"
+            type="number"
+            value={repeatCount}
+            min={1}
+            onChange={(e) => setRepeatCount(Number(e.target.value))}
+          />
+        </div>
 
-    {/* Set Size Slider */}
-    <div className="space-y-1">
-      <Label className="text-sm font-medium">Set Size</Label>
-      <Slider
-        value={[setSize]}
-        min={1}
-        max={200}
-        step={1}
-        onValueChange={(value) => setSetSize(value[0])}
-      />
-      <p className="text-sm text-center text-muted-foreground mt-1">
-        {setSize} puzzles
-      </p>
-    </div>
+        {/* Set Size Slider */}
+        <div className="space-y-1">
+          <Label className="text-sm font-medium">Set Size</Label>
+          <Slider
+            value={[setSize]}
+            min={1}
+            max={200}
+            step={1}
+            onValueChange={(value) => setSetSize(value[0])}
+          />
+          <p className="text-sm text-center text-muted-foreground mt-1">
+            {setSize} puzzles
+          </p>
+        </div>
 
-    {/* ELO Slider */}
-    <div className="space-y-1">
-      <Label className="text-sm font-medium">ELO Target</Label>
-      <Slider
-        value={[difficultySliderValue]}
-        min={500}
-        max={2900}
-        step={50}
-        onValueChange={(value) =>
-          setDifficultySliderValue(value[0])
-        }
-      />
-      <div className="flex justify-between text-xs text-muted-foreground px-1 pt-1">
-        <span>700</span>
-        <span>1400</span>
-        <span>2000</span>
-        <span>2700</span>
-      </div>
-      <p className="text-sm text-center text-muted-foreground mt-1">
-        Targeting:{" "}
-        <span className="font-semibold">
-          {difficultySliderValue} ELO
-        </span>
-      </p>
-    </div>
-  </CardContent>
+        {/* ELO Slider */}
+        <div className="space-y-1">
+          <Label className="text-sm font-medium">ELO Target</Label>
+          <Slider
+            value={[difficultySliderValue]}
+            min={500}
+            max={2900}
+            step={50}
+            onValueChange={(value) => setDifficultySliderValue(value[0])}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground px-1 pt-1">
+            <span>700</span>
+            <span>1400</span>
+            <span>2000</span>
+            <span>2700</span>
+          </div>
+          <p className="text-sm text-center text-muted-foreground mt-1">
+            Targeting:{" "}
+            <span className="font-semibold">{difficultySliderValue} ELO</span>
+          </p>
+        </div>
+      </CardContent>
 
-  <CardFooter className="pt-5">
-    <Button type="submit" className=" mx-auto ml-auto">
-      Create Puzzle Set
-    </Button>
-  </CardFooter>
-</form>;
+      <CardFooter className="pt-5">
+        <Button type="submit" className=" mx-auto ml-auto">
+          Create Puzzle Set
+        </Button>
+      </CardFooter>
+    </form>
+  );
 }
