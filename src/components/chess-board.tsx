@@ -57,7 +57,17 @@ export default function AnimatedBoard({
     sourceSquare: Square,
     targetSquare: Square
   ): boolean => {
-    console.log("handlePieceDrop()");
+    console.log("[handlePieceDrop] called with:");
+    console.log("  sourceSquare:", sourceSquare);
+    console.log("  targetSquare:", targetSquare);
+
+    // your existing logic here, example:
+    const move = {
+      from: sourceSquare,
+      to: targetSquare,
+    };
+
+    console.log("[handlePieceDrop] created move object:", move);
     if (!isSessionActive || isBoardLocked) return false;
 
     const moveStr = sourceSquare + targetSquare;
