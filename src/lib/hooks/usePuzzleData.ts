@@ -25,9 +25,6 @@ export const updateThisSetAccuracy = async (
   const correct = accuracyStats?.correct || 0;
   const incorrect = accuracyStats?.incorrect || 0;
 
-  console.log("\tUpdating set accuracy:", setId);
-  console.log("\tCorrect:", correct, "Incorrect:", incorrect);
-
   setAccuracies((prev) => ({
     ...prev,
     [setId]: { correct, incorrect },
@@ -36,17 +33,22 @@ export const updateThisSetAccuracy = async (
 
 export const updatePuzzleProgress = async (
   setId: number,
-  setCurrentRepeatIndex: (index: number) => void,
-  setCurrentPuzzleIndex: (index: number) => void
+  repeatIndex: number,
+  puzzleIndex: number
 ) => {
-  const progress = await getSetProgress(setId);
-  if (!progress) {
-    console.warn("No progress found for set id:", setId);
-    return;
-  }
+  console.log("[updatePuzzleProgress] updating progress for set id:", setId);
+  console.log(
+    "[updatePuzzleProgress] setting repeatIndex:",
+    repeatIndex,
+    "puzzleIndex:",
+    puzzleIndex
+  );
 
-  setCurrentRepeatIndex(progress.repeat_index);
-  setCurrentPuzzleIndex(progress.puzzle_index);
+  const { setSetProgress } = await import("@/lib/api/puzzleApi");
+
+  await setSetProgress(setId, repeatIndex, puzzleIndex);
+
+  console.log("[updatePuzzleProgress] server-side progress updated.");
 };
 
 export const incrementPuzzleIndex = async (
@@ -54,8 +56,6 @@ export const incrementPuzzleIndex = async (
   setCurrentRepeatIndex: (index: number) => void,
   setCurrentPuzzleIndex: (index: number) => void
 ) => {
-  console.log("incrementPuzzleIndex() for set", setId);
-
   const progress = await getSetProgress(setId);
   if (!progress) {
     console.warn("No progress found for set id:", setId);
@@ -75,7 +75,6 @@ export const incrementPuzzleIndex = async (
 
   await setSetProgress(setId, repeat_index, puzzle_index);
 
-  console.log("New progress - puzzle:", puzzle_index, "repeat:", repeat_index);
   setCurrentRepeatIndex(repeat_index);
   setCurrentPuzzleIndex(puzzle_index);
 
@@ -89,24 +88,16 @@ export const loadPuzzleAndInitialize = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
-  console.log("➡️ [loadPuzzleAndInitialize] START for puzzleId:", puzzleData.puzzle.id);
-
   const fen = getFenAtPly(
     puzzleData.game.pgn,
     puzzleData.puzzle.initialPly + 1
   );
 
-  console.log("♟️ [loadPuzzleAndInitialize] Setting FEN:", fen);
-  console.log("📜 [loadPuzzleAndInitialize] Setting solution moves:", puzzleData.puzzle.solution);
-
   setFen(fen);
   setSolution(puzzleData.puzzle.solution);
   setSolvedIndex(0);
   setHighlight(null);
-
-  console.log("✅ [loadPuzzleAndInitialize] END");
 };
-
 
 export const handleSetSelect = async (
   setId: number,
@@ -128,8 +119,6 @@ export const handleSetSelect = async (
   setPlayerSide: (side: "w" | "b") => void,
   preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
-  console.log("➡️ [handleSetSelect] START setId:", setId);
-
   setSelectedSetId(setId);
   sessionStorage.setItem("selected_set_id", String(setId));
 
@@ -143,13 +132,12 @@ export const handleSetSelect = async (
   const puzzleIds = set.puzzle_ids;
   setPuzzleIds(puzzleIds);
 
-  console.log("📦 [handleSetSelect] Loading puzzleId:", puzzleIds[set.puzzle_index]);
+  console.log(puzzleIds[set.puzzle_index]);
 
   const { getPuzzleData } = await import("@/lib/api/puzzleApi");
   const puzzle = await getPuzzleData(puzzleIds[set.puzzle_index]);
 
   if (puzzle) {
-    console.log("✅ [handleSetSelect] Loaded puzzle successfully");
     await loadPuzzleAndInitialize(
       puzzle,
       setFen,
@@ -168,7 +156,6 @@ export const handleSetSelect = async (
 
     const turn = chess.turn();
     setPlayerSide(turn);
-    console.log("🧩 [handleSetSelect] Player side set to:", turn);
   } else {
     console.warn("⚠️ [handleSetSelect] Failed to load puzzle");
     return;
@@ -191,6 +178,4 @@ export const handleSetSelect = async (
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
-  console.log("✅ [handleSetSelect] END");
 };
-
