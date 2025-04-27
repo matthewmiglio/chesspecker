@@ -5,13 +5,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 
 import { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
-import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
 
 import {
   getAllSetData,
   getSetAccuracy,
   getSetProgress,
-  
+
 } from "@/lib/api/puzzleApi";
 
 import { PuzzleSet } from "@/lib/types";
