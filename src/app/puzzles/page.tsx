@@ -10,7 +10,6 @@ import {
   getAllSetData,
   getSetAccuracy,
   getSetProgress,
-
 } from "@/lib/api/puzzleApi";
 
 import { PuzzleSet } from "@/lib/types";
@@ -332,6 +331,7 @@ export default function PuzzlesPage() {
           {userIsLoggedIn && userSets.length != 0 ? (
             <SetSelectTable
               userSets={userSets}
+              selectedSetId={selectedSetId}
               setSelectedSetId={setSelectedSetId}
               setPuzzleIds={setPuzzleIds}
               setCurrentRepeatIndex={setCurrentRepeatIndex}
