@@ -66,7 +66,6 @@ export default function AnimatedBoard({
 
     if (!isSessionActive || isBoardLocked) return false;
 
-    // --- NEW: Check legality safely using try-catch
     const tempGame = new Chess(game.fen());
     try {
       tempGame.move({
@@ -75,8 +74,8 @@ export default function AnimatedBoard({
         promotion: "q",
       });
     } catch (error) {
-      console.warn("[handlePieceDrop] Illegal move attempted:", move);
-      return false; // Illegal move, reject immediately
+      console.warn("[handlePieceDrop] Illegal move attempted:", move,error);
+      return false;
     }
 
     // If move is legal, proceed to check solution correctness
