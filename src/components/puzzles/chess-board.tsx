@@ -74,7 +74,7 @@ export default function AnimatedBoard({
         promotion: "q",
       });
     } catch (error) {
-      console.warn("[handlePieceDrop] Illegal move attempted:", move,error);
+      console.warn("[handlePieceDrop] Illegal move attempted:", move, error);
       return false;
     }
 
