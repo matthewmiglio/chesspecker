@@ -1,5 +1,3 @@
-// src/lib/hooks/usePuzzleSession.ts
-
 "use client";
 
 import { useState } from "react";
@@ -195,9 +193,12 @@ export function usePuzzleSession({
     );
 
     const chess = new Chess();
-    puzzle.game.fen
-      ? chess.load(puzzle.game.fen)
-      : chess.loadPgn(puzzle.game.pgn);
+    if (puzzle.game.fen) {
+      chess.load(puzzle.game.fen);
+    } else {
+      chess.loadPgn(puzzle.game.pgn);
+    }
+
     setPlayerSide(chess.turn());
 
     await updateThisSetAccuracy(setId, setAccuracies);
