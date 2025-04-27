@@ -3,6 +3,7 @@
 import SetFinishedGraphic from "@/components/puzzles/set-finished-graphic";
 import ChessBoardWrapper from "@/components/puzzles/chess-board-wrapper";
 import { PuzzleSet } from "@/lib/types";
+import type { ReturnTypeUsePuzzleSession } from "@/lib/types";
 
 type PuzzleBoardAreaProps = {
   selectedSet: PuzzleSet;
@@ -11,7 +12,7 @@ type PuzzleBoardAreaProps = {
   fen: string;
   solution: string[];
   solvedIndex: number;
-  puzzleSession: any;
+  puzzleSession: ReturnTypeUsePuzzleSession;
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
   playerSide: "w" | "b";

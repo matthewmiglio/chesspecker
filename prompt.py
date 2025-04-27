@@ -83,10 +83,10 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\SetTabs.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\NoDataCard.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\AccuracyChartCard.tsx",
+        r'H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleBoardArea.tsx',
+        r'H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleSession.ts',
+        r'H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleData.ts',
+        r'H:\my_files\my_programs\chesspecker\src\lib\api\puzzleApi.ts',
     ]
 
     ignore_folders = [

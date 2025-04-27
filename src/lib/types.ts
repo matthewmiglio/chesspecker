@@ -1,3 +1,8 @@
+import type { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
+
+export type ReturnTypeUsePuzzleSession = ReturnType<typeof usePuzzleSession>;
+
+
 export interface User {
   user_id: number;
   email: string;
