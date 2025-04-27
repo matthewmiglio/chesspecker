@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
   const { set_id, repeat_index } = await req.json();
 
   if (!set_id || repeat_index === undefined) {
-    return NextResponse.json({ error: "Missing set_id or repeat_index" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing set_id or repeat_index" },
+      { status: 400 }
+    );
   }
 
   const { data, error } = await supabase
@@ -18,11 +21,19 @@ export async function POST(req: NextRequest) {
     .select("correct, incorrect")
     .eq("set_id", set_id)
     .eq("repeat_index", repeat_index)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) {
-    return NextResponse.json({ error: "Not found or error fetching" }, { status: 404 });
+  if (error) {
+    console.error("Supabase error in getSetAccuracy:", error);
+    return NextResponse.json({ correct: 0, incorrect: 0 }, { status: 200 }); // Treat error as empty data
   }
 
-  return NextResponse.json({ correct: data.correct, incorrect: data.incorrect }, { status: 200 });
+  if (!data) {
+    return NextResponse.json({ correct: 0, incorrect: 0 }, { status: 200 }); // No data yet? Fine, zero
+  }
+
+  return NextResponse.json(
+    { correct: data.correct ?? 0, incorrect: data.incorrect ?? 0 },
+    { status: 200 }
+  );
 }

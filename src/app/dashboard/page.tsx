@@ -60,7 +60,9 @@ export default function AccuracyStatsPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ set_id, repeat_index: i }),
-        }).then((res) => res.json())
+        })
+          .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0 }))
+          .catch(() => ({ correct: 0, incorrect: 0 }))
       )
     );
 
