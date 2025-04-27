@@ -27,17 +27,15 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
-        <Link href="/puzzles" className="group">
-          <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform group-hover:scale-105 cursor-pointer">
-            <Image
-              src={heroImage}
-              alt="Chess Thinker Hero"
-              layout="fill"
-              objectFit="contain"
-              priority
-            />
-          </div>
-        </Link>
+        <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform">
+          <Image
+            src={heroImage}
+            alt="Chess Thinker Hero"
+            fill
+            style={{ objectFit: "contain" }}
+            priority
+          />
+        </div>
 
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
           Train Smarter. Play Better.
