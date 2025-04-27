@@ -17,9 +17,9 @@ export default function LoginButton({
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
       {session ? (
         <>
-          <span className="text-white">
+          {/* <span className="text-white">
             Welcome, {session.user?.name?.split(" ")[0] || "User"}
-          </span>
+          </span> */}
           {showLogout && (
             <button
               onClick={() => signOut()}
