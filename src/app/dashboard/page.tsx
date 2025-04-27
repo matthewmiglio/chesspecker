@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { cn } from "@/lib/utils";
 import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
 import AccuracyChartCard from "@/components/dashboard/AccuracyChartCard";
 import SetTabs from "@/components/dashboard/SetTabs";
+import NoDataCard from "@/components/dashboard/NoDataCard";
 
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
@@ -79,13 +79,20 @@ export default function AccuracyStatsPage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Puzzle Set Accuracy</h1>
 
-      <SetTabs
-        userSets={userSets}
-        selectedSetId={selectedSetId}
-        setSelectedSetId={setSelectedSetId}
-      />
+      {/* Only show SetTabs if there are sets */}
+      {userSets.length > 0 && selectedSetId !== null && (
+        <SetTabs
+          userSets={userSets}
+          selectedSetId={selectedSetId}
+          setSelectedSetId={setSelectedSetId}
+        />
+      )}
 
-      <AccuracyChartCard accuracyData={accuracyData} />
+      {accuracyData.length > 0 ? (
+        <AccuracyChartCard accuracyData={accuracyData} />
+      ) : (
+        <NoDataCard />
+      )}
     </div>
   );
 }
