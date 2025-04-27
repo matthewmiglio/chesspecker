@@ -265,8 +265,20 @@ export default function PuzzlesPage() {
     run();
   }, [authStatus]);
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
+
   const selectedSetIsDone =
     !!selectedSet && currentRepeatIndex >= (selectedSet?.repeats ?? Infinity);
+
+  console.log(
+    "🧩 [render] selectedSetId:",
+    selectedSetId,
+    "currentRepeatIndex:",
+    currentRepeatIndex,
+    "set.repeats:",
+    selectedSet?.repeats,
+    "selectedSetIsDone:",
+    selectedSetIsDone
+  );
 
   return (
     <div>
@@ -408,12 +420,9 @@ export default function PuzzlesPage() {
                         <div className="flex flex-col md:flex-row w-full border-b border-grey ">
                           <Button
                             onClick={async () => {
-                              const setToSelect = userSets.find(
-                                (s) => s.set_id === set.set_id
-                              );
+                              const setToSelect = userSets.find((s) => s.set_id === set.set_id);
                               if (!setToSelect) return;
 
-                              // ✅ pass setToSelect as a parameter into handleSetSelect
                               await handleSetSelect(
                                 set.set_id,
                                 userSets,
@@ -429,7 +438,13 @@ export default function PuzzlesPage() {
                                 setToSelect
                               );
 
-                              await puzzleSession.handleStartSession();
+                              const setIsDone = setToSelect.repeat_index >= setToSelect.repeats;
+
+                              if (!setIsDone) {
+                                await puzzleSession.handleStartSession();
+                              } else {
+                                console.log("✅ Selected set is already done. Skipping session start.");
+                              }
                             }}
                           >
                             {selectedSetId === set.set_id

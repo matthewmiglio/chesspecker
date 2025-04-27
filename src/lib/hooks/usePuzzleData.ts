@@ -87,27 +87,24 @@ export const loadPuzzleAndInitialize = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
-  console.log(
-    "[loadPuzzleAndInitialize] called for puzzleId:",
-    puzzleData.puzzle.id
-  );
+  console.log("➡️ [loadPuzzleAndInitialize] START for puzzleId:", puzzleData.puzzle.id);
 
   const fen = getFenAtPly(
     puzzleData.game.pgn,
     puzzleData.puzzle.initialPly + 1
   );
 
-  console.log("[loadPuzzleAndInitialize] FEN set to:", fen);
-  console.log(
-    "[loadPuzzleAndInitialize] Solution moves loaded:",
-    puzzleData.puzzle.solution
-  );
+  console.log("♟️ [loadPuzzleAndInitialize] Setting FEN:", fen);
+  console.log("📜 [loadPuzzleAndInitialize] Setting solution moves:", puzzleData.puzzle.solution);
 
   setFen(fen);
   setSolution(puzzleData.puzzle.solution);
   setSolvedIndex(0);
   setHighlight(null);
+
+  console.log("✅ [loadPuzzleAndInitialize] END");
 };
+
 
 export const handleSetSelect = async (
   setId: number,
@@ -127,9 +124,9 @@ export const handleSetSelect = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void,
   setPlayerSide: (side: "w" | "b") => void,
-  preloadedSet?: { repeat_index: number; puzzle_index: number } // ✅ NEW
+  preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
-  console.log("[handleSetSelect] called with setId:", setId);
+  console.log("➡️ [handleSetSelect] START setId:", setId);
 
   setSelectedSetId(setId);
   sessionStorage.setItem("selected_set_id", String(setId));
@@ -137,19 +134,20 @@ export const handleSetSelect = async (
   const set = userSets.find((s) => s.set_id === setId);
 
   if (!set || !set.elo || !set.size || set.puzzle_index == null) {
-    console.warn("[handleSetSelect] Invalid set data:", set, "Cannot proceed.");
+    console.warn("⚠️ [handleSetSelect] Invalid set data:", set);
     return;
   }
 
-  const currentIndex = set.puzzle_index;
   const puzzleIds = set.puzzle_ids;
   setPuzzleIds(puzzleIds);
 
+  console.log("📦 [handleSetSelect] Loading puzzleId:", puzzleIds[set.puzzle_index]);
+
   const { getPuzzleData } = await import("@/lib/api/puzzleApi");
-  const puzzleId = puzzleIds[currentIndex];
-  const puzzle = await getPuzzleData(puzzleId);
+  const puzzle = await getPuzzleData(puzzleIds[set.puzzle_index]);
 
   if (puzzle) {
+    console.log("✅ [handleSetSelect] Loaded puzzle successfully");
     await loadPuzzleAndInitialize(
       puzzle,
       setFen,
@@ -166,33 +164,31 @@ export const handleSetSelect = async (
       chess.loadPgn(puzzle.game.pgn);
     }
 
-    const turn = chess.turn(); // "w" or "b"
+    const turn = chess.turn();
     setPlayerSide(turn);
-    console.log("[handleSetSelect] Set player side based on FEN:", turn);
+    console.log("🧩 [handleSetSelect] Player side set to:", turn);
   } else {
-    console.warn("[handleSetSelect] Failed to load puzzle for id:", puzzleId);
+    console.warn("⚠️ [handleSetSelect] Failed to load puzzle");
     return;
   }
 
   if (preloadedSet) {
-    // ✅ If passed manually, use this
-    console.log("[handleSetSelect] Using preloaded set progress.");
+    console.log("📌 [handleSetSelect] Using preloadedSet:", preloadedSet);
     setCurrentRepeatIndex(preloadedSet.repeat_index);
     setCurrentPuzzleIndex(preloadedSet.puzzle_index);
   } else {
-    // 🛠 Otherwise, fetch from server
+    console.log("🌐 [handleSetSelect] Fetching set progress...");
     const progress = await getSetProgress(setId);
     if (progress) {
-      console.log("[handleSetSelect] Fetched progress from server.");
+      console.log("📌 [handleSetSelect] Server progress:", progress);
       setCurrentRepeatIndex(progress.repeat_index);
       setCurrentPuzzleIndex(progress.puzzle_index);
     } else {
-      console.warn(
-        "[handleSetSelect] Failed to load progress for set id:",
-        setId
-      );
+      console.warn("⚠️ [handleSetSelect] Failed to fetch set progress");
     }
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+  console.log("✅ [handleSetSelect] END");
 };
+

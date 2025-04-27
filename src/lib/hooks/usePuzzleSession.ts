@@ -304,9 +304,13 @@ export function usePuzzleSession({
   };
 
   const handleStartSession = async () => {
-    console.log("handleStartSession()");
+    console.log("➡️ [handleStartSession] START");
+
     setIsSessionActive(true);
-    if (!selectedSetId) return;
+    if (!selectedSetId) {
+      console.log("⚠️ [handleStartSession] No selectedSetId. Exiting early.");
+      return;
+    }
 
     const { updatePuzzleProgress } = await import("@/lib/hooks/usePuzzleData");
     await updatePuzzleProgress(
@@ -314,7 +318,10 @@ export function usePuzzleSession({
       setCurrentRepeatIndex,
       setCurrentPuzzleIndex
     );
+
+    console.log("✅ [handleStartSession] END");
   };
+
 
   return {
     isSessionActive,
