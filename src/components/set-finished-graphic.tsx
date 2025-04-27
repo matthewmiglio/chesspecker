@@ -34,7 +34,7 @@ export default function SetFinishedGraphic() {
 
       {/* Subheading */}
       <p className="text-muted-foreground text-base sm:text-lg max-w-md mb-8">
-        You're building serious tactical power.
+        You&apos;re building serious tactical power.
       </p>
 
       {/* CTA Button */}
