@@ -4,8 +4,8 @@ import type React from "react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
-import CreateSetForm from "@/components/create-set-form";
-import PuzzleSetCreationProgress from "@/components/PuzzleSetCreationProgress";
+import CreateSetForm from "@/components/create-page/create-set-form";
+import PuzzleSetCreationProgress from "@/components/create-page/PuzzleSetCreationProgress";
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;

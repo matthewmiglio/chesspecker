@@ -1,7 +1,7 @@
 import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import AnimatedBoard from "@/components/chess-board";
+import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect } from "react";
 
 type ChessBoardWrapperProps = {

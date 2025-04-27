@@ -16,12 +16,12 @@ import {
 
 import { PuzzleSet } from "@/lib/types";
 
-import ChessBoardWrapper from "@/components/chess-board-wrapper";
-import CreateSetButton from "@/components/create-set-button";
-import NotLoggedInButton from "@/components/not-logged-in-button";
-import NoSetSelectedButton from "@/components/no-set-selected-button";
-import SetFinishedGraphic from "@/components/set-finished-graphic";
-import SetSelectTable from "@/components/set-select-table";
+import ChessBoardWrapper from "@/components/puzzles/chess-board-wrapper";
+import CreateSetButton from "@/components/puzzles/create-set-button";
+import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
+import NoSetSelectedButton from "@/components/puzzles/no-set-selected-button";
+import SetFinishedGraphic from "@/components/puzzles/set-finished-graphic";
+import SetSelectTable from "@/components/puzzles/set-select-table";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();

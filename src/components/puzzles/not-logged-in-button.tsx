@@ -1,4 +1,4 @@
-import LoginButton from "@/components/LoginButton";
+import LoginButton from "@/components/header-footer/LoginButton";
 
 export default function NotLoggedInButton() {
   return (

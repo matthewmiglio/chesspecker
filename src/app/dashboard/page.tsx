@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
-import AccuracyChartCard from "@/components/dashboard/AccuracyChartCard";
-import SetTabs from "@/components/dashboard/SetTabs";
-import NoDataCard from "@/components/dashboard/NoDataCard";
+import AccuracyChartCard from "@/components/dashboard-page/AccuracyChartCard";
+import SetTabs from "@/components/dashboard-page/SetTabs";
+import NoDataCard from "@/components/dashboard-page/NoDataCard";
 
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
