@@ -62,7 +62,9 @@ export const incrementPuzzleIndex = async (
     return 0;
   }
 
-  let { repeat_index, puzzle_index, size } = progress;
+  let repeat_index = progress.repeat_index;
+  let puzzle_index = progress.puzzle_index;
+  const size = progress.size;
 
   if (puzzle_index + 1 === size) {
     puzzle_index = 0;
