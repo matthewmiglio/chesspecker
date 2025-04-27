@@ -14,17 +14,18 @@ A modern platform for chess enthusiasts to build and solve custom puzzle sets.
 
 Whether you're a casual player or training for your next tournament, Chesspecker helps sharpen your skills through deliberate, targeted practice.
 
----
-
-## ⚙️ Tech Stack
-
-- [Next.js](https://nextjs.org/)
-- React
-- Tailwind CSS (optional, add/remove if you're using it)
-- [Chess.js](https://github.com/jhlywa/chess.js) for game logic
-- [Chessboard.js](https://chessboardjs.com/) or a React-based alternative for the board UI
-
----
+⚙️ Tech Stack
+Next.js (TypeScript)
+React
+Tailwind CSS (for styling)
+Supabase (PostgreSQL DB + Authentication)
+NextAuth.js (Google OAuth 2.0 login)
+Chess.js (Chess engine logic)
+react-chessboard (interactive board UI)
+Recharts (statistics & graphs)
+Lichess API (live puzzles source)
+Framer Motion (animations) (optional, if you add more animated effects later)
+Custom-built API routes (/api) for database operations and Lichess fetches
 
 ## 📦 Getting Started
 
