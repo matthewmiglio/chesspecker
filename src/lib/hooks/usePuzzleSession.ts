@@ -100,6 +100,7 @@ export function usePuzzleSession({
     }
 
     showGreenCheck();
+    setHighlight(null);
 
     const newSolvedIndex = solvedIndex + 2;
 
