@@ -82,7 +82,12 @@ def generate_copy_string(
 if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
-    files_to_print = []
+    files_to_print = [
+        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\SetTabs.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\NoDataCard.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\AccuracyChartCard.tsx",
+    ]
 
     ignore_folders = [
         "node_modules",

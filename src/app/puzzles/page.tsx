@@ -39,7 +39,10 @@ export default function PuzzlesPage() {
   const [solvedIndex, setSolvedIndex] = useState<number>(0);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
-  const [isFinishedLoading, setIsFinishedLoading] = useState<boolean>(false);
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [isSetDataLoaded, setIsSetDataLoaded] = useState(false);
+
   const [setProgressMap, setSetProgressMap] = useState<
     Record<number, { repeat_index: number; puzzle_index: number }>
   >({});
@@ -97,25 +100,33 @@ export default function PuzzlesPage() {
     const run = async () => {
       if (authStatus !== "authenticated") {
         setUserIsLoggedIn(false);
-        setIsFinishedLoading(true);
+        setIsAuthChecked(true);
+        console.log("[PuzzleLoading] set isAuthChecked to true");
         return;
       }
 
       if (!session?.user?.email) {
         console.error("User is not logged in or missing email");
-        setIsFinishedLoading(true);
+        setIsAuthChecked(true);
+        console.log("[PuzzleLoading] set isAuthChecked to true");
         return;
       }
+
+      setUserIsLoggedIn(true);
+      setIsAuthChecked(true);
 
       const email = session.user.email;
       const sets = await getAllSetData(email);
       if (!sets) {
         console.error("Failed to fetch user sets");
-        setIsFinishedLoading(true);
+        console.log("[PuzzleLoading] set isSetDataLoaded to true");
+        setIsSetDataLoaded(true);
         return;
       }
 
       setUserSets(sets);
+      setIsSetDataLoaded(true);
+      console.log("[PuzzleLoading] set isSetDataLoaded to true");
 
       const accuracies: Record<number, { correct: number; incorrect: number }> =
         {};
@@ -144,8 +155,7 @@ export default function PuzzlesPage() {
 
       setSetAccuracies(accuracies);
       setSetProgressMap(progressMap);
-      setUserIsLoggedIn(true);
-      setIsFinishedLoading(true);
+      setIsSetDataLoaded(true);
     };
 
     run();
@@ -153,7 +163,7 @@ export default function PuzzlesPage() {
 
   return (
     <div>
-      {isFinishedLoading ? (
+      {isAuthChecked && isSetDataLoaded ? (
         <div className="mx-auto">
           {selectedSet && userIsLoggedIn ? (
             <PuzzleBoardArea

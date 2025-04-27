@@ -9,14 +9,49 @@ import NoDataCard from "@/components/dashboard-page/NoDataCard";
 
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
+
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
   const [accuracyData, setAccuracyData] = useState<RepeatAccuracy[]>([]);
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [isSetsChecked, setIsSetsChecked] = useState(false);
+  const [isAccuracyChecked, setIsAccuracyChecked] = useState(false);
+
   useEffect(() => {
-    if (status === "authenticated" && session?.user?.email) {
-      fetchUserSets(session.user.email);
-    }
+    const run = async () => {
+      if (status !== "authenticated") {
+        setIsAuthChecked(true);
+        return;
+      }
+
+      if (!session?.user?.email) {
+        return;
+      }
+      setIsAuthChecked(true);
+
+      const res = await fetch("/api/getSet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session.user.email }),
+      });
+
+      if (!res.ok) {
+        setIsSetsChecked(true); // even if fetch fails, we must set it
+        return;
+      }
+
+      const result = await res.json();
+      setUserSets(result.sets || []);
+
+      if (result.sets?.length > 0) {
+        setSelectedSetId(result.sets[0].set_id);
+      }
+
+      setIsSetsChecked(true); // ✅ move this OUTSIDE the if-block, always set
+    };
+
+    run();
   }, [status, session]);
 
   useEffect(() => {
@@ -24,19 +59,6 @@ export default function AccuracyStatsPage() {
       fetchAccuracy(selectedSetId);
     }
   }, [selectedSetId]);
-
-  const fetchUserSets = async (email: string) => {
-    const res = await fetch("/api/getSet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const result = await res.json();
-    setUserSets(result.sets);
-    if (result.sets.length > 0) {
-      setSelectedSetId(result.sets[0].set_id);
-    }
-  };
 
   const getSetSize = async (set_id: number) => {
     const response = await fetch("/api/getSetProgressStats", {
@@ -52,7 +74,10 @@ export default function AccuracyStatsPage() {
 
   const fetchAccuracy = async (set_id: number) => {
     const size = await getSetSize(set_id);
-    if (!size) return null;
+    if (!size) {
+      setIsAccuracyChecked(true);
+      return;
+    }
 
     const responses = await Promise.all(
       Array.from({ length: 10 }, (_, i) =>
@@ -75,25 +100,33 @@ export default function AccuracyStatsPage() {
       .filter((d) => d.correct > 0 || d.incorrect > 0);
 
     setAccuracyData(filtered);
+    setIsAccuracyChecked(true); // ✅ mark as done once fetched
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Puzzle Set Accuracy</h1>
 
-      {/* Only show SetTabs if there are sets */}
-      {userSets.length > 0 && selectedSetId !== null && (
-        <SetTabs
-          userSets={userSets}
-          selectedSetId={selectedSetId}
-          setSelectedSetId={setSelectedSetId}
-        />
-      )}
+      {isAuthChecked && isSetsChecked && isAccuracyChecked ? (
+        <>
+          {userSets.length > 0 && selectedSetId !== null && (
+            <SetTabs
+              userSets={userSets}
+              selectedSetId={selectedSetId}
+              setSelectedSetId={setSelectedSetId}
+            />
+          )}
 
-      {accuracyData.length > 0 ? (
-        <AccuracyChartCard accuracyData={accuracyData} />
+          {accuracyData.length > 0 ? (
+            <AccuracyChartCard accuracyData={accuracyData} />
+          ) : (
+            <NoDataCard />
+          )}
+        </>
       ) : (
-        <NoDataCard />
+        <div className="animate-pulse text-muted-foreground py-12 text-center">
+          Loading your dashboard...
+        </div>
       )}
     </div>
   );
