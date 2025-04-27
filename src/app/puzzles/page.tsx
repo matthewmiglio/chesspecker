@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 
@@ -13,9 +11,10 @@ import {
   getAllSetData,
   getSetAccuracy,
   getSetProgress,
+  
 } from "@/lib/api/puzzleApi";
 
-import { PuzzleSet, PuzzleData } from "@/lib/types";
+import { PuzzleSet } from "@/lib/types";
 
 import ChessBoardWrapper from "@/components/chess-board-wrapper";
 import CreateSetButton from "@/components/create-set-button";
