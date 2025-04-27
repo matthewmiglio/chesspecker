@@ -48,7 +48,7 @@ export default function Home() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
           <Button asChild size="lg">
-            <Link href="/login">Start Training</Link>
+            <Link href="/puzzles">Start Training</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
             <Link href="/about">Learn More</Link>
