@@ -5,7 +5,10 @@
 import { PuzzleSet } from "@/lib/types";
 import { showConfirmDeletePopup } from "@/lib/utils/uiHelpers";
 
-export const addIncorrectAttempt = async (setId: number, repeatIndex: number) => {
+export const addIncorrectAttempt = async (
+  setId: number,
+  repeatIndex: number
+) => {
   try {
     const res = await fetch("/api/addIncorrect", {
       method: "POST",
@@ -15,7 +18,8 @@ export const addIncorrectAttempt = async (setId: number, repeatIndex: number) =>
 
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || "Failed to add incorrect attempt");
+    if (!res.ok)
+      throw new Error(data.error || "Failed to add incorrect attempt");
 
     return true;
   } catch (err) {
@@ -26,6 +30,14 @@ export const addIncorrectAttempt = async (setId: number, repeatIndex: number) =>
 
 export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
   try {
+    console.log(
+      "[addCorrectAttempt] called with setId:",
+      setId,
+      "repeatIndex:",
+      repeatIndex
+    );
+    console.log("");
+
     const res = await fetch("/api/addCorrect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -96,12 +108,30 @@ export const getSetProgress = async (set_id: number) => {
   return result.progress;
 };
 
-export const setSetProgress = async (set_id: number, repeat_index: number, puzzle_index: number) => {
+export const setSetProgress = async (
+  set_id: number,
+  repeat_index: number,
+  puzzle_index: number
+) => {
+  console.log("🛰️ [setSetProgress] Sending to API:", {
+    set_id,
+    repeat_index,
+    puzzle_index,
+  });
+
   const response = await fetch("/api/updateSetProgressStats", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
   });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    console.error("❌ [setSetProgress] API failed:", result.error);
+  } else {
+    console.log("✅ [setSetProgress] API success:", result.message);
+  }
 
   return response.ok;
 };
