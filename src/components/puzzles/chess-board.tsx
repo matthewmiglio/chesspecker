@@ -57,16 +57,29 @@ export default function AnimatedBoard({
     sourceSquare: Square,
     targetSquare: Square
   ): boolean => {
-   
-
     const move = {
       from: sourceSquare,
       to: targetSquare,
     };
 
     console.log("[handlePieceDrop] created move object:", move);
+
     if (!isSessionActive || isBoardLocked) return false;
 
+    // --- NEW: Check legality safely using try-catch
+    const tempGame = new Chess(game.fen());
+    try {
+      tempGame.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: "q",
+      });
+    } catch (error) {
+      console.warn("[handlePieceDrop] Illegal move attempted:", move);
+      return false; // Illegal move, reject immediately
+    }
+
+    // If move is legal, proceed to check solution correctness
     const moveStr = sourceSquare + targetSquare;
     const expectedMoveStr = solution[solvedIndex];
     const expectedMoveNoPromotion = expectedMoveStr.slice(0, 4);
@@ -87,7 +100,7 @@ export default function AnimatedBoard({
     newGame.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: expectedPromotion || "q", // fallback if missing
+      promotion: expectedPromotion || "q",
     });
 
     setBoardPosition(newGame.fen());
@@ -118,6 +131,7 @@ export default function AnimatedBoard({
 
     return true;
   };
+
 
   const orientation = sideOnBottom === "w" ? "white" : "black";
 
