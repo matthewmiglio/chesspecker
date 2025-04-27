@@ -16,6 +16,7 @@ export default function Navbar() {
     { name: "Practice", href: "/puzzles" },
     { name: "Create", href: "/create" },
     { name: "Performance", href: "/dashboard" },
+    { name: "About", href: "/about" },
   ];
 
   return (
