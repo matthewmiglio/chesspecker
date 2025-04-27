@@ -33,22 +33,29 @@ export default function AboutPage() {
           What is the Woodpecker Method?
         </h2>
         <p className="text-muted-foreground">
-          The <span className="text-foreground font-semibold">Woodpecker Method</span> is a focused chess training system built around intensive repetition.
+          The{" "}
+          <span className="text-foreground font-semibold">
+            Woodpecker Method
+          </span>{" "}
+          is a focused chess training system built around intensive repetition.
         </p>
 
         <div className="space-y-6">
           {[
             {
               title: "Step 1",
-              description: "Solve a carefully selected set of puzzles—again and again.",
+              description:
+                "Solve a carefully selected set of puzzles—again and again.",
             },
             {
               title: "Step 2",
-              description: "Shrink the time between solving cycles, sharpening your pattern recognition.",
+              description:
+                "Shrink the time between solving cycles, sharpening your pattern recognition.",
             },
             {
               title: "Step 3",
-              description: "Master tactical motifs to make faster, stronger decisions in real games.",
+              description:
+                "Master tactical motifs to make faster, stronger decisions in real games.",
             },
           ].map((step, idx) => (
             <div key={idx}>
@@ -61,14 +68,13 @@ export default function AboutPage() {
 
       {/* QUOTE + CTA */}
       <div className="w-full max-w-2xl text-center space-y-10">
-       
-
         <h2 className="text-2xl font-bold text-foreground">
           Start mastering yours today.
         </h2>
 
         <p className="text-muted-foreground max-w-md mx-auto">
-          Build your first puzzle set and experience training that actually sharpens your instincts.
+          Build your first puzzle set and experience training that actually
+          sharpens your instincts.
         </p>
 
         <Link
