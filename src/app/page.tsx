@@ -8,9 +8,9 @@ export default function Home() {
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
         <Link href="/puzzles" className="group">
-          <div className="relative w-40 h-40 md:w-52 md:h-52 transition-transform group-hover:scale-105 cursor-pointer">
+          <div className="relative w-75 h-75 md:w-92 md:h-92 transition-transform group-hover:scale-105 cursor-pointer">
             <Image
-              src="/logos/logo_circle.png"
+              src="/chesspecker-hero.png"
               alt="ChessPecker Logo"
               layout="fill"
               objectFit="contain"
