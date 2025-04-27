@@ -83,12 +83,31 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\lib\utils\uiHelpers.ts",
-        r"H:\my_files\my_programs\chesspecker\src\lib\utils\puzzleUtils.ts",
-        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleSession.ts",
-        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleData.ts",
-        r"H:\my_files\my_programs\chesspecker\src\lib\api\puzzleApi.ts",
-        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
+        # r"H:\my_files\my_programs\chesspecker\src\lib\utils\uiHelpers.ts",
+        # r"H:\my_files\my_programs\chesspecker\src\lib\utils\puzzleUtils.ts",
+        # r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleSession.ts",
+        # r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleData.ts",
+        # r"H:\my_files\my_programs\chesspecker\src\lib\api\puzzleApi.ts",
+        # r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
+
+        # r'H:\my_files\my_programs\chesspecker\src\app\about\page.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\app\contact\page.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\app\create\page.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\app\page.tsx',
+
+
+        # r'H:\my_files\my_programs\chesspecker\src\components\chess-board-wrapper.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\chess-board.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\create-set-button.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\footer.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\LoginButton.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\mode-toggle.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\navbar.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\no-set-selected-button.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\not-logged-in-button.tsx',
+        # r'H:\my_files\my_programs\chesspecker\src\components\set-finished-graphic.tsx',
     ]
 
     ignore_folders = [
