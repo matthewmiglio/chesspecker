@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
 
 import { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
 
@@ -267,6 +269,13 @@ export default function PuzzlesPage() {
   const selectedSetIsDone =
     !!selectedSet && currentRepeatIndex >= (selectedSet?.repeats ?? Infinity);
 
+  const { resolvedTheme } = useTheme();
+
+  const heroImage =
+    resolvedTheme === "dark"
+      ? "/heros/chess-focus-white.png"
+      : "/heros/chess-focus-black.png";
+
   return (
     <div>
       {isFinishedLoading ? (
@@ -297,10 +306,25 @@ export default function PuzzlesPage() {
             <div className="mx-auto flex items-center justify-center  h-full min-h-[400px] border bg-muted/20">
               <div className="text-center p-8">
                 {/*Show no sets button if there are no sets AND logged in */}
-                {userSets.length === 0 && userIsLoggedIn ? (
-                  <CreateSetButton />
-                ) : (
-                  <></>
+                {userSets.length === 0 && userIsLoggedIn && (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="relative w-72 h-72 md:w-96 md:h-96 transition-transform group-hover:scale-105 cursor-pointer">
+                      <Image
+                        src={heroImage}
+                        alt="Chess Hero"
+                        layout="fill"
+                        objectFit="contain"
+                        priority
+                        className="rounded-xl"
+                      />
+                    </div>
+
+                    <div className="text-muted-foreground text-lg tracking-wide animate-fade-in">
+                      Ready to sharpen your instincts?
+                    </div>
+
+                    <CreateSetButton />
+                  </div>
                 )}
 
                 {/*Show user not logged in message if not logged in */}
