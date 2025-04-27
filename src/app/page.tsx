@@ -85,22 +85,6 @@ export default function Home() {
           </div>
         ))}
       </section>
-
-      {/* CALL TO ACTION STRIP */}
-      <section className="mt-32 w-full bg-muted text-muted-foreground py-12 px-6 text-center rounded-xl">
-        <h2 className="text-2xl font-semibold text-foreground">
-          Ready to sharpen your tactical edge?
-        </h2>
-        <p className="mt-2 max-w-xl mx-auto">
-          Start building your first puzzle set and experience the most focused
-          chess training on the web.
-        </p>
-        <div className="mt-6">
-          <Button asChild size="lg">
-            <Link href="/login">Get Started</Link>
-          </Button>
-        </div>
-      </section>
     </div>
   );
 }
