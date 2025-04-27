@@ -2,8 +2,8 @@ import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/chess-board";
+import { useEffect } from "react";
 
-// ✅ Add props type
 type ChessBoardWrapperProps = {
   fen: string;
   solution: string[];
@@ -11,6 +11,7 @@ type ChessBoardWrapperProps = {
   puzzleSession: {
     handleMove: (move: string, isCorrect: boolean) => Promise<void>;
     isSessionActive: boolean;
+    handleStartSession: () => Promise<void>;
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -39,6 +40,15 @@ export default function ChessBoardWrapper({
   currentRepeatIndex,
   selectedSet,
 }: ChessBoardWrapperProps) {
+  useEffect(() => {
+    if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
+      console.log(
+        "[ChessBoardWrapper] selectedSetId ready. Starting session..."
+      );
+      puzzleSession.handleStartSession();
+    }
+  }, [selectedSetId, puzzleSession]);
+
   return (
     <div className="mx-auto rounded-xl">
       <Card>
