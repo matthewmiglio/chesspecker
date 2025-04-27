@@ -22,6 +22,7 @@ import CreateSetButton from "@/components/create-set-button";
 import NotLoggedInButton from "@/components/not-logged-in-button";
 import NoSetSelectedButton from "@/components/no-set-selected-button";
 import SetFinishedGraphic from "@/components/set-finished-graphic";
+import SetSelectTable from "@/components/set-select-table";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
@@ -331,141 +332,22 @@ export default function PuzzlesPage() {
 
           {/*User sets*/}
           {userIsLoggedIn && userSets.length != 0 ? (
-            <div
-              className="
-            w-[100%]
-            sm:w-[90%] mx-auto
-            sm:mt-10
-            mt-0
-            grid
-            grid-cols-1 "
-            >
-              {/*Sets Table header row*/}
-              <div
-                className="
-              sm:rounded-t-lg
-              rounded-none
-              bg-foreground/30
-              "
-              >
-                <div className="text-md grid grid-cols-6 ">
-                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                    Name
-                  </div>
-                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                    ELO
-                  </div>
-                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                    Set #
-                  </div>
-                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                    <PuzzleIcon />
-                  </div>
-                  <div className=" py-2 flex justify-center items-center border-r-1 border-grey">
-                    <RepeatIcon />
-                  </div>
-                  <div> </div>
-                </div>
-              </div>
-
-              {/*Sets Table data*/}
-              <div
-                className="
-                sm:rounded-b-lg
-                bg-foreground/10
-                rounded-none"
-              >
-                {userSets.map((set) => (
-                  <div key={set.set_id} className="">
-                    <div
-                      key={set.set_id}
-                      className={`cursor-pointer bg-transparent transition-all py-0 ${
-                        selectedSetId === set.set_id ? "border-primary" : ""
-                      }`}
-                    >
-                      <div className="min-h-[70px] text-xs grid grid-cols-6 rounded-2xl">
-                        <div className="flex text-center justify-center items-center border-r-1 border-b-1 border-white py-3">
-                          {set.name}
-                        </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
-                          {set.elo}
-                        </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
-                          {setProgressMap[set.set_id]?.repeat_index ?? 0} /{" "}
-                          {set.repeats}
-                        </div>
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
-                          {" "}
-                          {setProgressMap[set.set_id]?.puzzle_index ?? 0} /{" "}
-                          {set.size}
-                        </div>
-
-                        <div className="flex justify-center items-center border-r-1 border-b-1 border-white py-3">
-                          {setAccuracies[set.set_id] ? (
-                            <>
-                              {Math.round(
-                                (setAccuracies[set.set_id].correct /
-                                  (setAccuracies[set.set_id].correct +
-                                    setAccuracies[set.set_id].incorrect || 1)) *
-                                  100
-                              )}
-                              %
-                            </>
-                          ) : (
-                            <>N/A</>
-                          )}
-                        </div>
-
-                        {/* set selection buttons */}
-                        <div className="flex flex-col md:flex-row w-full border-b border-grey ">
-                          <Button
-                            onClick={async () => {
-                              const setToSelect = userSets.find((s) => s.set_id === set.set_id);
-                              if (!setToSelect) return;
-
-                              await handleSetSelect(
-                                set.set_id,
-                                userSets,
-                                setSelectedSetId,
-                                setPuzzleIds,
-                                setCurrentRepeatIndex,
-                                setCurrentPuzzleIndex,
-                                setFen,
-                                setSolution,
-                                setSolvedIndex,
-                                setHighlight,
-                                setPlayerSide,
-                                setToSelect
-                              );
-
-                              const setIsDone = setToSelect.repeat_index >= setToSelect.repeats;
-
-                              if (!setIsDone) {
-                                await puzzleSession.handleStartSession();
-                              } else {
-                                console.log("✅ Selected set is already done. Skipping session start.");
-                              }
-                            }}
-                          >
-                            {selectedSetId === set.set_id
-                              ? "Selected"
-                              : "Select"}
-                          </Button>
-
-                          <Button
-                            className="h-auto py-0 gap-0 flex-1 rounded-none bg-red-500 hover:bg-red-900"
-                            variant="destructive"
-                            onClick={() => handleSetDelete(set.set_id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SetSelectTable
+              userSets={userSets}
+              setSelectedSetId={setSelectedSetId}
+              setPuzzleIds={setPuzzleIds}
+              setCurrentRepeatIndex={setCurrentRepeatIndex}
+              setCurrentPuzzleIndex={setCurrentPuzzleIndex}
+              setFen={setFen}
+              setSolution={setSolution}
+              setSolvedIndex={setSolvedIndex}
+              setHighlight={setHighlight}
+              setPlayerSide={setPlayerSide}
+              setProgressMap={setProgressMap}
+              setAccuracies={setAccuracies}
+              puzzleSession={puzzleSession}
+              handleSetDelete={handleSetDelete}
+            />
           ) : (
             <div className="mb-50"></div>
           )}
