@@ -16,17 +16,18 @@ function createFloatingIcon(
   div.className = `
     fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
     ${color} text-6xl opacity-0 scale-75
-    transition-all duration-300 ease-out z-[1000]
+    transition-all duration-150 ease-out z-[1000]
   `;
 
   document.body.appendChild(div);
 
-  // Trigger transition
+  // Fade In
   requestAnimationFrame(() => {
     div.classList.remove("opacity-0", "scale-75");
     div.classList.add("opacity-100", "scale-100");
   });
 
+  // Stay visible briefly, then Fade Out
   setTimeout(() => {
     div.classList.remove("opacity-100", "scale-100");
     div.classList.add("opacity-0", "scale-75");
@@ -38,8 +39,9 @@ function createFloatingIcon(
       },
       { once: true }
     );
-  }, 1000);
+  }, 300); // <<== only visible for 300ms instead of 1000ms
 }
+
 
 export async function showGreenCheck() {
   createFloatingIcon("✅", "text-green-500");
