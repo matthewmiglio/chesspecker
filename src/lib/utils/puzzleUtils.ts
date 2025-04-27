@@ -1,4 +1,4 @@
-// src/lib/utils/puzzleUtils.ts
+import { Chess } from "chess.js";
 
 "use client";
 
@@ -15,7 +15,7 @@ export const parseUCIMove = (uci: string) => ({
  * Gets the FEN string after playing a certain number of moves in a PGN game.
  */
 export const getFenAtPly = (pgn: string, initialPly: number) => {
-  const { Chess } = require("chess.js"); // Local import since utils shouldn't directly import modules globally
+
   const chess = new Chess();
   chess.loadPgn(pgn);
   const history = chess.history({ verbose: true });
