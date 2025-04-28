@@ -1,4 +1,3 @@
-import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions = {
@@ -15,7 +14,7 @@ export const authOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: true, 
+        secure: true,
       },
     },
   },
