@@ -53,6 +53,7 @@ export function usePuzzleSession({
   setPlayerSide: (side: "w" | "b") => void;
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
 
   const handleIncorrectMove = async () => {
     console.log('"[handleIncorrectMove] called!");');
@@ -92,18 +93,16 @@ export function usePuzzleSession({
     }
 
     if (!isCorrect) {
-      console.log(
-        "[handleMove] move incorrect, calling handleIncorrectMove..."
-      );
+      console.log("[handleMove] move incorrect, calling handleIncorrectMove...");
       await handleIncorrectMove();
       return;
     }
 
+    // Correct move played
     showGreenCheck();
     setHighlight(null);
 
     const newSolvedIndex = solvedIndex + 2;
-
     setSolvedIndex(newSolvedIndex);
 
     const chess = new Chess();
@@ -119,7 +118,15 @@ export function usePuzzleSession({
     setFen(newFen);
 
     if (newSolvedIndex - 1 === solution.length) {
-      await handleSuccessfulPuzzle(true);
+      console.log("[handleMove] Puzzle finished. Deciding outcome...");
+
+      if (hintUsed) {
+        console.log("[handleMove] Hint was used, logging as incorrect.");
+        await handleIncorrectMove();
+      } else {
+        console.log("[handleMove] No hint used, logging as correct.");
+        await handleSuccessfulPuzzle(true);
+      }
     }
   };
 
@@ -193,6 +200,9 @@ export function usePuzzleSession({
       setHighlight
     );
 
+    // Reset hint state for new puzzle
+    setHintUsed(false);
+
     const chess = new Chess();
     if (puzzle.game.fen) {
       chess.load(puzzle.game.fen);
@@ -240,5 +250,6 @@ export function usePuzzleSession({
     handleMove,
     handleNextPuzzle,
     handleStartSession,
+    setHintUsed,
   };
 }

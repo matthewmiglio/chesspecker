@@ -83,12 +83,15 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\app\api\auth\[...nextauth]\route.ts",
-        r"H:\my_files\my_programs\chesspecker\src\app\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board-wrapper.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\lib\api\puzzleApi.ts",
+        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleData.ts",
+        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\usePuzzleSession.ts",
+        r"H:\my_files\my_programs\chesspecker\src\lib\utils\chessBoardHelpers.ts",
+        r"H:\my_files\my_programs\chesspecker\src\lib\utils\puzzleUtils.ts",
         r"H:\my_files\my_programs\chesspecker\src\lib\types.ts",
-        r"H:\my_files\my_programs\chesspecker\.env.local",
-        r"H:\my_files\my_programs\chesspecker\src\app\providers.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\app\layout.tsx",
     ]
 
     ignore_folders = [

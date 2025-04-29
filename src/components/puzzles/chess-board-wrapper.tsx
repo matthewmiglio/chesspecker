@@ -12,6 +12,7 @@ type ChessBoardWrapperProps = {
     handleMove: (move: string, isCorrect: boolean) => Promise<void>;
     isSessionActive: boolean;
     handleStartSession: () => Promise<void>;
+    setHintUsed: (used: boolean) => void; // <-- NEW
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -111,7 +112,9 @@ export default function ChessBoardWrapper({
                   } else {
                     setHighlight(null);
                   }
+                  puzzleSession.setHintUsed(true);
                 }}
+
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Hint
