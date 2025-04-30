@@ -117,17 +117,26 @@ export default function SetSelectTable({
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
 
-                {/*debug card object */}
+            {/*debug card object */}
             <div className="p-4">
-  <Card className="bg-card bg-[#222] text-white border border-red-500">
-    <div>🧪 Debug Card</div>
-    <div>CSS var value:</div>
-    <pre className="text-xs whitespace-pre-wrap break-words px-2">
-      {typeof window !== "undefined" &&
-        getComputedStyle(document.documentElement).getPropertyValue("--card")}
-    </pre>
-  </Card>
-</div>
+              <Card className="bg-card bg-[#222] text-white border border-red-500">
+                <div>🧪 Debug Card</div>
+                <div>CSS var value:</div>
+                <pre className="text-xs whitespace-pre-wrap break-words px-2">
+                  {typeof window !== "undefined" &&
+                    getComputedStyle(document.documentElement).getPropertyValue("--card")}
+                </pre>
+              </Card>
+            </div>
+
+            <div className="p-4">
+              <div className="bg-red-500 text-white border border-blue-500 p-4 min-h-[100px] min-w-[100px]">
+                🧪 Mobile Test Card
+                <br />
+                If you can see this on mobile, layout is fine.
+              </div>
+            </div>
+
 
 
             <Progress
