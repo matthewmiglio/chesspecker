@@ -4,6 +4,7 @@ import { PuzzleSet } from "@/lib/types";
 import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
@@ -115,6 +116,19 @@ export default function SetSelectTable({
               </div>
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
+
+                {/*debug card object */}
+            <div className="p-4">
+  <Card className="bg-card bg-[#222] text-white border border-red-500">
+    <div>🧪 Debug Card</div>
+    <div>CSS var value:</div>
+    <pre className="text-xs whitespace-pre-wrap break-words px-2">
+      {typeof window !== "undefined" &&
+        getComputedStyle(document.documentElement).getPropertyValue("--card")}
+    </pre>
+  </Card>
+</div>
+
 
             <Progress
               value={progressPercent}
