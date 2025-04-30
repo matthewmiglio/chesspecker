@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -26,29 +25,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
-      {/*debug card object */}
-      <div className="p-4">
-        <Card className="bg-card bg-[#222] text-white border border-red-500">
-          <div>🧪 Debug Card</div>
-          <div>CSS var value:</div>
-          <pre className="text-xs whitespace-pre-wrap break-words px-2">
-            {typeof window !== "undefined" &&
-              getComputedStyle(document.documentElement).getPropertyValue("--card")}
-          </pre>
-        </Card>
-      </div>
-
-      {/*debug card object */}
-      <div className="p-4">
-        <div className="bg-red-500 text-white border border-blue-500 p-4 min-h-[100px] min-w-[100px]">
-          🧪 Mobile Test Card
-          <br />
-          If you can see this on mobile, layout is fine.
-        </div>
-      </div>
-
-
-
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
         <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform">
