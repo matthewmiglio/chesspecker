@@ -70,13 +70,12 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        let progressColor = "bg-red-500";
-        if (progressPercent >= 80) {
-          progressColor = "bg-green-500";
-        } else if (progressPercent >= 40) {
-          progressColor = "bg-yellow-400";
-        }
-
+        const progressColorClass =
+          progressPercent >= 80
+            ? "bg-green-500"
+            : progressPercent >= 40
+            ? "bg-yellow-400"
+            : "bg-red-500";
         return (
           <div
             key={set.set_id}
@@ -116,14 +115,10 @@ export default function SetSelectTable({
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
 
-
-
-
-
             <Progress
               value={progressPercent}
               className="h-3 rounded-full bg-muted/50"
-              barClassName={cn(progressColor)}
+              barClassName={progressColorClass}
             />
 
             <div className="mt-3 text-xs text-muted-foreground">
