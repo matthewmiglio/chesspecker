@@ -4,7 +4,6 @@ import { PuzzleSet } from "@/lib/types";
 import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
