@@ -45,11 +45,11 @@
 
 :root {
   --radius: 0.625rem;
-  --background: rgb(255, 255, 255); 
+  --background: rgb(255, 255, 255);
 
   --foreground: rgb(37, 37, 37);
 
-  --card: rgb(255, 255, 255);
+  --card: rgb(245, 245, 245);
 
   --card-foreground: rgb(37, 37, 37);
 
