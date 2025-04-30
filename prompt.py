@@ -83,11 +83,9 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\puzzles\page.tsx",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\globals.css",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\layout.tsx",
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\ui\card.tsx',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\providers.tsx',
+        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\puzzles\page.tsx',
+        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\puzzles\not-logged-in-button.tsx',
+       
     ]
 
     ignore_folders = [

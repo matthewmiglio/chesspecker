@@ -13,6 +13,7 @@ import {
 
 import { PuzzleSet } from "@/lib/types";
 
+import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
 import SetSelectTable from "@/components/puzzles/set-select-table";
 import PuzzleBoardArea from "@/components/puzzles/PuzzleBoardArea";
 import PuzzleEmptyState from "@/components/puzzles/PuzzleEmptyState";
@@ -21,9 +22,10 @@ import { showConfirmDeletePopup } from "@/components/puzzles/ConfirmDeletePopup"
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme(); const userIsLoggedIn = authStatus === "authenticated";
+  const isAuthChecked = authStatus !== "loading";
 
-  const [userIsLoggedIn, setUserIsLoggedIn] = useState(false);
+
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
   const [fen, setFen] = useState<string>(
@@ -40,7 +42,6 @@ export default function PuzzlesPage() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const [playerSide, setPlayerSide] = useState<"w" | "b">("w");
 
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isSetDataLoaded, setIsSetDataLoaded] = useState(false);
 
   const [setProgressMap, setSetProgressMap] = useState<
@@ -97,122 +98,140 @@ export default function PuzzlesPage() {
   };
 
   useEffect(() => {
+    console.log("[PuzzlePage] authStatus:", authStatus);
+    console.log("[PuzzlePage] session:", session);
+
     const run = async () => {
+      if (authStatus === "loading") {
+        console.log("[PuzzlePage] Auth is still loading — skipping...");
+        return;
+      }
+
       if (authStatus !== "authenticated") {
-        setUserIsLoggedIn(false);
-        setIsAuthChecked(true);
-        console.log("[PuzzleLoading] set isAuthChecked to true");
-        return;
-      }
-
-      if (!session?.user?.email) {
-        console.error("User is not logged in or missing email");
-        setIsAuthChecked(true);
-        console.log("[PuzzleLoading] set isAuthChecked to true");
-        return;
-      }
-
-      setUserIsLoggedIn(true);
-      setIsAuthChecked(true);
-
-      const email = session.user.email;
-      const sets = await getAllSetData(email);
-      if (!sets) {
-        console.error("Failed to fetch user sets");
-        console.log("[PuzzleLoading] set isSetDataLoaded to true");
+        console.log("[PuzzlePage] User is NOT authenticated — setting isSetDataLoaded = true");
         setIsSetDataLoaded(true);
         return;
       }
 
-      setUserSets(sets);
-      setIsSetDataLoaded(true);
-      console.log("[PuzzleLoading] set isSetDataLoaded to true");
-
-      const accuracies: Record<number, { correct: number; incorrect: number }> =
-        {};
-      const progressMap: Record<
-        number,
-        { repeat_index: number; puzzle_index: number }
-      > = {};
-
-      for (const set of sets) {
-        let repeat_index = set.repeat_index;
-        if (repeat_index === set.size) {
-          repeat_index = set.size - 1;
-        }
-
-        const acc = await getSetAccuracy(set.set_id, repeat_index);
-        if (acc) accuracies[set.set_id] = acc;
-
-        const progress = await getSetProgress(set.set_id);
-        if (progress) {
-          progressMap[set.set_id] = {
-            repeat_index: progress.repeat_index,
-            puzzle_index: progress.puzzle_index,
-          };
-        }
+      if (!session?.user?.email) {
+        console.error("[PuzzlePage] session.user.email is missing — setting isSetDataLoaded = true");
+        setIsSetDataLoaded(true);
+        return;
       }
 
-      setSetAccuracies(accuracies);
-      setSetProgressMap(progressMap);
+      console.log("[PuzzlePage] Authenticated, fetching data for:", session.user.email);
+
+      try {
+        const email = session.user.email;
+        const sets = await getAllSetData(email);
+
+        if (!sets) {
+          console.error("[PuzzlePage] Failed to fetch user sets — setting isSetDataLoaded = true");
+          setIsSetDataLoaded(true);
+          return;
+        }
+
+        setUserSets(sets);
+        console.log("[PuzzlePage] Fetched user sets:", sets);
+
+        const accuracies: Record<number, { correct: number; incorrect: number }> = {};
+        const progressMap: Record<number, { repeat_index: number; puzzle_index: number }> = {};
+
+        for (const set of sets) {
+          let repeat_index = set.repeat_index;
+          if (repeat_index === set.size) {
+            repeat_index = set.size - 1;
+          }
+
+          const acc = await getSetAccuracy(set.set_id, repeat_index);
+          if (acc) {
+            accuracies[set.set_id] = acc;
+          }
+
+          const progress = await getSetProgress(set.set_id);
+          if (progress) {
+            progressMap[set.set_id] = {
+              repeat_index: progress.repeat_index,
+              puzzle_index: progress.puzzle_index,
+            };
+          }
+        }
+
+        setSetAccuracies(accuracies);
+        setSetProgressMap(progressMap);
+        console.log("[PuzzlePage] Accuracies and progressMap set.");
+      } catch (err) {
+        console.error("[PuzzlePage] Unexpected error during fetch:", err);
+      }
+
       setIsSetDataLoaded(true);
+      console.log("[PuzzlePage] setIsSetDataLoaded(true) complete.");
     };
 
     run();
   }, [authStatus, session]);
 
+
+
   return (
     <div>
       {isAuthChecked && isSetDataLoaded ? (
-        <div className="mx-auto">
-          {selectedSet && userIsLoggedIn ? (
-            <PuzzleBoardArea
-              selectedSet={selectedSet}
-              selectedSetId={selectedSetId}
-              selectedSetIsDone={selectedSetIsDone}
-              fen={fen}
-              solution={solution}
-              solvedIndex={solvedIndex}
-              puzzleSession={puzzleSession}
-              highlight={highlight}
-              setHighlight={setHighlight}
-              playerSide={playerSide}
-              setAccuracies={setAccuracies}
-              currentPuzzleIndex={currentPuzzleIndex}
-              currentRepeatIndex={currentRepeatIndex}
-            />
-          ) : (
-            <PuzzleEmptyState
-              heroImage={heroImage}
-              userSetsLength={userSets.length}
-              userIsLoggedIn={userIsLoggedIn}
-              selectedSetExists={!!selectedSet}
-            />
-          )}
+        userIsLoggedIn ? (
+          <div className="mx-auto">
+            {selectedSet ? (
+              <PuzzleBoardArea
+                selectedSet={selectedSet}
+                selectedSetId={selectedSetId}
+                selectedSetIsDone={selectedSetIsDone}
+                fen={fen}
+                solution={solution}
+                solvedIndex={solvedIndex}
+                puzzleSession={puzzleSession}
+                highlight={highlight}
+                setHighlight={setHighlight}
+                playerSide={playerSide}
+                setAccuracies={setAccuracies}
+                currentPuzzleIndex={currentPuzzleIndex}
+                currentRepeatIndex={currentRepeatIndex}
+              />
+            ) : (
+              <PuzzleEmptyState
+                heroImage={heroImage}
+                userSetsLength={userSets.length}
+                userIsLoggedIn={userIsLoggedIn}
+                selectedSetExists={!!selectedSet}
+              />
+            )}
 
-          {userIsLoggedIn && userSets.length !== 0 && (
-            <SetSelectTable
-              userSets={userSets}
-              selectedSetId={selectedSetId}
-              setSelectedSetId={setSelectedSetId}
-              setPuzzleIds={setPuzzleIds}
-              setCurrentRepeatIndex={setCurrentRepeatIndex}
-              setCurrentPuzzleIndex={setCurrentPuzzleIndex}
-              setFen={setFen}
-              setSolution={setSolution}
-              setSolvedIndex={setSolvedIndex}
-              setHighlight={setHighlight}
-              setPlayerSide={setPlayerSide}
-              setProgressMap={setProgressMap}
-              setAccuracies={setAccuracies}
-              puzzleSession={puzzleSession}
-              handleSetDelete={handleSetDelete}
-            />
-          )}
-        </div>
+            {userSets.length !== 0 && (
+              <SetSelectTable
+                userSets={userSets}
+                selectedSetId={selectedSetId}
+                setSelectedSetId={setSelectedSetId}
+                setPuzzleIds={setPuzzleIds}
+                setCurrentRepeatIndex={setCurrentRepeatIndex}
+                setCurrentPuzzleIndex={setCurrentPuzzleIndex}
+                setFen={setFen}
+                setSolution={setSolution}
+                setSolvedIndex={setSolvedIndex}
+                setHighlight={setHighlight}
+                setPlayerSide={setPlayerSide}
+                setProgressMap={setProgressMap}
+                setAccuracies={setAccuracies}
+                puzzleSession={puzzleSession}
+                handleSetDelete={handleSetDelete}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-[60vh]">
+            <NotLoggedInButton />
+          </div>
+        )
       ) : (
         <PuzzlePageLoading />
       )}
     </div>
   );
+
 }
