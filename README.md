@@ -1,6 +1,6 @@
 # ♟️ Chesspecker
 
-**Assemble. Practice. Repeat. Share.**  
+**Assemble. Practice. Repeat. Share.**
 A modern platform for chess enthusiasts to build and solve custom puzzle sets.
 
 
@@ -27,6 +27,11 @@ Lichess API (live puzzles source)
 Framer Motion (animations) (optional, if you add more animated effects later)
 Custom-built API routes (/api) for database operations and Lichess fetches
 
+## TODO
+-Share puzzles feature
+-skip forward/backward while in the middle of puzzles
+-mobile progress bar colors
+
 ## 📦 Getting Started
 
 Clone the repo and install dependencies:
@@ -35,3 +40,6 @@ Clone the repo and install dependencies:
 git clone https://github.com/your-username/chesspecker.git
 cd chesspecker
 npm install
+
+
+
