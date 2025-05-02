@@ -3,9 +3,7 @@
 import { PuzzleSet } from "@/lib/types";
 import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
 import { Button } from "@/components/ui/button";
-// import { Progress } from "@/components/ui/progress";
-import BareProgress from "@/components/ui/progress-bare";
-
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
@@ -72,12 +70,12 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        const progressColorClass = cn({
-          "bg-green-500": progressPercent >= 80,
-          "bg-yellow-400": progressPercent >= 40 && progressPercent < 80,
-          "bg-red-500": progressPercent < 40,
-        });
-
+        const progressColorClass =
+          progressPercent >= 80
+            ? "bg-green-500"
+            : progressPercent >= 40
+            ? "bg-yellow-400"
+            : "bg-red-500";
         return (
           <div
             key={set.set_id}
@@ -117,7 +115,7 @@ export default function SetSelectTable({
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
 
-            <BareProgress
+            <Progress
               value={progressPercent}
               className="h-3 rounded-full bg-muted/50"
               barClassName={progressColorClass}
@@ -144,28 +142,6 @@ export default function SetSelectTable({
           </div>
         );
       })}
-
-      {/* STATIC SAFE TEST BLOCK */}
-      <div className="hidden">
-        <div className="bg-green-500"></div>
-        <div className="bg-yellow-400"></div>
-        <div className="bg-red-500"></div>
-      </div>
-      {/* COLOR STRIP TEST */}
-      <div className="mt-4 flex space-x-2">
-        <div className="h-3 w-1/3 rounded-full bg-red-500" />
-        <div className="h-3 w-1/3 rounded-full bg-yellow-400" />
-        <div className="h-3 w-1/3 rounded-full bg-green-500" />
-      </div>
-      {/* PROGRESS BAR DIRECT TEST */}
-      <BareProgress
-        value={75}
-        className="h-3 rounded-full bg-muted/50"
-        barClassName="bg-green-500"
-      />
-      <div className="px-4 py-4 pb-14 bg-green-500 h-3 w-full rounded-full overflow-hidden">
-        test
-      </div>
     </div>
   );
 }

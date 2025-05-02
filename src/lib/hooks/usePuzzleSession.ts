@@ -1,5 +1,3 @@
-// src/lib/hooks/usePuzzleSession.ts
-
 "use client";
 
 import { useState } from "react";
@@ -57,34 +55,8 @@ export function usePuzzleSession({
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
 
-  const [moveHistory, setMoveHistory] = useState<string[]>([fen]);
-  const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
-
-  const isReviewing = currentMoveIndex < moveHistory.length - 1;
-
-  const goBack = () => {
-    if (currentMoveIndex > 0) {
-      setCurrentMoveIndex((i) => i - 1);
-      setFen(moveHistory[currentMoveIndex - 1]);
-    }
-  };
-
-  const goForward = () => {
-    if (currentMoveIndex < moveHistory.length - 1) {
-      setCurrentMoveIndex((i) => i + 1);
-      setFen(moveHistory[currentMoveIndex + 1]);
-    }
-  };
-
-  const goToFront = () => {
-    if (currentMoveIndex < moveHistory.length - 1) {
-      const lastFen = moveHistory[moveHistory.length - 1];
-      setCurrentMoveIndex(moveHistory.length - 1);
-      setFen(lastFen);
-    }
-  };
-
   const handleIncorrectMove = async () => {
+    console.log('"[handleIncorrectMove] called!");');
     const setId = getSelectedSetId();
     if (!setId) return;
     showRedX();
@@ -92,17 +64,41 @@ export function usePuzzleSession({
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
     await showSolution();
+    console.log("This puzzle was unsuccessful!");
     await handleNextPuzzle(true);
   };
 
+  const handleSuccessfulPuzzle = async (forceFinish = false) => {
+    const setId = getSelectedSetId();
+    if (!setId) {
+      console.log(
+        "[handleSuccessfulPuzzle] no selectedSetId, returning early."
+      );
+      return;
+    }
+
+    const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
+    await addCorrectAttempt(setId, currentRepeatIndex);
+    console.log(
+      "[handleSuccessfulPuzzle] recorded correct attempt on server-side."
+    );
+
+    await handleNextPuzzle(forceFinish);
+  };
+
   const handleMove = async (move: string, isCorrect: boolean) => {
-    if (!isSessionActive || isReviewing) return;
+    if (!isSessionActive) {
+      console.log("[handleMove] session not active, returning early.");
+      return;
+    }
 
     if (!isCorrect) {
+      console.log("[handleMove] move incorrect, calling handleIncorrectMove...");
       await handleIncorrectMove();
       return;
     }
 
+    // Correct move played
     showGreenCheck();
     setHighlight(null);
 
@@ -119,20 +115,16 @@ export function usePuzzleSession({
     }
 
     const newFen = chess.fen();
-
-    const updatedHistory = [
-      ...moveHistory.slice(0, currentMoveIndex + 1),
-      newFen,
-    ];
-    setMoveHistory(updatedHistory);
-    setCurrentMoveIndex(updatedHistory.length - 1);
-
     setFen(newFen);
 
     if (newSolvedIndex - 1 === solution.length) {
+      console.log("[handleMove] Puzzle finished. Deciding outcome...");
+
       if (hintUsed) {
+        console.log("[handleMove] Hint was used, logging as incorrect.");
         await handleIncorrectMove();
       } else {
+        console.log("[handleMove] No hint used, logging as correct.");
         await handleSuccessfulPuzzle(true);
       }
     }
@@ -143,63 +135,72 @@ export function usePuzzleSession({
     const remainingSolution = solution.slice(solvedIndex);
 
     for (let i = 0; i < remainingSolution.length; i++) {
+      const moveUci = remainingSolution[i];
       await new Promise((resolve) => setTimeout(resolve, 600));
 
-      chess.move(parseUCIMove(remainingSolution[i]));
-      const newFen = chess.fen();
+      chess.move({
+        from: moveUci.slice(0, 2),
+        to: moveUci.slice(2, 4),
+        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+      });
 
-      setFen(newFen);
+      setFen(chess.fen());
     }
   };
 
-  const handleSuccessfulPuzzle = async (forceFinish = false) => {
-    const setId = getSelectedSetId();
-    if (!setId) return;
-
-    const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
-    await addCorrectAttempt(setId, currentRepeatIndex);
-
-    await handleNextPuzzle(forceFinish);
-  };
-
   const handleNextPuzzle = async (forceFinish = false) => {
+    console.log("[handleNextPuzzle] called. forceFinish:", forceFinish);
     const setId = getSelectedSetId();
     if (!setId) return;
 
     if (setIsDone(userSets, setId, currentRepeatIndex)) {
+      console.log("[handleNextPuzzle] set is fully done! showing confetti.");
       showConfetti();
       return;
     }
 
-    if (!forceFinish && !puzzleIsFinished(solution.length, solvedIndex)) return;
+    if (!forceFinish && !puzzleIsFinished(solution.length, solvedIndex)) {
+      console.log(
+        "[handleNextPuzzle] Puzzle not finished yet, returning early."
+      );
+      return;
+    }
 
     let nextRepeatIndex = currentRepeatIndex;
     let nextPuzzleIndex = currentPuzzleIndex + 1;
 
     if (nextPuzzleIndex >= puzzleIds.length) {
+      console.log(
+        "[handleNextPuzzle] No more puzzles left. Starting new repeat..."
+      );
       nextRepeatIndex += 1;
       nextPuzzleIndex = 0;
     }
 
+    // Update client-side indexes
     setCurrentRepeatIndex(nextRepeatIndex);
     setCurrentPuzzleIndex(nextPuzzleIndex);
 
     const nextPuzzleId = puzzleIds[nextPuzzleIndex];
     const puzzle = await getPuzzleData(nextPuzzleId);
-    if (!puzzle) return;
+
+    if (!puzzle) {
+      console.error(
+        "[handleNextPuzzle] Failed to load puzzle with id",
+        nextPuzzleId
+      );
+      return;
+    }
 
     await loadPuzzleAndInitialize(
       puzzle,
-      (f) => {
-        setFen(f);
-        setMoveHistory([f]);
-        setCurrentMoveIndex(0);
-      },
+      setFen,
       setSolution,
       setSolvedIndex,
       setHighlight
     );
 
+    // Reset hint state for new puzzle
     setHintUsed(false);
 
     const chess = new Chess();
@@ -212,11 +213,18 @@ export function usePuzzleSession({
     setPlayerSide(chess.turn());
 
     await updateThisSetAccuracy(setId, setAccuracies);
+
     await updatePuzzleProgress(setId, nextRepeatIndex, nextPuzzleIndex);
+
+    console.log(
+      "[handleNextPuzzle] Puzzle loaded and server progress updated."
+    );
   };
 
   const handleStartSession = async () => {
     let setId = getSelectedSetId();
+
+    // ⏳ Wait until selectedSetId is available
     if (!setId) {
       for (let attempt = 0; attempt < 20; attempt++) {
         await new Promise((resolve) => setTimeout(resolve, 50));
@@ -225,7 +233,12 @@ export function usePuzzleSession({
       }
     }
 
-    if (!setId) return;
+    if (!setId) {
+      console.log(
+        "⚠️ [handleStartSession] No selectedSetId after waiting. Exiting early."
+      );
+      return;
+    }
 
     setIsSessionActive(true);
   };
@@ -238,10 +251,5 @@ export function usePuzzleSession({
     handleNextPuzzle,
     handleStartSession,
     setHintUsed,
-    goBack,
-    goForward,
-    goToFront,
-    currentMoveIndex,
-    moveHistory,
   };
 }
