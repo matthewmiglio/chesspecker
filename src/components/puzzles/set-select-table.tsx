@@ -3,7 +3,9 @@
 import { PuzzleSet } from "@/lib/types";
 import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+// import { Progress } from "@/components/ui/progress";
+import BareProgress from "@/components/ui/progress-bare";
+
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
@@ -115,7 +117,7 @@ export default function SetSelectTable({
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
 
-            <Progress
+            <BareProgress
               value={progressPercent}
               className="h-3 rounded-full bg-muted/50"
               barClassName={progressColorClass}
@@ -156,7 +158,7 @@ export default function SetSelectTable({
         <div className="h-3 w-1/3 rounded-full bg-green-500" />
       </div>
       {/* PROGRESS BAR DIRECT TEST */}
-      <Progress
+      <BareProgress
         value={75}
         className="h-3 rounded-full bg-muted/50"
         barClassName="bg-green-500"

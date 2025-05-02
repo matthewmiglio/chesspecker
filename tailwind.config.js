@@ -1,4 +1,3 @@
-// tailwind.config.js or tailwind.config.ts
 module.exports = {
   content: [
     "./src/**/*.{ts,tsx,js,jsx}",
