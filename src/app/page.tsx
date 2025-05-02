@@ -28,7 +28,7 @@ export default function Home() {
       {/*Debug*/}
       <div>
         <div className="bg-green-500 w-3xl h-32">
-          Here's a big debug box. Tell why this shouldnt work v1048
+          Heres a big debug box. Tell why this shouldnt work v1048
         </div>
       </div>
 
