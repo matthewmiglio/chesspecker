@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
 import AccuracyChartCard from "@/components/dashboard-page/AccuracyChartCard";
@@ -72,36 +72,39 @@ export default function AccuracyStatsPage() {
     return result.progress.size;
   };
 
-  const fetchAccuracy = async (set_id: number) => {
-    const size = await getSetSize(set_id);
-    if (!size) {
+  const fetchAccuracy = useCallback(
+    async (set_id: number) => {
+      const size = await getSetSize(set_id);
+      if (!size) {
+        setIsAccuracyChecked(true);
+        return;
+      }
+
+      const responses = await Promise.all(
+        Array.from({ length: 10 }, (_, i) =>
+          fetch("/api/getSetAccuracy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ set_id, repeat_index: i }),
+          })
+            .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0 }))
+            .catch(() => ({ correct: 0, incorrect: 0 }))
+        )
+      );
+
+      const filtered = responses
+        .map((data, i) => ({
+          repeat: i,
+          correct: data.correct || 0,
+          incorrect: data.incorrect || 0,
+        }))
+        .filter((d) => d.correct > 0 || d.incorrect > 0);
+
+      setAccuracyData(filtered);
       setIsAccuracyChecked(true);
-      return;
-    }
-
-    const responses = await Promise.all(
-      Array.from({ length: 10 }, (_, i) =>
-        fetch("/api/getSetAccuracy", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ set_id, repeat_index: i }),
-        })
-          .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0 }))
-          .catch(() => ({ correct: 0, incorrect: 0 }))
-      )
-    );
-
-    const filtered = responses
-      .map((data, i) => ({
-        repeat: i,
-        correct: data.correct || 0,
-        incorrect: data.incorrect || 0,
-      }))
-      .filter((d) => d.correct > 0 || d.incorrect > 0);
-
-    setAccuracyData(filtered);
-    setIsAccuracyChecked(true); // ✅ mark as done once fetched
-  };
+    },
+    [getSetSize]
+  ); // include getSetSize in deps if it's also declared in component
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
