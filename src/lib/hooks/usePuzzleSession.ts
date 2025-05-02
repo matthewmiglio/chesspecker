@@ -120,7 +120,10 @@ export function usePuzzleSession({
 
     const newFen = chess.fen();
 
-    const updatedHistory = [...moveHistory.slice(0, currentMoveIndex + 1), newFen];
+    const updatedHistory = [
+      ...moveHistory.slice(0, currentMoveIndex + 1),
+      newFen,
+    ];
     setMoveHistory(updatedHistory);
     setCurrentMoveIndex(updatedHistory.length - 1);
 
@@ -200,7 +203,12 @@ export function usePuzzleSession({
     setHintUsed(false);
 
     const chess = new Chess();
-    puzzle.game.fen ? chess.load(puzzle.game.fen) : chess.loadPgn(puzzle.game.pgn);
+    if (puzzle.game.fen) {
+      chess.load(puzzle.game.fen);
+    } else {
+      chess.loadPgn(puzzle.game.pgn);
+    }
+
     setPlayerSide(chess.turn());
 
     await updateThisSetAccuracy(setId, setAccuracies);
