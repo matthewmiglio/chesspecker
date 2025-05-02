@@ -25,6 +25,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
+      {/*Debug*/}
+      <div>
+        <div className="bg-green-500 w-3xl h-32">
+          Here's a big debug box. Tell why this shouldnt work v1048
+        </div>
+      </div>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
         <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform">
