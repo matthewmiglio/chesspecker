@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect } from "react";
+import { MoveLeft, MoveRight, FastForward } from "lucide-react";
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -12,7 +13,13 @@ type ChessBoardWrapperProps = {
     handleMove: (move: string, isCorrect: boolean) => Promise<void>;
     isSessionActive: boolean;
     handleStartSession: () => Promise<void>;
-    setHintUsed: (used: boolean) => void; // <-- NEW
+    setHintUsed: (used: boolean) => void;
+
+    goBack: () => void;
+    goForward: () => void;
+    goToFront: () => void;
+    currentMoveIndex: number;
+    moveHistory: string[];
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -114,12 +121,48 @@ export default function ChessBoardWrapper({
                   }
                   puzzleSession.setHintUsed(true);
                 }}
-
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Hint
               </Button>
             </div>
+          </div>
+        </CardFooter>
+        <CardFooter className="px-4 pt-2 pb-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="bg-muted-foreground/10 hover:bg-muted-foreground/20 text-foreground font-medium rounded-md shadow-none"
+              onClick={puzzleSession.goBack}
+              disabled={puzzleSession.currentMoveIndex === 0}
+            >
+              <MoveLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <Button
+              size="sm"
+              className="bg-muted-foreground/10 hover:bg-muted-foreground/20 text-foreground font-medium rounded-md shadow-none"
+              onClick={puzzleSession.goForward}
+              disabled={
+                puzzleSession.currentMoveIndex >=
+                puzzleSession.moveHistory.length - 1
+              }
+            >
+              <MoveRight className="h-4 w-4 mr-1" />
+              Forward
+            </Button>
+            <Button
+              size="sm"
+              className="bg-muted-foreground/10 hover:bg-muted-foreground/20 text-foreground font-medium rounded-md shadow-none"
+              onClick={puzzleSession.goToFront}
+              disabled={
+                puzzleSession.currentMoveIndex >=
+                puzzleSession.moveHistory.length - 1
+              }
+            >
+              <FastForward className="h-4 w-4 mr-1" />
+              Front
+            </Button>
           </div>
         </CardFooter>
       </Card>
