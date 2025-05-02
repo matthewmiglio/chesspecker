@@ -163,6 +163,9 @@ export default function SetSelectTable({
         className="h-3 rounded-full bg-muted/50"
         barClassName="bg-green-500"
       />
+      <div className="px-4 py-4 pb-14 bg-green-500 h-3 w-full rounded-full overflow-hidden">
+        test
+      </div>
     </div>
   );
 }
