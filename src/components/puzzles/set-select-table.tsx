@@ -70,12 +70,12 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        const progressColorClass =
-          progressPercent >= 80
-            ? "bg-green-500"
-            : progressPercent >= 40
-            ? "bg-yellow-400"
-            : "bg-red-500";
+        const progressColorClass = cn({
+          "bg-green-500": progressPercent >= 80,
+          "bg-yellow-400": progressPercent >= 40 && progressPercent < 80,
+          "bg-red-500": progressPercent < 40,
+        });
+
         return (
           <div
             key={set.set_id}
