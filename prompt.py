@@ -86,7 +86,7 @@ if __name__ == "__main__":
         r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-select-table.tsx",
         r"H:\my_files\my_programs\chesspecker\src\components\ui\progress.tsx",
         r"H:\my_files\my_programs\chesspecker\src\app\globals.css",
-
+        r"H:\my_files\my_programs\chesspecker\tsconfig.json",
     ]
 
     ignore_folders = [
