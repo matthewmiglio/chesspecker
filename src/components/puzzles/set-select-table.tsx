@@ -70,12 +70,15 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        const progressColorClass =
-          progressPercent >= 80
-            ? "bg-green-500"
-            : progressPercent >= 40
-            ? "bg-yellow-400"
-            : "bg-red-500";
+        const progressColorStyle = {
+          backgroundColor:
+            progressPercent >= 80
+              ? "var(--green-progress-color)"
+              : progressPercent >= 40
+              ? "var(--yellow-progress-color)"
+              : "var(--red-progress-color)",
+        };
+
         return (
           <div
             key={set.set_id}
@@ -118,7 +121,8 @@ export default function SetSelectTable({
             <Progress
               value={progressPercent}
               className="h-3 rounded-full bg-muted/50"
-              barClassName={progressColorClass}
+              barClassName=""
+              style={progressColorStyle}
             />
 
             <div className="mt-3 text-xs text-muted-foreground">

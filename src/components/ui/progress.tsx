@@ -9,7 +9,8 @@ interface ProgressProps extends React.ComponentProps<typeof ProgressPrimitive.Ro
   barClassName?: string
 }
 
-function Progress({ className, value, barClassName, ...props }: ProgressProps) {
+function Progress({ className, value, barClassName, style, ...props }: ProgressProps) {
+
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
@@ -25,7 +26,11 @@ function Progress({ className, value, barClassName, ...props }: ProgressProps) {
           "bg-primary h-full w-full flex-1 transition-all",
           barClassName
         )}
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        style={{
+          transform: `translateX(-${100 - (value || 0)}%)`,
+          ...style,
+        }}
+
       />
     </ProgressPrimitive.Root>
   )

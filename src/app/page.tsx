@@ -27,7 +27,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
       {/*Debug*/}
       <div>
-        <div className="bg-green-500 w-3xl h-32">
+        <div className="bg-green-progress-color w-3xl h-32">
           Heres a big debug box. Tell why this shouldnt work v1048
         </div>
       </div>

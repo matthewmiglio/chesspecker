@@ -5,6 +5,9 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-green-progress-color: var(--green-progress-color);
+  --color-red-progress-color: var(--red-progress-color);
+  --color-yellow-progress-color: var(--yellow-progress-color);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -47,6 +50,10 @@
   --radius: 0.625rem;
   --background: rgb(255, 255, 255);
 
+  --green-progress-color : rgb(24, 190, 93);
+  --red-progress-color : rgb(244, 67, 54);
+  --yellow-progress-color : rgb(255, 235, 59);
+
   --foreground: rgb(37, 37, 37);
 
   --card: rgb(245, 245, 245);
@@ -82,6 +89,11 @@
 
 html.dark {
   --background: rgb(20, 20, 20);
+
+
+  --green-progress-color : rgb(0, 200, 83);
+  --red-progress-color : rgb(244, 67, 54);
+  --yellow-progress-color : rgb(255, 235, 59);
 
   --foreground: rgb(245, 245, 245);
 
