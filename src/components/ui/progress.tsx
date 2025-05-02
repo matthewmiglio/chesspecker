@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import * as React from "react";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-interface ProgressProps extends React.ComponentProps<typeof ProgressPrimitive.Root> {
-  barClassName?: string
+interface ProgressProps
+  extends React.ComponentProps<typeof ProgressPrimitive.Root> {
+  barClassName?: string;
 }
 
 function Progress({ className, value, barClassName, ...props }: ProgressProps) {
@@ -22,13 +23,19 @@ function Progress({ className, value, barClassName, ...props }: ProgressProps) {
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={cn(
-          "bg-primary h-full w-full flex-1 transition-all",
+          "bg-primary h-full w-full flex-1 transition-all will-change-transform",
+          "transform-gpu",
           barClassName
         )}
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        style={{
+          transform: `translateX(-${100 - (value || 0)}%)`,
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          WebkitTransform: `translateX(-${100 - (value || 0)}%)`,
+        }}
       />
     </ProgressPrimitive.Root>
-  )
+  );
 }
 
-export { Progress }
+export { Progress };
