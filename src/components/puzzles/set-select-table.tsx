@@ -142,6 +142,25 @@ export default function SetSelectTable({
           </div>
         );
       })}
+
+      {/* STATIC SAFE TEST BLOCK */}
+      <div className="hidden">
+        <div className="bg-green-500"></div>
+        <div className="bg-yellow-400"></div>
+        <div className="bg-red-500"></div>
+      </div>
+      {/* COLOR STRIP TEST */}
+      <div className="mt-4 flex space-x-2">
+        <div className="h-3 w-1/3 rounded-full bg-red-500" />
+        <div className="h-3 w-1/3 rounded-full bg-yellow-400" />
+        <div className="h-3 w-1/3 rounded-full bg-green-500" />
+      </div>
+      {/* PROGRESS BAR DIRECT TEST */}
+      <Progress
+        value={75}
+        className="h-3 rounded-full bg-muted/50"
+        barClassName="bg-green-500"
+      />
     </div>
   );
 }
