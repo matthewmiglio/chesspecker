@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
-import PuzzleSetCreationProgress from "@/components/create-page/PuzzleSetCreationProgress";
+import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
 const getProgressColor = (elo: number) => {
   if (elo < 1000) return "var(--green-progress-color)";

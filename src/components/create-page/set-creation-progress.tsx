@@ -2,6 +2,8 @@
 
 import type React from "react";
 
+
+
 type PuzzleSetCreationProgressProps = {
   puzzleProgress: number;
   accuracyProgress: number;

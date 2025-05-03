@@ -1,6 +1,12 @@
 import type React from "react";
 import { useRef } from "react";
 
+//src\components\create-page\set-elo-input.tsx EloTargetInput
+//src\components\create-page\set-size-input.tsx SetSizeInput
+
+import EloTargetInput from "@/components/create-page/set-elo-input";
+import SetSizeInput from "@/components/create-page/set-size-input";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +17,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import FancyNameInput from "@/components/create-page/FancyNameInput";
+import FancyNameInput from "@/components/create-page/set-name-input";
+import RepeatCountInput from "@/components/create-page/repeat-count-input";
 
 type CreateSetFormProps = {
   name: string;
@@ -51,58 +58,14 @@ export default function CreateSetForm({
         <FancyNameInput value={name} onChange={setName} />
 
         {/* Repeat Count */}
-        <div className="space-y-1">
-          <Label htmlFor="repeat-count" className="text-sm font-medium">
-            Repeat Count
-          </Label>
-          <Input
-            id="repeat-count"
-            type="number"
-            value={repeatCount}
-            min={1}
-            onChange={(e) => setRepeatCount(Number(e.target.value))}
-          />
-        </div>
+        <RepeatCountInput value={repeatCount} onChange={setRepeatCount} />
+
 
         {/* Set Size Slider */}
-        <div className="space-y-1">
-          <Label className="text-sm font-medium">Set Size</Label>
-          <Slider
-            value={[setSize]}
-            min={1}
-            max={200}
-            step={1}
-            onValueChange={(value) => setSetSize(value[0])}
-          />
-          <p className="text-sm text-center text-muted-foreground mt-1">
-            {setSize} puzzles
-          </p>
-        </div>
+        <SetSizeInput value={setSize} onChange={setSetSize} />
 
         {/* ELO Slider */}
-        <div className="space-y-1">
-          <Label className="text-sm font-medium">ELO Target</Label>
-          <div className="relative" ref={sliderRef}>
-            <Slider
-              value={[difficultySliderValue]}
-              min={500}
-              max={2900}
-              step={50}
-              onValueChange={(value) => setDifficultySliderValue(value[0])}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs text-muted-foreground px-1 pt-1">
-            <span>700</span>
-            <span>1400</span>
-            <span>2000</span>
-            <span>2700</span>
-          </div>
-          <p className="text-sm text-center text-muted-foreground mt-1">
-            Targeting:{" "}
-            <span className="font-semibold">{difficultySliderValue} ELO</span>
-          </p>
-        </div>
+        <EloTargetInput value={difficultySliderValue} onChange={setDifficultySliderValue} />
       </CardContent>
 
       <CardFooter className="pt-5">
