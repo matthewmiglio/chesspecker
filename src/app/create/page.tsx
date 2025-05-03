@@ -16,7 +16,7 @@ const getProgressColor = (elo: number) => {
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const isLoggedIn = !!session?.user?.email;
 
   const [name, setName] = useState("");
