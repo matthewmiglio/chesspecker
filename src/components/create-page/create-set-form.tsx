@@ -1,16 +1,11 @@
 import type React from "react";
 import { useRef } from "react";
 
-//src\components\create-page\set-elo-input.tsx EloTargetInput
-//src\components\create-page\set-size-input.tsx SetSizeInput
 
 import EloTargetInput from "@/components/create-page/set-elo-input";
 import SetSizeInput from "@/components/create-page/set-size-input";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import {
   CardContent,
   CardFooter,
@@ -45,7 +40,6 @@ export default function CreateSetForm({
   setDifficultySliderValue,
   handleCreateSetButton,
 }: CreateSetFormProps) {
-  const sliderRef = useRef<HTMLDivElement>(null);
 
   return (
     <form className="" onSubmit={handleCreateSetButton}>

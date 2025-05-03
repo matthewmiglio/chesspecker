@@ -2,10 +2,8 @@
 
 import type React from "react";
 import { useCallback } from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 
 type RepeatCountInputProps = {
   value: number;
@@ -38,41 +36,6 @@ export default function RepeatCountInput({ value, onChange }: RepeatCountInputPr
           </Button>
         ))}
       </div>
-
-      {/* --- 2. Slider --- */}
-      {/* <div className="space-y-2">
-        <Slider
-          value={[value]}
-          min={MIN}
-          max={MAX}
-          step={1}
-          onValueChange={(val) => onChange(val[0])}
-        />
-        <p className="text-center text-muted-foreground text-sm">
-          Selected: <span className="font-semibold">{value}</span>
-        </p>
-      </div> */}
-
-      {/* --- 3. Stepper Buttons --- */}
-      {/* <div className="flex items-center gap-3 justify-center">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => onChange(clamp(value - 1))}
-          disabled={value <= MIN}
-        >
-          –
-        </Button>
-        <span className="text-xl font-bold w-6 text-center">{value}</span>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => onChange(clamp(value + 1))}
-          disabled={value >= MAX}
-        >
-          +
-        </Button>
-      </div> */}
     </div>
   );
 }
