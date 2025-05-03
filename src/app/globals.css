@@ -55,6 +55,13 @@
   --yellow-progress-color : rgb(255, 235, 59);
   --blue-progress-color: rgb(66, 165, 245);
   --violet-progress-color: rgb(138, 43, 226);
+  --red-color: rgb(244, 67, 54);         /* Strong red (already used) */
+  --orange-color: rgb(255, 111, 0);      /* Bright modern orange */
+  --yellow-color: rgb(255, 235, 59);     /* Warm yellow (already used) */
+  --green-color: rgb(0, 200, 83);        /* Lively green (already used in dark mode) */
+  --indigo-color: rgb(63, 81, 181);      /* Deep, clean indigo */
+  --blue-color: rgb(66, 165, 245);       /* Bright modern blue (already used) */
+  --violet-color: rgb(138, 43, 226);
 
   --foreground: rgb(37, 37, 37);
 
