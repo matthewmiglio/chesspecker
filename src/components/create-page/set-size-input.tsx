@@ -6,13 +6,15 @@ type SetSizeInputProps = {
   onChange: (value: number) => void;
 };
 
+const STEP = 10;
+
 export default function SetSizeInput({ value, onChange }: SetSizeInputProps) {
   const handleDecrement = () => {
-    if (value > 1) onChange(value - 1);
+    if (value > 1) onChange(value - STEP);
   };
 
   const handleIncrement = () => {
-    if (value < 200) onChange(value + 1);
+    if (value < 200) onChange(value + STEP);
   };
 
   return (
