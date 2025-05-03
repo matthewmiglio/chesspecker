@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import { useCallback } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
@@ -10,13 +9,9 @@ type RepeatCountInputProps = {
   onChange: (value: number) => void;
 };
 
-const MIN = 1;
-const MAX = 14;
 const COMMON_VALUES = [3, 4, 5, 6, 7, 8];
 
 export default function RepeatCountInput({ value, onChange }: RepeatCountInputProps) {
-  const clamp = useCallback((val: number) => Math.max(MIN, Math.min(MAX, val)), []);
-
   return (
     <div className="space-y-8">
       {/* Label */}

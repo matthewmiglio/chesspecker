@@ -1,5 +1,4 @@
 import type React from "react";
-import { useRef } from "react";
 
 
 import EloTargetInput from "@/components/create-page/set-elo-input";
