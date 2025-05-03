@@ -1,3 +1,5 @@
 -export dashboard logic to a lib helper file
 -add red/blue flair to dashboard page
--make dashboard page 
+-make dashboard page
+-highlight selected set with the red/blue outline
+-add some more colors around puzzle so its not just whitespace
