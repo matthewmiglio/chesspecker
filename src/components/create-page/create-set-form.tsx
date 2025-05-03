@@ -1,4 +1,6 @@
 import type React from "react";
+import { useRef } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import FancyNameInput from "@/components/create-page/FancyNameInput";
 
 type CreateSetFormProps = {
   name: string;
@@ -27,8 +30,6 @@ type CreateSetFormProps = {
 export default function CreateSetForm({
   name,
   setName,
-  description,
-  setDescription,
   repeatCount,
   setRepeatCount,
   setSize,
@@ -37,6 +38,8 @@ export default function CreateSetForm({
   setDifficultySliderValue,
   handleCreateSetButton,
 }: CreateSetFormProps) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+
   return (
     <form className="" onSubmit={handleCreateSetButton}>
       <CardHeader className="pb-6">
@@ -45,31 +48,7 @@ export default function CreateSetForm({
 
       <CardContent className="space-y-6">
         {/* Set Name */}
-        <div className="space-y-1">
-          <Label htmlFor="name" className="text-sm font-medium">
-            Set Name
-          </Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="My Tactical Puzzles"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div className="space-y-1">
-          <Label htmlFor="description" className="text-sm font-medium">
-            Description
-          </Label>
-          <Input
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="A collection of tactical puzzles for intermediate players"
-          />
-        </div>
+        <FancyNameInput value={name} onChange={setName} />
 
         {/* Repeat Count */}
         <div className="space-y-1">
@@ -103,13 +82,16 @@ export default function CreateSetForm({
         {/* ELO Slider */}
         <div className="space-y-1">
           <Label className="text-sm font-medium">ELO Target</Label>
-          <Slider
-            value={[difficultySliderValue]}
-            min={500}
-            max={2900}
-            step={50}
-            onValueChange={(value) => setDifficultySliderValue(value[0])}
-          />
+          <div className="relative" ref={sliderRef}>
+            <Slider
+              value={[difficultySliderValue]}
+              min={500}
+              max={2900}
+              step={50}
+              onValueChange={(value) => setDifficultySliderValue(value[0])}
+            />
+          </div>
+
           <div className="flex justify-between text-xs text-muted-foreground px-1 pt-1">
             <span>700</span>
             <span>1400</span>

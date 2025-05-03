@@ -53,6 +53,8 @@
   --green-progress-color : rgb(24, 190, 93);
   --red-progress-color : rgb(244, 67, 54);
   --yellow-progress-color : rgb(255, 235, 59);
+  --blue-progress-color: rgb(66, 165, 245);
+  --violet-progress-color: rgb(138, 43, 226);
 
   --foreground: rgb(37, 37, 37);
 
@@ -94,6 +96,9 @@ html.dark {
   --green-progress-color : rgb(0, 200, 83);
   --red-progress-color : rgb(244, 67, 54);
   --yellow-progress-color : rgb(255, 235, 59);
+  --blue-progress-color: rgb(66, 165, 245);
+  --violet-progress-color: rgb(138, 43, 226);
+
 
   --foreground: rgb(245, 245, 245);
 

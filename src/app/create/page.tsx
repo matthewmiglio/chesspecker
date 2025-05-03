@@ -7,10 +7,16 @@ import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/PuzzleSetCreationProgress";
 
+const getProgressColor = (elo: number) => {
+  if (elo < 1000) return "var(--green-progress-color)";
+  if (elo < 1500) return "var(--blue-progress-color)";
+  if (elo < 2000) return "var(--yellow-progress-color)";
+  return "var(--red-progress-color)";
+};
+
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
   const { data: session, status } = useSession();
-  const isLoading = status === "loading";
   const isLoggedIn = !!session?.user?.email;
 
   const [name, setName] = useState("");
@@ -235,19 +241,17 @@ export default function CreatePuzzleSetPage() {
       <div className="max-w-3xl mx-auto">
         <h1 className=" pt-6 text-3xl font-bold mb-6">New Puzzle</h1>
 
-        <div className="relative">
-          {!isLoading && !isLoggedIn && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-              <div className="text-center text-muted-foreground text-xl font-semibold">
-                Log in to create sets
-              </div>
-            </div>
-          )}
-
+        <div
+          className="rounded-xl p-[2px] transition-all duration-300"
+          style={{
+            boxShadow: `0 0 12px ${getProgressColor(difficultySliderValue)}`,
+            borderRadius: "1rem",
+          }}
+        >
           <Card
             className={
               !isLoggedIn
-                ? "blur-sm pointer-events-none opacity-50 "
+                ? "blur-sm pointer-events-none opacity-50"
                 : "rounded-xl"
             }
           >
@@ -266,6 +270,7 @@ export default function CreatePuzzleSetPage() {
             />
           </Card>
         </div>
+
         {isCreatingSet && (
           <PuzzleSetCreationProgress
             puzzleProgress={puzzleProgress}
