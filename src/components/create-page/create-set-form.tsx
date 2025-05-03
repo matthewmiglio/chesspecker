@@ -1,6 +1,5 @@
 import type React from "react";
 
-
 import EloTargetInput from "@/components/create-page/set-elo-input";
 import SetSizeInput from "@/components/create-page/set-size-input";
 
@@ -39,32 +38,45 @@ export default function CreateSetForm({
   setDifficultySliderValue,
   handleCreateSetButton,
 }: CreateSetFormProps) {
-
   return (
-    <form className="" onSubmit={handleCreateSetButton}>
-      <CardHeader className="pb-6">
-        <CardTitle>Puzzle Set Details</CardTitle>
+    <form onSubmit={handleCreateSetButton} className="space-y-6">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg">Puzzle Set Details</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Set Name */}
-        <FancyNameInput value={name} onChange={setName} />
+        <div className="space-y-2">
 
-        {/* Repeat Count */}
-        <RepeatCountInput value={repeatCount} onChange={setRepeatCount} />
+          <FancyNameInput value={name} onChange={setName} />
+        </div>
 
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">
+            Repeat Count
+          </label>
+          <RepeatCountInput value={repeatCount} onChange={setRepeatCount} />
+        </div>
 
-        {/* Set Size Slider */}
-        <SetSizeInput value={setSize} onChange={setSetSize} />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">
+            Set Size
+          </label>
+          <SetSizeInput value={setSize} onChange={setSetSize} />
+        </div>
 
-        {/* ELO Slider */}
-        <EloTargetInput value={difficultySliderValue} onChange={setDifficultySliderValue} />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">
+            ELO Target
+          </label>
+          <EloTargetInput
+            value={difficultySliderValue}
+            onChange={setDifficultySliderValue}
+          />
+        </div>
       </CardContent>
 
-      <CardFooter className="pt-5">
-        <Button type="submit" className=" mx-auto ml-auto">
-          Create Puzzle Set
-        </Button>
+      <CardFooter className="pt-4 justify-end">
+        <Button type="submit">Create Puzzle Set</Button>
       </CardFooter>
     </form>
   );

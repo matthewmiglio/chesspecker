@@ -1,35 +1,29 @@
-"use client";
-
-import type React from "react";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type SetSizeInputProps = {
   value: number;
   onChange: (value: number) => void;
-  min?: number;
-  max?: number;
 };
 
-export default function SetSizeInput({
-  value,
-  onChange,
-  min = 1,
-  max = 200,
-}: SetSizeInputProps) {
+export default function SetSizeInput({ value, onChange }: SetSizeInputProps) {
+  const handleDecrement = () => {
+    if (value > 1) onChange(value - 1);
+  };
+
+  const handleIncrement = () => {
+    if (value < 200) onChange(value + 1);
+  };
+
   return (
-    <div className="space-y-1">
-      <Label className="text-sm font-medium">Set Size</Label>
-      <Slider
-        value={[value]}
-        min={min}
-        max={max}
-        step={1}
-        onValueChange={(val) => onChange(val[0])}
-      />
-      <p className="text-sm text-center text-muted-foreground mt-1">
-        {value} puzzles
-      </p>
+    <div className="flex items-center gap-4">
+      <Button type="button" size="icon" variant="outline" onClick={handleDecrement}>
+        <Minus className="w-4 h-4" />
+      </Button>
+      <span className="text-lg font-medium w-12 text-center">{value}</span>
+      <Button type="button" size="icon" variant="outline" onClick={handleIncrement}>
+        <Plus className="w-4 h-4" />
+      </Button>
     </div>
   );
 }

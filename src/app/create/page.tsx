@@ -7,12 +7,7 @@ import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
-const getProgressColor = (elo: number) => {
-  if (elo < 1000) return "var(--green-progress-color)";
-  if (elo < 1500) return "var(--blue-progress-color)";
-  if (elo < 2000) return "var(--yellow-progress-color)";
-  return "var(--red-progress-color)";
-};
+
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
@@ -244,7 +239,7 @@ export default function CreatePuzzleSetPage() {
         <div
           className="rounded-xl p-[2px] transition-all duration-300"
           style={{
-            boxShadow: `0 0 12px ${getProgressColor(difficultySliderValue)}`,
+            boxShadow: "0 0 12px red",
             borderRadius: "1rem",
           }}
         >

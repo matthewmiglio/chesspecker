@@ -84,11 +84,10 @@ if __name__ == "__main__":
 
     files_to_print = [
         r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\create\page.tsx",
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\create-set-form.tsx',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\FancyNameInput.tsx',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\PuzzleSetCreationProgress.tsx',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\RepeatCountInput.tsx',
-
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\create-set-form.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\FancyNameInput.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\PuzzleSetCreationProgress.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\RepeatCountInput.tsx",
     ]
 
     ignore_folders = [
