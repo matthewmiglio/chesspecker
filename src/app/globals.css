@@ -50,18 +50,21 @@
   --radius: 0.625rem;
   --background: rgb(255, 255, 255);
 
+
   --green-progress-color : rgb(24, 190, 93);
   --red-progress-color : rgb(244, 67, 54);
   --yellow-progress-color : rgb(255, 235, 59);
   --blue-progress-color: rgb(66, 165, 245);
   --violet-progress-color: rgb(138, 43, 226);
-  --red-color: rgb(244, 67, 54);         /* Strong red (already used) */
-  --orange-color: rgb(255, 111, 0);      /* Bright modern orange */
-  --yellow-color: rgb(255, 235, 59);     /* Warm yellow (already used) */
-  --green-color: rgb(0, 200, 83);        /* Lively green (already used in dark mode) */
-  --indigo-color: rgb(63, 81, 181);      /* Deep, clean indigo */
-  --blue-color: rgb(66, 165, 245);       /* Bright modern blue (already used) */
+  --red-color: rgb(244, 67, 54);
+  --orange-color: rgb(255, 111, 0);
+  --yellow-color: rgb(255, 235, 59);
+  --green-color: rgb(0, 200, 83);
+  --indigo-color: rgb(63, 81, 181);
+  --blue-color: rgb(66, 165, 245);
   --violet-color: rgb(138, 43, 226);
+  --icon-green: var(--green-progress-color);
+  --icon-red: var(--red-progress-color);
 
   --foreground: rgb(37, 37, 37);
 
@@ -100,11 +103,20 @@ html.dark {
   --background: rgb(20, 20, 20);
 
 
-  --green-progress-color : rgb(0, 200, 83);
+  --green-progress-color : rgb(24, 190, 93);
   --red-progress-color : rgb(244, 67, 54);
   --yellow-progress-color : rgb(255, 235, 59);
   --blue-progress-color: rgb(66, 165, 245);
   --violet-progress-color: rgb(138, 43, 226);
+  --red-color: rgb(244, 67, 54);
+  --orange-color: rgb(255, 111, 0);
+  --yellow-color: rgb(255, 235, 59);
+  --green-color: rgb(0, 200, 83);
+  --indigo-color: rgb(63, 81, 181);
+  --blue-color: rgb(66, 165, 245);
+  --violet-color: rgb(138, 43, 226);
+  --icon-green: var(--green-progress-color);
+  --icon-red: var(--red-progress-color);
 
 
   --foreground: rgb(245, 245, 245);

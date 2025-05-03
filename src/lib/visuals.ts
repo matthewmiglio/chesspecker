@@ -13,10 +13,15 @@ const feedbackIconDisplayTime = 400;
 function createFloatingIcon(type: "check" | "x") {
   const div = document.createElement("div");
 
+  // Choose color from global CSS variables
+  const iconColor =
+    type === "check"
+      ? getComputedStyle(document.documentElement).getPropertyValue("--icon-green")
+      : getComputedStyle(document.documentElement).getPropertyValue("--icon-red");
+
   div.className = `
     fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
     flex items-center justify-center
-    ${type === "check" ? "bg-green-500" : "bg-red-500"}
     text-white rounded-xl shadow-lg
     w-20 h-20 text-5xl
     opacity-0 scale-75
@@ -24,6 +29,7 @@ function createFloatingIcon(type: "check" | "x") {
   `;
 
   div.innerText = type === "check" ? "✓" : "✕";
+  div.style.backgroundColor = iconColor;
 
   document.body.appendChild(div);
 
