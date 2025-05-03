@@ -17,7 +17,9 @@ export default function EloTargetInput({
         step={50}
         value={[value]}
         onValueChange={(vals) => onChange(vals[0])}
+        className="py-2 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6"
       />
+
       <p className="text-sm text-muted-foreground">
         Targeting: <span className="font-semibold">{value} ELO</span>
       </p>
