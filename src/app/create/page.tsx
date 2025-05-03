@@ -239,7 +239,7 @@ export default function CreatePuzzleSetPage() {
   return (
     <div className="max-w-[90%] mx-auto">
       <div className="max-w-3xl mx-auto">
-        <h1 className=" pt-6 text-3xl font-bold mb-6">New Puzzle</h1>
+        <h1 className=" pt-6 text-3xl font-bold mb-6"></h1>
 
         <div
           className="rounded-xl p-[2px] transition-all duration-300"
