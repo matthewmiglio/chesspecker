@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 import LoginButton from "./LoginButton";
 import { Menu, X } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,11 +22,17 @@ export default function Navbar() {
     { name: "About", href: "/about" },
   ];
 
-  // Detect theme (light/dark) and set appropriate color
+
+  const { resolvedTheme } = useTheme();
+
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setThemeColor(isDark ? "var(--red-progress-color)" : "var(--blue-progress-color)");
-  }, []);
+    setThemeColor(
+      resolvedTheme === "dark"
+        ? "var(--red-progress-color)"
+        : "var(--blue-progress-color)"
+    );
+  }, [resolvedTheme]);
+
 
   return (
     <nav

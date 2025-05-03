@@ -88,6 +88,7 @@ if __name__ == "__main__":
         r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\FancyNameInput.tsx",
         r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\PuzzleSetCreationProgress.tsx",
         r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\create-page\RepeatCountInput.tsx",
+        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\header-footer\navbar.tsx',
     ]
 
     ignore_folders = [

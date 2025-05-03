@@ -1,13 +1,12 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
-
-
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
@@ -19,14 +18,27 @@ export default function CreatePuzzleSetPage() {
 
   const [setSize, setSetSize] = useState<number>(100);
   const [repeatCount, setRepeatCount] = useState<number>(8);
+  const [difficultySliderValue, setDifficultySliderValue] = useState<number>(1500);
 
-  const [difficultySliderValue, setDifficultySliderValue] =
-    useState<number>(1500);
-
-  //progress bar popup vars
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
   const [accuracyProgress, setAccuracyProgress] = useState(0);
+
+  // THEME COLOR STATE
+
+  const { resolvedTheme } = useTheme();
+  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
+
+  useEffect(() => {
+    setThemeColor(
+      resolvedTheme === "dark"
+        ? "var(--red-progress-color)"
+        : "var(--blue-progress-color)"
+    );
+  }, [resolvedTheme]);
+
+
+
 
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
     console.log("createSetAccuracy()");
@@ -161,8 +173,7 @@ export default function CreatePuzzleSetPage() {
       const selectedDifficulty = getRandom(pool);
 
       console.log(
-        `➕ Adding puzzle ${
-          puzzleIds.size + 1
+        `➕ Adding puzzle ${puzzleIds.size + 1
         } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
           2
         )})`
@@ -234,12 +245,12 @@ export default function CreatePuzzleSetPage() {
   return (
     <div className="max-w-[90%] mx-auto">
       <div className="max-w-3xl mx-auto">
-        <h1 className=" pt-6 text-3xl font-bold mb-6"></h1>
+        <h1 className="pt-6 text-3xl font-bold mb-6"></h1>
 
         <div
           className="rounded-xl p-[2px] transition-all duration-300"
           style={{
-            boxShadow: "0 0 12px red",
+            boxShadow: `0 0 12px ${themeColor}`,
             borderRadius: "1rem",
           }}
         >
