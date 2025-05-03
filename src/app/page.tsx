@@ -9,10 +9,19 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    setThemeColor(
+      resolvedTheme === "dark"
+        ? "var(--red-progress-color)"
+        : "var(--blue-progress-color)"
+    );
+  }, [resolvedTheme]);
 
   if (!isMounted) {
     return null;
@@ -44,10 +53,23 @@ export default function Home() {
           Build your own tactical puzzles, master key positions, and track your
           progress across every session.
         </p>
+
+        {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
-          <Button asChild size="lg">
-            <Link href="/puzzles">Start Training</Link>
-          </Button>
+          {/* Start Training (glow wrap) */}
+          <div
+            className="rounded-xl p-[2px] transition-all duration-300"
+            style={{
+              boxShadow: `0 0 12px ${themeColor}`,
+              borderRadius: "1rem",
+            }}
+          >
+            <Button asChild size="lg" className="rounded-xl">
+              <Link href="/puzzles">Start Training</Link>
+            </Button>
+          </div>
+
+          {/* Learn More */}
           <Button asChild variant="outline" size="lg">
             <Link href="/about">Learn More</Link>
           </Button>
