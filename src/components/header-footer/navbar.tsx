@@ -20,32 +20,61 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-50">
+    <nav
+      className="sticky top-0 z-50  backdrop-blur-md"
+      style={{
+        background: "var(--background)",
+        borderColor: "var(--red-progress-color)",
+        boxShadow: "var(--navbar-glow)",
+      }}
+    >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
         <Link href="/" className="font-bold text-2xl flex items-center gap-2">
-          <span className="text-primary">Chess</span>
-          <span>Pecker</span>
+          <span
+            style={{
+              color: "var(--red-progress-color)",
+              textShadow: "0 0 6px var(--red-progress-color)",
+            }}
+          >
+            Chess
+          </span>
+          <span style={{ color: "var(--primary)" }}>Pecker</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="sm:px-4 hidden sm:flex items-center gap-6">
-          {navLinks.map(({ name, href }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`text-muted-foreground hover:text-primary transition-colors font-medium ${
-                pathname === href ? "text-primary" : ""
-              }`}
-            >
-              {name}
-            </Link>
-          ))}
-
+          {navLinks.map(({ name, href }) => {
+            const isActive = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className="relative font-medium transition-all duration-200"
+                style={{
+                  color: isActive
+                    ? "var(--red-progress-color)"
+                    : "var(--muted-foreground)",
+                }}
+              >
+                {name}
+                {isActive && (
+                  <span
+                    className="absolute -bottom-1 left-0 h-[2px] w-full animate-pulse rounded-full"
+                    style={{
+                      background: "var(--red-progress-color)",
+                      boxShadow: "0 0 4px var(--red-progress-color)",
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
           <LoginButton />
           <ModeToggle />
         </div>
 
-        {/* Mobile Navigation Toggle */}
+        {/* Mobile Toggle */}
         <div className="flex items-center gap-3 sm:hidden">
           <ModeToggle />
           <Button
@@ -58,28 +87,35 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="sm:hidden border-t bg-muted/10 backdrop-blur-md shadow-lg rounded-b-lg max-h-[90vh] overflow-y-auto">
+        <div
+          className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            borderColor: "var(--red-progress-color)",
+          }}
+        >
           <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
-            <div className="flex flex-col gap-y-2">
-              {navLinks.map(({ name, href }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`block px-2 py-3 rounded-md transition-colors font-medium ${
+            {navLinks.map(({ name, href }) => (
+              <Link
+                key={href}
+                href={href}
+                className="block px-3 py-2 rounded-md font-medium transition-colors"
+                style={{
+                  color:
                     pathname === href
-                      ? "text-primary bg-muted"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="border-t border-border pt-4">
+                      ? "var(--red-progress-color)"
+                      : "var(--muted-foreground)",
+                  background:
+                    pathname === href ? "var(--muted)" : "transparent",
+                }}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {name}
+              </Link>
+            ))}
+            <div className="pt-3 border-t" style={{ borderColor: "var(--border)" }}>
               <LoginButton />
             </div>
           </div>
