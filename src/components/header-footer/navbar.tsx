@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
@@ -10,6 +10,8 @@ import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
+
   const pathname = usePathname();
 
   const navLinks = [
@@ -19,12 +21,18 @@ export default function Navbar() {
     { name: "About", href: "/about" },
   ];
 
+  // Detect theme (light/dark) and set appropriate color
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setThemeColor(isDark ? "var(--red-progress-color)" : "var(--blue-progress-color)");
+  }, []);
+
   return (
     <nav
-      className="sticky top-0 z-50  backdrop-blur-md"
+      className="sticky top-0 z-50 backdrop-blur-md"
       style={{
         background: "var(--background)",
-        borderColor: "var(--red-progress-color)",
+        borderColor: themeColor,
         boxShadow: "var(--navbar-glow)",
       }}
     >
@@ -33,8 +41,8 @@ export default function Navbar() {
         <Link href="/" className="font-bold text-2xl flex items-center gap-2">
           <span
             style={{
-              color: "var(--red-progress-color)",
-              textShadow: "0 0 6px var(--red-progress-color)",
+              color: themeColor,
+              textShadow: `0 0 6px ${themeColor}`,
             }}
           >
             Chess
@@ -52,9 +60,7 @@ export default function Navbar() {
                 href={href}
                 className="relative font-medium transition-all duration-200"
                 style={{
-                  color: isActive
-                    ? "var(--red-progress-color)"
-                    : "var(--muted-foreground)",
+                  color: isActive ? themeColor : "var(--muted-foreground)",
                 }}
               >
                 {name}
@@ -62,8 +68,8 @@ export default function Navbar() {
                   <span
                     className="absolute -bottom-1 left-0 h-[2px] w-full animate-pulse rounded-full"
                     style={{
-                      background: "var(--red-progress-color)",
-                      boxShadow: "0 0 4px var(--red-progress-color)",
+                      background: themeColor,
+                      boxShadow: `0 0 4px ${themeColor}`,
                     }}
                   />
                 )}
@@ -93,7 +99,7 @@ export default function Navbar() {
           className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
           style={{
             background: "rgba(0,0,0,0.6)",
-            borderColor: "var(--red-progress-color)",
+            borderColor: themeColor,
           }}
         >
           <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
@@ -104,9 +110,7 @@ export default function Navbar() {
                 className="block px-3 py-2 rounded-md font-medium transition-colors"
                 style={{
                   color:
-                    pathname === href
-                      ? "var(--red-progress-color)"
-                      : "var(--muted-foreground)",
+                    pathname === href ? themeColor : "var(--muted-foreground)",
                   background:
                     pathname === href ? "var(--muted)" : "transparent",
                 }}
