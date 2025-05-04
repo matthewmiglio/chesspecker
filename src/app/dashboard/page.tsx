@@ -6,6 +6,8 @@ import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
 import AccuracyChartCard from "@/components/dashboard-page/AccuracyChartCard";
 import SetTabs from "@/components/dashboard-page/SetTabs";
 import NoDataCard from "@/components/dashboard-page/NoDataCard";
+import { useFetchUserSets } from "@/lib/hooks/useFetchUserSets";
+import { useFetchAccuracyData } from "@/lib/hooks/useFetchAccuracyData";
 
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
@@ -18,6 +20,7 @@ export default function AccuracyStatsPage() {
   const [isSetsChecked, setIsSetsChecked] = useState(false);
   const [isAccuracyChecked, setIsAccuracyChecked] = useState(false);
 
+  // Step 1: Auth & Fetch Sets
   useEffect(() => {
     const run = async () => {
       if (status !== "authenticated") {
@@ -25,83 +28,31 @@ export default function AccuracyStatsPage() {
         return;
       }
 
-      if (!session?.user?.email) {
-        return;
-      }
+      if (!session?.user?.email) return;
+
       setIsAuthChecked(true);
 
-      const res = await fetch("/api/getSet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session.user.email }),
-      });
-
-      if (!res.ok) {
-        setIsSetsChecked(true); // even if fetch fails, we must set it
-        return;
-      }
-
-      const result = await res.json();
-      setUserSets(result.sets || []);
-
-      if (result.sets?.length > 0) {
-        setSelectedSetId(result.sets[0].set_id);
-      }
-
-      setIsSetsChecked(true); // ✅ move this OUTSIDE the if-block, always set
+      await useFetchUserSets(
+        session.user.email,
+        setUserSets,
+        setSelectedSetId,
+        setIsSetsChecked
+      );
     };
 
     run();
   }, [status, session]);
 
+  // Step 2: Fetch Accuracy
   useEffect(() => {
     if (selectedSetId !== null) {
-      fetchAccuracy(selectedSetId);
+      useFetchAccuracyData(
+        selectedSetId,
+        setAccuracyData,
+        setIsAccuracyChecked
+      );
     }
   }, [selectedSetId]);
-
-  const getSetSize = async (set_id: number) => {
-    const response = await fetch("/api/getSetProgressStats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id }),
-    });
-
-    if (!response.ok) return null;
-    const result = await response.json();
-    return result.progress.size;
-  };
-
-  const fetchAccuracy = async (set_id: number) => {
-    const size = await getSetSize(set_id);
-    if (!size) {
-      setIsAccuracyChecked(true);
-      return;
-    }
-
-    const responses = await Promise.all(
-      Array.from({ length: 10 }, (_, i) =>
-        fetch("/api/getSetAccuracy", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ set_id, repeat_index: i }),
-        })
-          .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0 }))
-          .catch(() => ({ correct: 0, incorrect: 0 }))
-      )
-    );
-
-    const filtered = responses
-      .map((data, i) => ({
-        repeat: i,
-        correct: data.correct || 0,
-        incorrect: data.incorrect || 0,
-      }))
-      .filter((d) => d.correct > 0 || d.incorrect > 0);
-
-    setAccuracyData(filtered);
-    setIsAccuracyChecked(true); // ✅ mark as done once fetched
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

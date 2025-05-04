@@ -1,6 +1,7 @@
 import os
 
 import pyperclip
+from regex import R
 
 
 def generate_copy_string(
@@ -83,6 +84,18 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\types.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\uiHelpers.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\puzzleUtils.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\chessBoardHelpers.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\hooks\usePuzzleSession.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\hooks\usePuzzleData.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\api\puzzleApi.ts",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\SetTabs.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\NoDataCard.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\AccuracyChartCard.tsx",
+        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\dashboard\page.tsx",
     ]
 
     ignore_folders = [
