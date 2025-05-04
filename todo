@@ -4,3 +4,4 @@
 -highlight selected set with the red/blue outline
 -add some more colors around puzzle so its not just whitespace
 -when user makes an incorrect move, restart the puzzle from the beginning, then do the replay
+-manually contine to next puzzle after incorrect replay plays out
