@@ -47,8 +47,9 @@ export default function Home() {
         </div>
 
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          Train Smarter. Play Better.
+          Train Smarter. <span style={{ color: themeColor }}>Play Better.</span>
         </h1>
+
         <p className="text-muted-foreground text-lg md:text-xl px-4">
           Build your own tactical puzzles, master key positions, and track your
           progress across every session.
@@ -58,13 +59,17 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
           {/* Start Training (glow wrap) */}
           <div
-            className="rounded-xl p-[2px] transition-all duration-300"
+            className="rounded-xl  transition-all duration-300"
             style={{
-              boxShadow: `0 0 12px ${themeColor}`,
-              borderRadius: "1rem",
+              boxShadow: `0 0 22px ${themeColor}`,
+              // borderRadius: "1rem",
             }}
           >
-            <Button asChild size="lg" className="rounded-xl">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-xl shadow-none  bg-white"
+            >
               <Link href="/puzzles">Start Training</Link>
             </Button>
           </div>
