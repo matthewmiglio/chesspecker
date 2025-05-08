@@ -84,14 +84,10 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleBoardArea.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleBoardArea.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-finished-graphic.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board-wrapper.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzlePageSkeleton.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleEmptyState.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\NoDataCard.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\AccuracyChartCard.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\dashboard-page\SetTabs.tsx",
     ]
 
     ignore_folders = [

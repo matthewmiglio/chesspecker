@@ -46,11 +46,7 @@ export default function AccuracyStatsPage() {
   // Step 2: Fetch Accuracy
   useEffect(() => {
     if (selectedSetId !== null) {
-      fetchAccuracyData(
-        selectedSetId,
-        setAccuracyData,
-        setIsAccuracyChecked
-      );
+      fetchAccuracyData(selectedSetId, setAccuracyData, setIsAccuracyChecked);
     }
   }, [selectedSetId]);
 
