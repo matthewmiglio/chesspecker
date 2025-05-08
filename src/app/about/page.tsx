@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 
 export default function AboutPage() {
