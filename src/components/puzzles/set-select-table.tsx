@@ -85,6 +85,9 @@ export default function SetSelectTable({
         return (
           <div
             key={set.set_id}
+            style={{
+              boxShadow: isSelected ? `0 0 12px ${progressColor}` : undefined,
+            }}
             onClick={async () => {
               const setToSelect = userSets.find((s) => s.set_id === set.set_id);
               if (!setToSelect) return;
@@ -110,8 +113,8 @@ export default function SetSelectTable({
               }
             }}
             className={cn(
-              "relative bg-card text-card-foreground rounded-2xl shadow-md p-5 hover:ring-2 hover:ring-primary hover:scale-105 transition-all cursor-pointer group",
-              isSelected && "ring-2 ring-primary scale-105"
+              "relative bg-card text-card-foreground rounded-2xl shadow-md p-5 hover:scale-[1.03] transition-all cursor-pointer group",
+              isSelected && "ring-[2px] ring-offset-2 ring-offset-background"
             )}
           >
             <div className="mb-4">
@@ -120,6 +123,9 @@ export default function SetSelectTable({
               </div>
               <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
             </div>
+            <span className="absolute top-2 right-3 text-xl opacity-60">
+              {set.elo >= 1200 ? "🔥" : "🧩"}
+            </span>
 
             <Progress
               value={progressPercent}
