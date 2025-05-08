@@ -84,9 +84,9 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\fetchUserSets.ts",
-        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\fetchAccuracyData.ts",
-        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-select-table.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\ui\progress.tsx",
     ]
 
     ignore_folders = [

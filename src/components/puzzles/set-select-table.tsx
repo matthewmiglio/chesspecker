@@ -70,13 +70,16 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
+        const progressColor =
+          progressPercent >= 80
+            ? "var(--green-progress-color)"
+            : progressPercent >= 40
+            ? "var(--yellow-progress-color)"
+            : "var(--red-progress-color)";
+
         const progressColorStyle = {
-          backgroundColor:
-            progressPercent >= 80
-              ? "var(--green-progress-color)"
-              : progressPercent >= 40
-              ? "var(--yellow-progress-color)"
-              : "var(--red-progress-color)",
+          backgroundColor: progressColor,
+          boxShadow: `0 0 16px 19px ${progressColor}`,
         };
 
         return (
