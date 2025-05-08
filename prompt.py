@@ -85,8 +85,13 @@ if __name__ == "__main__":
 
     files_to_print = [
         r"H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-select-table.tsx",
-        r"H:\my_files\my_programs\chesspecker\src\components\ui\progress.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleBoardArea.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleBoardArea.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\set-finished-graphic.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board-wrapper.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\chess-board.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzlePageSkeleton.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\components\puzzles\PuzzleEmptyState.tsx",
     ]
 
     ignore_folders = [

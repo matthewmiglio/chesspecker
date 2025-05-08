@@ -2,7 +2,8 @@ import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -41,6 +42,9 @@ export default function ChessBoardWrapper({
   currentRepeatIndex,
   selectedSet,
 }: ChessBoardWrapperProps) {
+  const themeColor = useThemeAccentColor();
+  const [glow, setGlow] = useState(false);
+
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
       console.log(
@@ -51,10 +55,20 @@ export default function ChessBoardWrapper({
   }, [selectedSetId, puzzleSession]);
 
   return (
-    <div className="mx-auto rounded-xl">
-      <Card>
-        <CardContent className="px-0 mx-auto">
-          <div className="flex">
+    <div className="mx-auto ">
+      <Card className="">
+        <CardContent className="px-0 mx-auto ">
+          <div
+            className=" transition-all duration-300"
+            onMouseEnter={() => setGlow(true)}
+            onMouseLeave={() => setGlow(false)}
+            style={{
+              boxShadow: glow
+                ? `0 0 18px 2px ${themeColor}`
+                : `0 0 12px 1px ${themeColor}`,
+              padding: "0.5rem",
+            }}
+          >
             <AnimatedBoard
               fen={fen}
               solution={solution}
@@ -114,7 +128,6 @@ export default function ChessBoardWrapper({
                   }
                   puzzleSession.setHintUsed(true);
                 }}
-
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Hint
