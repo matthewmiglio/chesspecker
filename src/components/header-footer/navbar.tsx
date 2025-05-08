@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 import LoginButton from "./LoginButton";
 import { Menu, X } from "lucide-react";
-import { useTheme } from "next-themes";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
-
+  const themeColor = useThemeAccentColor();
   const pathname = usePathname();
 
   const navLinks = [
@@ -21,18 +20,6 @@ export default function Navbar() {
     { name: "Performance", href: "/dashboard" },
     { name: "About", href: "/about" },
   ];
-
-
-  const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    setThemeColor(
-      resolvedTheme === "dark"
-        ? "var(--red-progress-color)"
-        : "var(--blue-progress-color)"
-    );
-  }, [resolvedTheme]);
-
 
   return (
     <nav
@@ -126,7 +113,10 @@ export default function Navbar() {
                 {name}
               </Link>
             ))}
-            <div className="pt-3 border-t" style={{ borderColor: "var(--border)" }}>
+            <div
+              className="pt-3 border-t"
+              style={{ borderColor: "var(--border)" }}
+            >
               <LoginButton />
             </div>
           </div>
