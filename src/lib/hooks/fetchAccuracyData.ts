@@ -1,6 +1,6 @@
 import type { RepeatAccuracy } from "@/lib/types";
 
-export const useFetchAccuracyData = async (
+export const fetchAccuracyData = async (
   set_id: number,
   setAccuracyData: React.Dispatch<React.SetStateAction<RepeatAccuracy[]>>,
   setIsAccuracyChecked: React.Dispatch<React.SetStateAction<boolean>>

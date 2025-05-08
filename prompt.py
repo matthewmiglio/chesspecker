@@ -84,10 +84,9 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\SetTabs.tsx",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\NoDataCard.tsx",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\components\dashboard-page\AccuracyChartCard.tsx",
-        r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\dashboard\page.tsx",
+        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\fetchUserSets.ts",
+        r"H:\my_files\my_programs\chesspecker\src\lib\hooks\fetchAccuracyData.ts",
+        r"H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx",
     ]
 
     ignore_folders = [

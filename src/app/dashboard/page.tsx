@@ -6,8 +6,8 @@ import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
 import AccuracyChartCard from "@/components/dashboard-page/AccuracyChartCard";
 import SetTabs from "@/components/dashboard-page/SetTabs";
 import NoDataCard from "@/components/dashboard-page/NoDataCard";
-import { useFetchUserSets } from "@/lib/hooks/useFetchUserSets";
-import { useFetchAccuracyData } from "@/lib/hooks/useFetchAccuracyData";
+import { fetchUserSets } from "@/lib/hooks/fetchUserSets";
+import { fetchAccuracyData } from "@/lib/hooks/fetchAccuracyData";
 
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
@@ -32,7 +32,7 @@ export default function AccuracyStatsPage() {
 
       setIsAuthChecked(true);
 
-      await useFetchUserSets(
+      await fetchUserSets(
         session.user.email,
         setUserSets,
         setSelectedSetId,
@@ -46,7 +46,7 @@ export default function AccuracyStatsPage() {
   // Step 2: Fetch Accuracy
   useEffect(() => {
     if (selectedSetId !== null) {
-      useFetchAccuracyData(
+      fetchAccuracyData(
         selectedSetId,
         setAccuracyData,
         setIsAccuracyChecked

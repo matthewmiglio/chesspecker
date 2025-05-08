@@ -18,7 +18,8 @@ export default function CreatePuzzleSetPage() {
 
   const [setSize, setSetSize] = useState<number>(100);
   const [repeatCount, setRepeatCount] = useState<number>(8);
-  const [difficultySliderValue, setDifficultySliderValue] = useState<number>(1500);
+  const [difficultySliderValue, setDifficultySliderValue] =
+    useState<number>(1500);
 
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
@@ -36,9 +37,6 @@ export default function CreatePuzzleSetPage() {
         : "var(--blue-progress-color)"
     );
   }, [resolvedTheme]);
-
-
-
 
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
     console.log("createSetAccuracy()");
@@ -173,7 +171,8 @@ export default function CreatePuzzleSetPage() {
       const selectedDifficulty = getRandom(pool);
 
       console.log(
-        `➕ Adding puzzle ${puzzleIds.size + 1
+        `➕ Adding puzzle ${
+          puzzleIds.size + 1
         } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
           2
         )})`

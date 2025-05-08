@@ -1,6 +1,6 @@
 import { PuzzleSet } from "@/lib/types";
 
-export const useFetchUserSets = async (
+export const fetchUserSets = async (
   email: string,
   setUserSets: React.Dispatch<React.SetStateAction<PuzzleSet[]>>,
   setSelectedSetId: React.Dispatch<React.SetStateAction<number | null>>,
