@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 
 export default function AboutPage() {
   const steps = [
@@ -11,13 +12,17 @@ export default function AboutPage() {
     },
     {
       title: "Step 2",
-      description: "Shrink the time between solving cycles, sharpening your pattern recognition.",
+      description:
+        "Shrink the time between solving cycles, sharpening your pattern recognition.",
     },
     {
       title: "Step 3",
-      description: "Master tactical motifs to make faster, stronger decisions in real games.",
+      description:
+        "Master tactical motifs to make faster, stronger decisions in real games.",
     },
   ];
+
+  const themeColor = useThemeAccentColor();
 
   return (
     <div className="max-w-6xl mx-auto px-8 py-24 space-y-36">
@@ -36,7 +41,9 @@ export default function AboutPage() {
 
         {/* TITLE + TAGLINE */}
         <div className="space-y-6 pl-4">
-          <h1 className="text-5xl font-bold leading-tight">About ChessPecker</h1>
+          <h1 className="text-5xl font-bold leading-tight">
+            About ChessPecker
+          </h1>
           <p className="text-muted-foreground text-2xl leading-relaxed">
             Master tactics. Train smarter. Win faster.
           </p>
@@ -46,10 +53,16 @@ export default function AboutPage() {
       {/* WOODPECKER METHOD */}
       <section className="space-y-20 scroll-mt-24">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold text-primary">What is the Woodpecker Method?</h2>
+          <h2 className="text-3xl font-bold text-primary">
+            What is the Woodpecker Method?
+          </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            The <span className="text-foreground font-semibold">Woodpecker Method</span> is a focused
-            chess training system built around intensive repetition.
+            The{" "}
+            <span className="text-foreground font-semibold">
+              Woodpecker Method
+            </span>{" "}
+            is a focused chess training system built around intensive
+            repetition.
           </p>
           <div className="h-[1px] bg-border w-16 mx-auto mt-4" />
         </div>
@@ -61,28 +74,20 @@ export default function AboutPage() {
               key={idx}
               className="bg-card border border-border p-6 rounded-xl shadow hover:shadow-md transition space-y-4"
             >
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold text-primary ring-1 ring-border">
+              <div
+                className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold text-primary ring-1 ring-border"
+                style={{ boxShadow: `0 0 8px ${themeColor}` }}
+              >
                 {idx + 1}
               </div>
-              <h3 className="text-xl font-semibold text-primary">{step.title}</h3>
+
+              <h3 className="text-xl font-semibold text-primary">
+                {step.title}
+              </h3>
               <p className="text-muted-foreground">{step.description}</p>
             </div>
           ))}
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="w-full max-w-3xl mx-auto text-center bg-muted/10 p-10 rounded-2xl shadow-inner space-y-6">
-        <h2 className="text-3xl font-bold text-foreground">Start mastering yours today.</h2>
-        <p className="text-muted-foreground">
-          Build your first puzzle set and experience training that actually sharpens your instincts.
-        </p>
-        <Link
-          href="/puzzles"
-          className="inline-block bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition"
-        >
-          Get Started
-        </Link>
       </section>
 
       {/* FOOTER */}
