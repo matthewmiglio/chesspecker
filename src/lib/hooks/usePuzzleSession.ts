@@ -15,6 +15,12 @@ import {
   updatePuzzleProgress,
 } from "@/lib/hooks/usePuzzleData";
 
+import {
+  incrementCorrect,
+  incrementIncorrect,
+
+} from "@/lib/api/dailyStatsApi";
+
 export function usePuzzleSession({
   getSelectedSetId,
   currentRepeatIndex,
@@ -63,6 +69,8 @@ export function usePuzzleSession({
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
+    incrementIncorrect();//total daily stats
+
     await showSolution();
     console.log("This puzzle was unsuccessful!");
     await handleNextPuzzle(true);
@@ -82,6 +90,7 @@ export function usePuzzleSession({
     console.log(
       "[handleSuccessfulPuzzle] recorded correct attempt on server-side."
     );
+    incrementCorrect();//total daily stats
 
     await handleNextPuzzle(forceFinish);
   };

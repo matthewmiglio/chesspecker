@@ -8,6 +8,11 @@ import {
 import { PuzzleData } from "@/lib/types";
 import { getFenAtPly } from "@/lib/utils/puzzleUtils";
 
+import {
+  incrementPuzzleStart,
+} from "@/lib/api/dailyStatsApi";
+
+
 export const updateThisSetAccuracy = async (
   setId: number,
   setAccuracies: React.Dispatch<
@@ -119,6 +124,8 @@ export const handleSetSelect = async (
   setPlayerSide: (side: "w" | "b") => void,
   preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
+  incrementPuzzleStart(); //total daily stats
+
   setSelectedSetId(setId);
   sessionStorage.setItem("selected_set_id", String(setId));
 

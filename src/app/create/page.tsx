@@ -8,6 +8,14 @@ import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
+import {
+
+  incrementSetCreate,
+  incrementPuzzleRequest,
+
+} from "@/lib/api/dailyStatsApi";
+import { count } from "console";
+
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
   const { data: session } = useSession();
@@ -229,6 +237,9 @@ export default function CreatePuzzleSetPage() {
       );
       return;
     }
+
+    incrementSetCreate();
+    incrementPuzzleRequest(setSize);
 
     await addNewSetToDatabase(
       email,
