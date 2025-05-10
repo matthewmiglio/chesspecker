@@ -4,8 +4,13 @@ import { ShieldCheck } from "lucide-react";
 export default function Footer() {
   return (
     <footer
-      className="border-t py-4 sm:mt-14
-             mt-0 text-sm text-muted-foreground"
+      className="
+          border-t
+          py-4
+          mt-14
+          text-sm
+          text-muted-foreground
+             "
     >
       <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="flex items-center gap-2">
