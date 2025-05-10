@@ -14,7 +14,6 @@ import {
   incrementPuzzleRequest,
 
 } from "@/lib/api/dailyStatsApi";
-import { count } from "console";
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 200;
@@ -179,8 +178,7 @@ export default function CreatePuzzleSetPage() {
       const selectedDifficulty = getRandom(pool);
 
       console.log(
-        `➕ Adding puzzle ${
-          puzzleIds.size + 1
+        `➕ Adding puzzle ${puzzleIds.size + 1
         } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
           2
         )})`
