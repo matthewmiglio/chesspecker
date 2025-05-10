@@ -1,8 +1,13 @@
 import type { RepeatAccuracy } from "@/lib/types";
 
+type PercentifiedAccuracy = RepeatAccuracy & {
+  correctPercent: number;
+  incorrectPercent: number;
+};
+
 export const fetchAccuracyData = async (
   set_id: number,
-  setAccuracyData: React.Dispatch<React.SetStateAction<RepeatAccuracy[]>>,
+  setAccuracyData: React.Dispatch<React.SetStateAction<PercentifiedAccuracy[]>>,
   setIsAccuracyChecked: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const getSetSize = async () => {
@@ -36,11 +41,19 @@ export const fetchAccuracyData = async (
   );
 
   const filtered = responses
-    .map((data, i) => ({
-      repeat: i,
-      correct: data.correct || 0,
-      incorrect: data.incorrect || 0,
-    }))
+    .map((data, i) => {
+      const correct = data.correct || 0;
+      const incorrect = data.incorrect || 0;
+      const total = correct + incorrect;
+
+      return {
+        repeat: i,
+        correct,
+        incorrect,
+        correctPercent: total > 0 ? (correct / total) * 100 : 0,
+        incorrectPercent: total > 0 ? (incorrect / total) * 100 : 0,
+      };
+    })
     .filter((d) => d.correct > 0 || d.incorrect > 0);
 
   setAccuracyData(filtered);

@@ -9,11 +9,17 @@ import NoDataCard from "@/components/dashboard-page/NoDataCard";
 import { fetchUserSets } from "@/lib/hooks/fetchUserSets";
 import { fetchAccuracyData } from "@/lib/hooks/fetchAccuracyData";
 
+// Extend RepeatAccuracy to include percent fields
+type PercentifiedAccuracy = RepeatAccuracy & {
+  correctPercent: number;
+  incorrectPercent: number;
+};
+
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
 
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
-  const [accuracyData, setAccuracyData] = useState<RepeatAccuracy[]>([]);
+  const [accuracyData, setAccuracyData] = useState<PercentifiedAccuracy[]>([]);
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);

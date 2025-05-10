@@ -12,8 +12,34 @@ import {
 } from "recharts";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 interface AccuracyChartCardProps {
-  accuracyData: { repeat: number; correct: number; incorrect: number }[];
+  accuracyData: {
+    repeat: number;
+    correct: number;
+    incorrect: number;
+    correctPercent: number;
+    incorrectPercent: number;
+  }[];
 }
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload?.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-md bg-background border p-2 shadow-md">
+        <p className="font-semibold">Repeat #{label}</p>
+        <p className="text-green-500">
+          ✅ Correct: {data.correct} ({data.correctPercent.toFixed(1)}%)
+        </p>
+        <p className="text-red-500">
+          ❌ Incorrect: {data.incorrect} ({data.incorrectPercent.toFixed(1)}%)
+        </p>
+        <p>Total: {data.correct + data.incorrect}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 
 export default function AccuracyChartCard({
   accuracyData,
@@ -35,16 +61,23 @@ export default function AccuracyChartCard({
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={accuracyData}
-                margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
+                margin={{ top: 8, right: 8, left: 28, bottom: 0 }}
                 barCategoryGap="20%"
                 barGap={2}
               >
                 <XAxis dataKey="repeat" />
-                <YAxis width={28} allowDecimals={false} />
-                <Tooltip />
+                <YAxis
+                  width={28}
+                  domain={[0, 100]}
+                  tickFormatter={(tick) => `${tick}%`}
+                  allowDecimals={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+
                 <Legend />
-                <Bar dataKey="correct" fill="#4ade80" name="Correct" />
-                <Bar dataKey="incorrect" fill="#f87171" name="Incorrect" />
+                <Bar dataKey="correctPercent" stackId="a" fill="#4ade80" name="Correct %" />
+                <Bar dataKey="incorrectPercent" stackId="a" fill="#f87171" name="Incorrect %" />
+
               </BarChart>
             </ResponsiveContainer>
           ) : (
