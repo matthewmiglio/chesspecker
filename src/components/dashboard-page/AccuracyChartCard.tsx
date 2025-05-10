@@ -20,9 +20,15 @@ interface AccuracyChartCardProps {
     incorrectPercent: number;
   }[];
 }
-const CustomTooltip = ({ active, payload, label }: any) => {
+import type { TooltipProps } from "recharts";
+
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: TooltipProps<number, string>) => {
   if (active && payload?.length) {
-    const data = payload[0].payload;
+    const data = payload[0].payload as AccuracyChartCardProps["accuracyData"][0];
     return (
       <div className="rounded-md bg-background border p-2 shadow-md">
         <p className="font-semibold">Repeat #{label}</p>
@@ -39,6 +45,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
   return null;
 };
+
 
 
 export default function AccuracyChartCard({
