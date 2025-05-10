@@ -138,7 +138,7 @@ export default function AnimatedBoard({
       onMouseDown={handleRightMouseDown}
       onMouseUp={handleRightMouseUp}
     >
-      <MoveIndicator turn={game.turn()} />
+      <div className = 'py-2 '><MoveIndicator turn={game.turn()} /></div>
       <Chessboard
         position={boardPosition}
         onPieceDrop={handlePieceDrop}

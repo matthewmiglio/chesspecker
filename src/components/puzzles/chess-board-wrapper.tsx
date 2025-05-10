@@ -66,7 +66,7 @@ export default function ChessBoardWrapper({
               boxShadow: glow
                 ? `0 0 18px 2px ${themeColor}`
                 : `0 0 12px 1px ${themeColor}`,
-              padding: "0.5rem",
+              padding: "0.0rem",
             }}
           >
             <AnimatedBoard
