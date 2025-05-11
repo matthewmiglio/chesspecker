@@ -8,13 +8,13 @@ export default function SideNavBar({
     setActiveTab: (tab: "figures" | "tables") => void;
 }) {
     return (
-        <div className="w-48 min-h-screen border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm">
+        <div className="w-48 min-h-screen border-r border-sidebar-border bg-sidebar text-sm text-sidebar-foreground">
             <nav className="flex flex-col p-4 space-y-2">
                 <button
                     onClick={() => setActiveTab("figures")}
                     className={`px-4 py-2 rounded text-left font-medium transition-all duration-150 ${activeTab === "figures"
-                        ? "bg-indigo-600 text-white"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "hover:bg-sidebar-accent text-sidebar-primary-foreground"
                         }`}
                 >
                     Figures
@@ -22,8 +22,8 @@ export default function SideNavBar({
                 <button
                     onClick={() => setActiveTab("tables")}
                     className={`px-4 py-2 rounded text-left font-medium transition-all duration-150 ${activeTab === "tables"
-                        ? "bg-indigo-600 text-white"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "hover:bg-sidebar-accent text-sidebar-primary-foreground"
                         }`}
                 >
                     Raw Tables
