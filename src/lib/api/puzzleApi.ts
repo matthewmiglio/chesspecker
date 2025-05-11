@@ -10,7 +10,7 @@ export const addIncorrectAttempt = async (
   repeatIndex: number
 ) => {
   try {
-    const res = await fetch("/api/addIncorrect", {
+    const res = await fetch("/api/accuracy/addIncorrect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
@@ -38,7 +38,7 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
     );
     console.log("");
 
-    const res = await fetch("/api/addCorrect", {
+    const res = await fetch("/api/accuracy/addCorrect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
@@ -73,7 +73,7 @@ export const getAllSetData = async (email: string) => {
 
 export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
   try {
-    const res = await fetch("/api/getSetAccuracy", {
+    const res = await fetch("/api/accuracy/getSetAccuracy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),

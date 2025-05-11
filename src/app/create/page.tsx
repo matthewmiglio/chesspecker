@@ -50,7 +50,7 @@ export default function CreatePuzzleSetPage() {
     console.log("setId", setId);
 
     try {
-      const res = await fetch("/api/createSetAccuracy", {
+      const res = await fetch("/api/accuracy/createSetAccuracy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ set_id: setId, repeat_index: repeat_index }),

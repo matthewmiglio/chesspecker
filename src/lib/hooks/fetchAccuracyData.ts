@@ -30,7 +30,7 @@ export const fetchAccuracyData = async (
 
   const responses = await Promise.all(
     Array.from({ length: 10 }, (_, i) =>
-      fetch("/api/getSetAccuracy", {
+      fetch("/api/accuracy/getSetAccuracy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ set_id, repeat_index: i }),
