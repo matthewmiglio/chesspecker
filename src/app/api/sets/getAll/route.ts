@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,7 +8,7 @@ const supabase = createClient(
 
 const verbose = true;
 
-export async function POST(req: NextRequest) {
+export async function POST() {
     if (verbose) console.log("Fetching sets for user");
 
 
