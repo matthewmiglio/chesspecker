@@ -82,7 +82,7 @@ export default function CreatePuzzleSetPage() {
     setAccuracyProgress(0);
 
     const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
-    const res = await fetch("/api/addSet", {
+    const res = await fetch("/api/sets/addSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, elo, size, repeats, name, puzzleIds }),
@@ -110,7 +110,7 @@ export default function CreatePuzzleSetPage() {
   };
 
   const createNewPuzzle = async (difficulty: string) => {
-    const response = await fetch("/api/getPuzzles", {
+    const response = await fetch("/api/lichess/getPuzzles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ difficulty }),

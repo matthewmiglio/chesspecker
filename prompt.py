@@ -84,25 +84,15 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\api\puzzleApi.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\hooks\fetchAccuracyData.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\hooks\fetchUserSets.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\hooks\usePuzzleData.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\chessBoardHelpers.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\puzzleUtils.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils\uiHelpers.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\types.ts",
-        # r"C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\utils.ts",
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
 
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\addCorrect\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\addIncorrect\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\addPuzzleRequest\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\addPuzzleStart\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\addSetCreate\route.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\api\daily_stats\getAll\route.ts',
-
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\lib\api\dailyStatsApi.ts',
-        r'C:\Users\matmi\Desktop\my files\my programs\chesspecker\src\app\about\page.tsx',
 
 
     ]

@@ -56,7 +56,7 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
 };
 
 export const getAllSetData = async (email: string) => {
-  const response = await fetch("/api/getSet", {
+  const response = await fetch("/api/sets/getSet", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -91,13 +91,13 @@ export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
 };
 
 export const getPuzzleData = async (puzzleId: string) => {
-  const response = await fetch(`/api/getPuzzleById?id=${puzzleId}`);
+  const response = await fetch(`/api/lichess/getPuzzleById?id=${puzzleId}`);
   if (!response.ok) return null;
   return await response.json();
 };
 
 export const getSetProgress = async (set_id: number) => {
-  const response = await fetch("/api/getSetProgressStats", {
+  const response = await fetch("/api/sets/getSetProgressStats", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ set_id }),
@@ -119,7 +119,7 @@ export const setSetProgress = async (
     puzzle_index,
   });
 
-  const response = await fetch("/api/updateSetProgressStats", {
+  const response = await fetch("/api/sets/updateSetProgressStats", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
@@ -149,7 +149,7 @@ export const handleSetDelete = async (
   }
   console.log("User confirmed set deletion.");
 
-  const res = await fetch("/api/removeSet", {
+  const res = await fetch("/api/sets/removeSet", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ set_id: setId }),

@@ -6,7 +6,7 @@ export const fetchUserSets = async (
   setSelectedSetId: React.Dispatch<React.SetStateAction<number | null>>,
   setIsSetsChecked: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const res = await fetch("/api/getSet", {
+  const res = await fetch("/api/sets/getSet", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),

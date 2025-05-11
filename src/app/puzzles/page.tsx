@@ -80,7 +80,7 @@ export default function PuzzlesPage() {
     const confirmed = await showConfirmDeletePopup();
     if (!confirmed) return;
 
-    const res = await fetch("/api/removeSet", {
+    const res = await fetch("/api/sets/removeSet", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id: setId }),

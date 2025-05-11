@@ -11,7 +11,7 @@ export const fetchAccuracyData = async (
   setIsAccuracyChecked: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const getSetSize = async () => {
-    const response = await fetch("/api/getSetProgressStats", {
+    const response = await fetch("/api/sets/getSetProgressStats", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ set_id }),
