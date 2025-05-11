@@ -1,5 +1,6 @@
 import ChartCard from './ChartCard';
+import { TimeSeriesPoint } from '@/lib/types';
 
-export const RequestsOverTime = ({ data }: { data: any[] }) => (
-    <ChartCard title="Puzzle Requests Over Time" data={data} dataKey="puzzle_requests" />
-  );
+export const RequestsOverTime = ({ data }: { data: TimeSeriesPoint[] }) => (
+  <ChartCard title="Puzzle Requests Over Time" data={data} dataKey="value" />
+);

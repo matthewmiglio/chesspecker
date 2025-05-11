@@ -2,6 +2,52 @@ import type { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
 
 export type ReturnTypeUsePuzzleSession = ReturnType<typeof usePuzzleSession>;
 
+export type TimeSeriesPoint = {
+  day: string;
+  value: number;
+};
+
+
+// src/lib/types.ts
+
+export type AccuracyData = {
+  set_id: string;
+  repeat_index: number;
+  correct: number;
+  incorrect: number;
+};
+
+export type UserStats = {
+  email: string;
+  created_at: string;
+  puzzle_starts: number;
+  correct_puzzles: number;
+  incorrect_puzzles: number;
+  set_creates: number;
+  hints: number;
+};
+
+export type DailyStats = {
+  day: string;
+  correct_puzzles: number;
+  incorrect_puzzles: number;
+  puzzle_starts: number;
+  set_creates: number;
+  puzzle_requests: number;
+};
+
+export type SetData = {
+  set_id: string;
+  name: string;
+  email: string;
+  elo: number;
+  size: number;
+  repeats: number;
+  create_time: string;
+};
+
+
+
 
 export interface User {
   user_id: number;

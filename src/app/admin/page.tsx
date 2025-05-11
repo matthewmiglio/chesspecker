@@ -14,13 +14,15 @@ import SideNavBar from "@/components/admin-page/sideNavBar";
 import Unauthorized from "@/components/admin-page/unauthorized";
 import { useSession } from "next-auth/react";
 
+import { AccuracyData, DailyStats, SetData, UserStats } from "@/lib/types";
+
 export default function AdminPage() {
     const { data: session, status } = useSession();
     const [activeTab, setActiveTab] = useState<"figures" | "tables">("figures");
-    const [accuracy, setAccuracy] = useState<any[]>([]);
-    const [users, setUsers] = useState<any[]>([]);
-    const [daily, setDaily] = useState<any[]>([]);
-    const [sets, setSets] = useState<any[]>([]);
+    const [accuracy, setAccuracy] = useState<AccuracyData[]>([]);
+    const [users, setUsers] = useState<UserStats[]>([]);
+    const [daily, setDaily] = useState<DailyStats[]>([]);
+    const [sets, setSets] = useState<SetData[]>([]);
     const [loading, setLoading] = useState(true);
 
     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
@@ -58,13 +60,14 @@ export default function AdminPage() {
         total_daily_stats_rows: daily.length,
     };
 
-    const creates = daily.map(({ day, set_creates }) => ({ day, set_creates }));
-    const starts = daily.map(({ day, puzzle_starts }) => ({ day, puzzle_starts }));
-    const requests = daily.map(({ day, puzzle_requests }) => ({ day, puzzle_requests }));
+    const creates = daily.map(({ day, set_creates }) => ({ day, value: set_creates }));
+    const starts = daily.map(({ day, puzzle_starts }) => ({ day, value: puzzle_starts }));
+    const requests = daily.map(({ day, puzzle_requests }) => ({ day, value: puzzle_requests }));
     const puzzles = daily.map(({ day, correct_puzzles, incorrect_puzzles }) => ({
         day,
-        puzzles_total: correct_puzzles + incorrect_puzzles,
+        value: correct_puzzles + incorrect_puzzles,
     }));
+
 
     return (
         <div className="flex">
