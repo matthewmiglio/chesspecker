@@ -13,8 +13,8 @@ export default function SideNavBar({
                 <button
                     onClick={() => setActiveTab("figures")}
                     className={`px-4 py-2 rounded text-left font-medium transition-all duration-150 ${activeTab === "figures"
-                            ? "bg-indigo-600 text-white"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                        ? "bg-indigo-600 text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                         }`}
                 >
                     Figures
@@ -22,8 +22,8 @@ export default function SideNavBar({
                 <button
                     onClick={() => setActiveTab("tables")}
                     className={`px-4 py-2 rounded text-left font-medium transition-all duration-150 ${activeTab === "tables"
-                            ? "bg-indigo-600 text-white"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                        ? "bg-indigo-600 text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                         }`}
                 >
                     Raw Tables
