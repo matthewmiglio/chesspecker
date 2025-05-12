@@ -22,9 +22,10 @@ import { showConfirmDeletePopup } from "@/components/puzzles/ConfirmDeletePopup"
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
-  const { resolvedTheme } = useTheme(); const userIsLoggedIn = authStatus === "authenticated";
+  const email = session?.user?.email ?? null;
+  const { resolvedTheme } = useTheme();
+  const userIsLoggedIn = authStatus === "authenticated";
   const isAuthChecked = authStatus !== "loading";
-
 
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
@@ -65,6 +66,7 @@ export default function PuzzlesPage() {
     userSets,
     currentPuzzleIndex,
     setPlayerSide,
+    email,
   });
 
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
@@ -108,25 +110,34 @@ export default function PuzzlesPage() {
       }
 
       if (authStatus !== "authenticated") {
-        console.log("[PuzzlePage] User is NOT authenticated — setting isSetDataLoaded = true");
+        console.log(
+          "[PuzzlePage] User is NOT authenticated — setting isSetDataLoaded = true"
+        );
         setIsSetDataLoaded(true);
         return;
       }
 
       if (!session?.user?.email) {
-        console.error("[PuzzlePage] session.user.email is missing — setting isSetDataLoaded = true");
+        console.error(
+          "[PuzzlePage] session.user.email is missing — setting isSetDataLoaded = true"
+        );
         setIsSetDataLoaded(true);
         return;
       }
 
-      console.log("[PuzzlePage] Authenticated, fetching data for:", session.user.email);
+      console.log(
+        "[PuzzlePage] Authenticated, fetching data for:",
+        session.user.email
+      );
 
       try {
         const email = session.user.email;
         const sets = await getAllSetData(email);
 
         if (!sets) {
-          console.error("[PuzzlePage] Failed to fetch user sets — setting isSetDataLoaded = true");
+          console.error(
+            "[PuzzlePage] Failed to fetch user sets — setting isSetDataLoaded = true"
+          );
           setIsSetDataLoaded(true);
           return;
         }
@@ -134,8 +145,14 @@ export default function PuzzlesPage() {
         setUserSets(sets);
         console.log("[PuzzlePage] Fetched user sets:", sets);
 
-        const accuracies: Record<number, { correct: number; incorrect: number }> = {};
-        const progressMap: Record<number, { repeat_index: number; puzzle_index: number }> = {};
+        const accuracies: Record<
+          number,
+          { correct: number; incorrect: number }
+        > = {};
+        const progressMap: Record<
+          number,
+          { repeat_index: number; puzzle_index: number }
+        > = {};
 
         for (const set of sets) {
           let repeat_index = set.repeat_index;
@@ -170,8 +187,6 @@ export default function PuzzlesPage() {
 
     run();
   }, [authStatus, session]);
-
-
 
   return (
     <div>
@@ -233,5 +248,4 @@ export default function PuzzlesPage() {
       )}
     </div>
   );
-
 }

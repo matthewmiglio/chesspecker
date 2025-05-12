@@ -15,11 +15,12 @@ import {
   updatePuzzleProgress,
 } from "@/lib/hooks/usePuzzleData";
 
-import {
-  incrementCorrect,
-  incrementIncorrect,
+import { incrementCorrect, incrementIncorrect } from "@/lib/api/dailyStatsApi";
 
-} from "@/lib/api/dailyStatsApi";
+import {
+  incrementUserCorrect,
+  incrementUserIncorrect,
+} from "@/lib/api/userStatsApi";
 
 export function usePuzzleSession({
   getSelectedSetId,
@@ -38,6 +39,7 @@ export function usePuzzleSession({
   userSets,
   currentPuzzleIndex,
   setPlayerSide,
+  email, // ← ✅ add email
 }: {
   getSelectedSetId: () => number | null;
   currentRepeatIndex: number;
@@ -57,6 +59,7 @@ export function usePuzzleSession({
   userSets: { set_id: number; repeats: number }[];
   currentPuzzleIndex: number;
   setPlayerSide: (side: "w" | "b") => void;
+  email: string | null;
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
@@ -69,7 +72,9 @@ export function usePuzzleSession({
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
-    incrementIncorrect();//total daily stats
+    incrementIncorrect(); //total daily stats
+    if (!email) email = 'unauthenticated@email.com';
+    incrementUserIncorrect(email); //user stats
 
     await showSolution();
     console.log("This puzzle was unsuccessful!");
@@ -90,7 +95,9 @@ export function usePuzzleSession({
     console.log(
       "[handleSuccessfulPuzzle] recorded correct attempt on server-side."
     );
-    incrementCorrect();//total daily stats
+    incrementCorrect(); //total daily stats
+    if (!email) email = 'unauthenticated@email.com';
+    incrementUserCorrect(email); //user stats
 
     await handleNextPuzzle(forceFinish);
   };
@@ -102,11 +109,13 @@ export function usePuzzleSession({
     }
 
     if (!isCorrect) {
-      console.log("[handleMove] move incorrect, calling handleIncorrectMove...");
+      console.log(
+        "[handleMove] move incorrect, calling handleIncorrectMove..."
+      );
       await handleIncorrectMove();
       return;
-    }
 
+    }
     // Correct move played
     showGreenCheck();
     setHighlight(null);
