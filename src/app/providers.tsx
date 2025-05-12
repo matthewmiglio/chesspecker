@@ -4,7 +4,7 @@
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import type { Session } from "next-auth";
-
+import { UserProvider } from "@/lib/context/UserContext";
 export function Providers({
   children,
   session,
@@ -18,9 +18,12 @@ export function Providers({
       refetchInterval={5 * 60}
       refetchOnWindowFocus={false}
     >
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {children}
-      </ThemeProvider>
+      <UserProvider>
+        {" "}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+      </UserProvider>
     </SessionProvider>
   );
 }
