@@ -73,7 +73,7 @@ export function usePuzzleSession({
     await addIncorrectAttempt(setId, currentRepeatIndex);
 
     incrementIncorrect(); //total daily stats
-    if (!email) email = 'unauthenticated@email.com';
+    if (!email) email = "unauthenticated@email.com";
     incrementUserIncorrect(email); //user stats
 
     await showSolution();
@@ -96,7 +96,7 @@ export function usePuzzleSession({
       "[handleSuccessfulPuzzle] recorded correct attempt on server-side."
     );
     incrementCorrect(); //total daily stats
-    if (!email) email = 'unauthenticated@email.com';
+    if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email); //user stats
 
     await handleNextPuzzle(forceFinish);
@@ -114,7 +114,6 @@ export function usePuzzleSession({
       );
       await handleIncorrectMove();
       return;
-
     }
     // Correct move played
     showGreenCheck();
