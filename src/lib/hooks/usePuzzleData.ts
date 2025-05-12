@@ -8,10 +8,9 @@ import {
 import { PuzzleData } from "@/lib/types";
 import { getFenAtPly } from "@/lib/utils/puzzleUtils";
 
-import {
-  incrementPuzzleStart,
-} from "@/lib/api/dailyStatsApi";
+import { incrementPuzzleStart } from "@/lib/api/dailyStatsApi";
 
+import { incrementUserPuzzleStart } from "@/lib/api/userStatsApi";
 
 export const updateThisSetAccuracy = async (
   setId: number,
@@ -105,6 +104,7 @@ export const loadPuzzleAndInitialize = async (
 };
 
 export const handleSetSelect = async (
+  email:string,
   setId: number,
   userSets: {
     set_id: number;
@@ -124,7 +124,12 @@ export const handleSetSelect = async (
   setPlayerSide: (side: "w" | "b") => void,
   preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
-  incrementPuzzleStart(); //total daily stats
+  //increment total daily stats
+  incrementPuzzleStart();
+
+  //increment user stats
+  //grab email from session for user stats
+  incrementUserPuzzleStart(email);
 
   setSelectedSetId(setId);
   sessionStorage.setItem("selected_set_id", String(setId));
