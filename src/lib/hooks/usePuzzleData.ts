@@ -104,7 +104,7 @@ export const loadPuzzleAndInitialize = async (
 };
 
 export const handleSetSelect = async (
-  email:string,
+  email: string,
   setId: number,
   userSets: {
     set_id: number;
