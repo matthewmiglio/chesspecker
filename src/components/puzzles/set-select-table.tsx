@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 type SetSelectTableProps = {
   userSets: PuzzleSet[];
@@ -82,6 +83,9 @@ export default function SetSelectTable({
           boxShadow: `0 0 16px 19px ${progressColor}`,
         };
 
+        const { data: session } = useSession();
+        const email = session?.user?.email || "unauthenticated@email.com";
+
         return (
           <div
             key={set.set_id}
@@ -93,6 +97,7 @@ export default function SetSelectTable({
               if (!setToSelect) return;
 
               await handleSetSelect(
+                email,
                 set.set_id,
                 userSets,
                 setSelectedSetId,
