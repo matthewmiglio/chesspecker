@@ -59,6 +59,9 @@ export default function SetSelectTable({
     return aPercent - bPercent;
   });
 
+  const { data: session } = useSession();
+  const email = session?.user?.email || "unauthenticated@email.com";
+
   return (
     <div className="w-[90%] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 py-8">
       {sortedSets.map((set) => {
@@ -82,9 +85,6 @@ export default function SetSelectTable({
           backgroundColor: progressColor,
           boxShadow: `0 0 16px 19px ${progressColor}`,
         };
-
-        const { data: session } = useSession();
-        const email = session?.user?.email || "unauthenticated@email.com";
 
         return (
           <div
