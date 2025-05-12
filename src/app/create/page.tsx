@@ -9,10 +9,12 @@ import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
 import {
+  incrementUserSetCreate,
+} from "@/lib/api/userStatsApi";
 
+import {
   incrementSetCreate,
   incrementPuzzleRequest,
-
 } from "@/lib/api/dailyStatsApi";
 
 export default function CreatePuzzleSetPage() {
@@ -178,7 +180,8 @@ export default function CreatePuzzleSetPage() {
       const selectedDifficulty = getRandom(pool);
 
       console.log(
-        `➕ Adding puzzle ${puzzleIds.size + 1
+        `➕ Adding puzzle ${
+          puzzleIds.size + 1
         } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
           2
         )})`
@@ -238,6 +241,7 @@ export default function CreatePuzzleSetPage() {
 
     incrementSetCreate();
     incrementPuzzleRequest(setSize);
+    incrementUserSetCreate(email);
 
     await addNewSetToDatabase(
       email,
