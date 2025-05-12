@@ -28,6 +28,13 @@ export default function AdminPage() {
     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
     useEffect(() => {
+        if (!session) return;
+        if (!adminEmail) {
+            console.error("Admin email is not set in environment variables.");
+            return;
+        }
+        if (!session.user) return;
+        if (!session?.user?.email) return;
         if (session?.user?.email !== adminEmail) return;
 
         async function loadData() {
