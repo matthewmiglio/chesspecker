@@ -13,6 +13,19 @@ type ChartDatum = {
   value: number;
 };
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <div className="bg-gray-900 text-white text-sm p-2 rounded shadow-md">
+      <p className="text-xs text-gray-400">{label}</p>
+      <p className="font-semibold text-violet-300">
+        {payload[0].name} : {payload[0].value}
+      </p>
+    </div>
+  );
+};
+
 const ChartCard = ({
   title,
   data,
@@ -30,9 +43,13 @@ const ChartCard = ({
         <CartesianGrid strokeDasharray="3 3" />
 
         <YAxis allowDecimals={false} width={55} />
-        <XAxis dataKey="day" tickFormatter={(day) => new Date(day).toLocaleDateString()} />
+        <XAxis
+          dataKey="day"
+          tickFormatter={(day) => new Date(day).toLocaleDateString()}
+        />
 
-        <Tooltip />
+        <Tooltip content={<CustomTooltip />} />
+
         <Line
           type="monotone"
           dataKey={dataKey}
