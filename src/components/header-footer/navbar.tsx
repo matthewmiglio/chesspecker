@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 import LoginButton from "./LoginButton";
 import { Menu, X } from "lucide-react";
+import LoginStreakDisplay from "./LoginStreakDisplay";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,6 +71,10 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          {/* Streak display */}
+          <LoginStreakDisplay />
+
           <LoginButton />
           <ModeToggle />
         </div>
@@ -90,37 +95,44 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div
-          className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
-          style={{
-            background: "rgba(0,0,0,0.6)",
-            borderColor: themeColor,
-          }}
-        >
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
-            {navLinks.map(({ name, href }) => (
-              <Link
-                key={href}
-                href={href}
-                className="block px-3 py-2 rounded-md font-medium transition-colors"
-                style={{
-                  color:
-                    pathname === href ? themeColor : "var(--muted-foreground)",
-                  background:
-                    pathname === href ? "var(--muted)" : "transparent",
-                }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {name}
-              </Link>
-            ))}
-            <div
-              className="pt-3 border-t"
-              style={{ borderColor: "var(--border)" }}
+        className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
+        style={{
+          background: "rgba(0,0,0,0.6)",
+          borderColor: themeColor,
+        }}
+      >
+        <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
+          {navLinks.map(({ name, href }) => (
+            <Link
+              key={href}
+              href={href}
+              className="block px-3 py-2 rounded-md font-medium transition-colors"
+              style={{
+                color:
+                  pathname === href ? themeColor : "var(--muted-foreground)",
+                background:
+                  pathname === href ? "var(--muted)" : "transparent",
+              }}
+              onClick={() => setIsMenuOpen(false)}
             >
-              <LoginButton />
-            </div>
+              {name}
+            </Link>
+          ))}
+
+          {/* Streak display (mobile) */}
+          <div className="mt-2 self-start pl-3">
+            <LoginStreakDisplay />
+          </div>
+
+          <div
+            className="pt-3 border-t"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <LoginButton />
           </div>
         </div>
+      </div>
+
       )}
     </nav>
   );
