@@ -8,12 +8,22 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import type { TooltipProps } from "recharts";
+import type {
+  ValueType,
+  NameType,
+} from "recharts/types/component/DefaultTooltipContent";
+
 type ChartDatum = {
   day: string;
   value: number;
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: TooltipProps<ValueType, NameType>) => {
   if (!active || !payload || !payload.length) return null;
 
   return (
@@ -33,7 +43,7 @@ const ChartCard = ({
 }: {
   title: string;
   data: ChartDatum[];
-  dataKey: "value"; // literal since all charts pass { day, value }
+  dataKey: "value";
 }) => (
   <div className="bg-card text-card-foreground rounded-lg shadow p-4">
     <h3 className="text-lg font-semibold mb-2">{title}</h3>
