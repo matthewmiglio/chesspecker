@@ -10,7 +10,7 @@ export const CurrentTotals = ({ totals }: { totals: Record<string, number> }) =>
         <span className="ml-auto font-medium text-white">{totals.total_accuracy_rows}</span>
       </div>
       <div className="flex items-center gap-3">
-        <Users className="w-5 h-5 text-muted-foreground" />
+        <Activity className="w-5 h-5 text-muted-foreground" />
         <span className="text-muted-foreground">Unique Set Creators:</span>
         <span className="ml-auto font-medium text-white">{totals.total_unique_emails_in_sets}</span>
       </div>
