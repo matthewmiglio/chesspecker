@@ -1,8 +1,6 @@
--export dashboard logic to a lib helper file
--add red/blue flair to dashboard page
--make dashboard page
--highlight selected set with the red/blue outline
--add some more colors around puzzle so its not just whitespace
 -when user makes an incorrect move, restart the puzzle from the beginning, then do the replay
 -manually contine to next puzzle after incorrect replay plays out
--fix mobile puzzle styling (it hangs off screen to the right)
+-fix making sets below 450 elo
+-fully test login strek feature
+-add user count vs time graph to components/admin
+
