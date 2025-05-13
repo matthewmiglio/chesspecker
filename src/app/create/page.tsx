@@ -8,9 +8,7 @@ import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
-import {
-  incrementUserSetCreate,
-} from "@/lib/api/userStatsApi";
+import { incrementUserSetCreate } from "@/lib/api/userStatsApi";
 
 import {
   incrementSetCreate,
@@ -33,8 +31,6 @@ export default function CreatePuzzleSetPage() {
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
   const [accuracyProgress, setAccuracyProgress] = useState(0);
-
-  // THEME COLOR STATE
 
   const { resolvedTheme } = useTheme();
   const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
