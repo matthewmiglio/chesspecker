@@ -67,6 +67,11 @@ export default function AdminPage() {
     total_daily_stats_rows: daily.length,
   };
 
+  const userStats = users.map(({ email, created_at }) => ({
+    email,
+    created_at,
+  }));
+
   const creates = daily.map(({ day, set_creates }) => ({
     day,
     value: set_creates,
@@ -99,6 +104,7 @@ export default function AdminPage() {
             requests={requests}
             starts={starts}
             totals={totals}
+            userStats={userStats}
           />
         ) : (
           <RawTables
