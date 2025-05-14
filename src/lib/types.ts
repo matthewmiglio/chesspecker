@@ -7,9 +7,6 @@ export type TimeSeriesPoint = {
   value: number;
 };
 
-
-// src/lib/types.ts
-
 export type AccuracyData = {
   set_id: string;
   repeat_index: number;
@@ -45,9 +42,6 @@ export type SetData = {
   repeats: number;
   create_time: string;
 };
-
-
-
 
 export interface User {
   user_id: number;
