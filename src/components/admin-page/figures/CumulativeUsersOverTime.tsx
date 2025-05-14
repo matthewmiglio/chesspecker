@@ -7,10 +7,17 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  TooltipProps,
 } from "recharts";
 import { TimeSeriesPoint } from "@/lib/types";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface CustomTooltipProps extends TooltipProps<string, string> {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
   return (
@@ -35,7 +42,7 @@ const CumulativeUsersOverTime = ({
       const cumulativeUsers: { [key: string]: number } = {};
 
       userStats.forEach(({ created_at }) => {
-        const joinDate = new Date(created_at).toLocaleDateString(); // Convert timestamp to date string
+        const joinDate = new Date(created_at).toLocaleDateString();
         cumulativeUsers[joinDate] = (cumulativeUsers[joinDate] || 0) + 1;
       });
 
