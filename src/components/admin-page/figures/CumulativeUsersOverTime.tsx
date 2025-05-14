@@ -7,13 +7,17 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps,
 } from "recharts";
 import { TimeSeriesPoint } from "@/lib/types";
 
-interface CustomTooltipProps extends TooltipProps<string, string> {
+interface TooltipPayloadItem {
+  name: string;
+  value: number;
+}
+
+interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: TooltipPayloadItem[];
   label?: string;
 }
 
