@@ -1,6 +1,6 @@
 -when user makes an incorrect move, restart the puzzle from the beginning, then do the replay
 -manually contine to next puzzle after incorrect replay plays out
 -fix making sets below 450 elo
--fully test login strek feature
--add user count vs time graph to components/admin
+
+
 
