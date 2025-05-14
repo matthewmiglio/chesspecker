@@ -130,7 +130,7 @@ export default function CreatePuzzleSetPage() {
     onProgress: (progress: number) => void
   ): Promise<string[]> => {
     const difficultyEloMap: Record<string, number> = {
-      easiest: 499,
+      easiest: 1,
       easier: 999,
       normal: 1499,
       harder: 2249,
