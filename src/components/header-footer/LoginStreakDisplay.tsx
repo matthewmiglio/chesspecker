@@ -42,7 +42,7 @@ const LoginStreakDisplay = () => {
   return (
     <div className="flex items-center gap-2 px-3 py-1 rounded-md text-sm bg-orange-50 text-orange-600 dark:bg-orange-900 dark:text-orange-200 border border-orange-300 dark:border-orange-700 shadow-sm">
       <Flame className="w-4 h-4" />
-      <span>🔥 {streak}-day streak</span>
+      <span>{streak}-day streak</span>
     </div>
   );
 };
