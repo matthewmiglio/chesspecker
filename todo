@@ -5,3 +5,4 @@
 -add streak admin page stuff
 -feedback popup for active users only
 -rate limiting to prevent spam
+-add puzzle requests to user stats table
