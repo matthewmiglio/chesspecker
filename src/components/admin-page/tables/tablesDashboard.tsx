@@ -5,6 +5,9 @@ import AccuraciesTable from "@/components/admin-page/tables/accuraciesTable";
 import UsersTable from "@/components/admin-page/tables/usersTable";
 import DailyStatsTable from "@/components/admin-page/tables/dailyStatsTable";
 import SetsTable from "@/components/admin-page/tables/setsTable";
+import StreaksTable from "@/components/admin-page/tables/StreaksTable";
+import { Streak } from "@/lib/types";
+
 
 type User = {
   email: string;
@@ -42,29 +45,39 @@ type AccuracyData = {
   incorrect: number;
 };
 
+type RawTablesProps = {
+  accuracyData: AccuracyData[];
+  usersData: User[];
+  dailydata: DailyStats[];
+  setsData: SetData[];
+  streaksData: Streak[];
+};
+
 export default function RawTables({
   accuracyData,
   usersData,
   dailydata,
   setsData,
-}: {
-  accuracyData: AccuracyData[];
-  usersData: User[];
-  dailydata: DailyStats[];
-  setsData: SetData[];
-}) {
+  streaksData,
+}: RawTablesProps) {
   return (
     <Tabs defaultValue="accuracies" className="w-full">
-      <TabsList className="grid grid-cols-4 w-full mb-4">
+      <TabsList className="grid grid-cols-5 w-full mb-4">
         <TabsTrigger value="accuracies">Accuracy</TabsTrigger>
         <TabsTrigger value="users">Users</TabsTrigger>
         <TabsTrigger value="daily">Daily Stats</TabsTrigger>
         <TabsTrigger value="sets">Sets</TabsTrigger>
+        <TabsTrigger value="streaks">Streaks</TabsTrigger>
       </TabsList>
 
       <TabsContent value="accuracies">
         <h2 className="text-xl font-semibold mb-2">Accuracy Data</h2>
         <AccuraciesTable data={accuracyData} />
+      </TabsContent>
+
+      <TabsContent value="streaks">
+        <h2 className="text-xl font-semibold mb-2">Login Streaks</h2>
+        <StreaksTable data={streaksData} />
       </TabsContent>
 
       <TabsContent value="users">

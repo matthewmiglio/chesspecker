@@ -51,6 +51,11 @@ export interface User {
   created?: string;
 }
 
+export type Streak = {
+  email: string;
+  login_count: number;
+};
+
 export type AccuracyRecord = {
   correct: number;
   incorrect: number;

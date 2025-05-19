@@ -20,7 +20,9 @@ export default function Navbar() {
     { name: "Create", href: "/create" },
     { name: "Performance", href: "/dashboard" },
     { name: "About", href: "/about" },
+    { name: "Feedback", href: "/feedback" },
   ];
+
 
   return (
     <nav
@@ -95,43 +97,43 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div
-        className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
-        style={{
-          background: "rgba(0,0,0,0.6)",
-          borderColor: themeColor,
-        }}
-      >
-        <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
-          {navLinks.map(({ name, href }) => (
-            <Link
-              key={href}
-              href={href}
-              className="block px-3 py-2 rounded-md font-medium transition-colors"
-              style={{
-                color:
-                  pathname === href ? themeColor : "var(--muted-foreground)",
-                background:
-                  pathname === href ? "var(--muted)" : "transparent",
-              }}
-              onClick={() => setIsMenuOpen(false)}
+          className="sm:hidden border-t rounded-b-lg shadow-inner backdrop-blur-md"
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            borderColor: themeColor,
+          }}
+        >
+          <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
+            {navLinks.map(({ name, href }) => (
+              <Link
+                key={href}
+                href={href}
+                className="block px-3 py-2 rounded-md font-medium transition-colors"
+                style={{
+                  color:
+                    pathname === href ? themeColor : "var(--muted-foreground)",
+                  background:
+                    pathname === href ? "var(--muted)" : "transparent",
+                }}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {name}
+              </Link>
+            ))}
+
+            {/* Streak display (mobile) */}
+            <div className="mt-2 self-start pl-3">
+              <LoginStreakDisplay />
+            </div>
+
+            <div
+              className="pt-3 border-t"
+              style={{ borderColor: "var(--border)" }}
             >
-              {name}
-            </Link>
-          ))}
-
-          {/* Streak display (mobile) */}
-          <div className="mt-2 self-start pl-3">
-            <LoginStreakDisplay />
-          </div>
-
-          <div
-            className="pt-3 border-t"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <LoginButton />
+              <LoginButton />
+            </div>
           </div>
         </div>
-      </div>
 
       )}
     </nav>
