@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/adminDataApi";
 
 import RawTables from "@/components/admin-page/tables/tablesDashboard";
+import { fetchAllLoginStreaks } from "@/lib/api/adminDataApi";
 import FiguresDashboard from "@/components/admin-page/figures/figuresDashboard";
 import SideNavBar from "@/components/admin-page/sideNavBar";
 import Unauthorized from "@/components/admin-page/unauthorized";
@@ -22,9 +23,10 @@ export default function AdminPage() {
   const [accuracy, setAccuracy] = useState<AccuracyData[]>([]);
   const [users, setUsers] = useState<UserStats[]>([]);
   const [daily, setDaily] = useState<DailyStats[]>([]);
+  const [streaks, setStreaks] = useState<{ email: string; login_count: number }[]>([]);
   const [sets, setSets] = useState<SetData[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -40,17 +42,19 @@ export default function AdminPage() {
 
     async function loadData() {
       setLoading(true);
-      const [accuracyData, userData, dailyData, setsData] = await Promise.all([
+      const [accuracyData, userData, dailyData, setsData, streakData] = await Promise.all([
         fetchAccuracyData(),
         fetchUserStats(),
         fetchDailyStats(),
         fetchSets(),
+        fetchAllLoginStreaks(), // New
       ]);
 
       setAccuracy(accuracyData.sets || []);
       setUsers(userData.users || []);
       setDaily(dailyData.days || []);
       setSets(setsData.sets || []);
+      setStreaks(streakData.data || []); // New
       setLoading(false);
     }
 
@@ -106,6 +110,7 @@ export default function AdminPage() {
             starts={starts}
             totals={totals}
             userStats={userStats}
+            streaks={streaks}
           />
         ) : (
           <RawTables
@@ -113,6 +118,7 @@ export default function AdminPage() {
             usersData={users}
             dailydata={daily}
             setsData={sets}
+            streaksData={streaks}
           />
         )}
       </div>
