@@ -24,35 +24,28 @@ export default function AboutPage() {
   const themeColor = useThemeAccentColor();
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-24 space-y-36">
-      {/* HERO GRID */}
-      <section className="grid grid-cols-2 gap-12 items-center scroll-mt-24">
-        {/* IMAGE with max-width */}
-        <div className="relative w-full aspect-square max-w-[400px] mx-auto">
-          <Image
-            src="/heros/about_hero_graphic.png"
-            alt="Chess tactic diagram"
-            fill
-            className="object-contain rounded-2xl shadow-lg border border-border"
-            priority
-          />
-        </div>
+    <div className="max-w-6xl mx-auto px-8 mt-12 ">
+      {/* TITLE + TAGLINE */}
+      <div className="flex flex-col items-center text-center space-y-6">
+        <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-12">About ChessPecker</h1>
 
-        {/* TITLE + TAGLINE */}
-        <div className="space-y-6 pl-4">
-          <h1 className="text-5xl font-bold leading-tight">
-            About ChessPecker
-          </h1>
-          <p className="text-muted-foreground text-2xl leading-relaxed">
-            Master tactics. Train smarter. Win faster.
-          </p>
-        </div>
-      </section>
+      </div>
+
+      {/* IMAGE with max-width */}
+      <div className="relative w-full aspect-square max-w-[400px] mx-auto">
+        <Image
+          src="/heros/table_study.png"
+          alt="Chess tactic diagram"
+          fill
+          className="object-contain  shadow-lg "
+          priority
+        />
+      </div>
 
       {/* WOODPECKER METHOD */}
-      <section className="space-y-20 scroll-mt-24">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold text-primary">
+      <section className="mt-12 ">
+        <div className="mb-8 md:mb-20 text-center space-y-4">
+          <h2 className="text-2xl md:text-3xl italic text-primary">
             What is the Woodpecker Method?
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
