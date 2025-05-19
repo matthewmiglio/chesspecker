@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [daily, setDaily] = useState<DailyStats[]>([]);
   const [sets, setSets] = useState<SetData[]>([]);
   const [loading, setLoading] = useState(true);
+  
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 

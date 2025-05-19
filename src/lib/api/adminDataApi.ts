@@ -21,3 +21,8 @@ export async function fetchSets() {
   const res = await fetch("/api/sets/getAll");
   return res.json();
 }
+
+export async function fetchAllLoginStreaks() {
+  const res = await fetch("/api/login_streak/getAll");
+  return res.json();
+}
