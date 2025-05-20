@@ -19,9 +19,9 @@ async function postTo(endpoint: string, email: string): Promise<boolean> {
 }
 
 // New helper for endpoints requiring extra parameters
-async function postToWithPayload(
+async function postToWithPayload<T extends Record<string, unknown>>(
   endpoint: string,
-  payload: Record<string, any>
+  payload: T
 ): Promise<boolean> {
   try {
     const res = await fetch(`${BASE}/${endpoint}`, {
@@ -37,6 +37,7 @@ async function postToWithPayload(
     return false;
   }
 }
+
 
 export const incrementUserCorrect = (email: string) =>
   postTo("incrementCorrectPuzzles", email);
