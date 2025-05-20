@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
 
-import { incrementUserSetCreate } from "@/lib/api/userStatsApi";
+import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
 import {
   incrementSetCreate,
@@ -238,6 +238,7 @@ export default function CreatePuzzleSetPage() {
     incrementSetCreate();
     incrementPuzzleRequest(setSize);
     incrementUserSetCreate(email);
+    incrementUserPuzzleRequests(email, setSize);
 
     await addNewSetToDatabase(
       email,
