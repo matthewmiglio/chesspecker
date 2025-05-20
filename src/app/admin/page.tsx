@@ -15,13 +15,13 @@ import SideNavBar from "@/components/admin-page/sideNavBar";
 import Unauthorized from "@/components/admin-page/unauthorized";
 import { useSession } from "next-auth/react";
 
-import { AccuracyData, DailyStats, SetData, UserStats } from "@/lib/types";
+import { AccuracyData, DailyStats, SetData, UserTableUser } from "@/lib/types";
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState<"figures" | "tables">("figures");
   const [accuracy, setAccuracy] = useState<AccuracyData[]>([]);
-  const [users, setUsers] = useState<UserStats[]>([]);
+  const [users, setUsers] = useState<UserTableUser[]>([]);
   const [daily, setDaily] = useState<DailyStats[]>([]);
   const [streaks, setStreaks] = useState<{ email: string; login_count: number }[]>([]);
   const [sets, setSets] = useState<SetData[]>([]);

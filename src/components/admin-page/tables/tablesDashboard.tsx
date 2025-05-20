@@ -9,7 +9,7 @@ import StreaksTable from "@/components/admin-page/tables/StreaksTable";
 import { Streak } from "@/lib/types";
 
 
-type User = {
+type UserTableUser = {
   email: string;
   created_at: string;
   puzzle_starts: number;
@@ -17,6 +17,7 @@ type User = {
   incorrect_puzzles: number;
   set_creates: number;
   hints: number;
+  puzzle_requests: number;
 };
 
 type SetData = {
@@ -47,7 +48,7 @@ type AccuracyData = {
 
 type RawTablesProps = {
   accuracyData: AccuracyData[];
-  usersData: User[];
+  usersData: UserTableUser[];
   dailydata: DailyStats[];
   setsData: SetData[];
   streaksData: Streak[];

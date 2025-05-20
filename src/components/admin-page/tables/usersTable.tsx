@@ -11,6 +11,7 @@ type User = {
   incorrect_puzzles: number;
   set_creates: number;
   hints: number;
+  puzzle_requests: number;
 };
 
 export default function UsersTable({ data }: { data: User[] }) {
@@ -26,6 +27,7 @@ export default function UsersTable({ data }: { data: User[] }) {
             <th className="p-3">Incorrect</th>
             <th className="p-3">Creates</th>
             <th className="p-3">Hints</th>
+            <th className="p-3">Puzzle Requests</th>
           </tr>
         </thead>
         <tbody>
@@ -38,6 +40,7 @@ export default function UsersTable({ data }: { data: User[] }) {
               <td className="p-3">{user.incorrect_puzzles}</td>
               <td className="p-3">{user.set_creates}</td>
               <td className="p-3">{user.hints}</td>
+              <td className="p-3">{user.puzzle_requests}</td>
             </tr>
           ))}
         </tbody>

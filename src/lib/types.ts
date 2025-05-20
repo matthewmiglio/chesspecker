@@ -14,7 +14,7 @@ export type AccuracyData = {
   incorrect: number;
 };
 
-export type UserStats = {
+export type UserTableUser = {
   email: string;
   created_at: string;
   puzzle_starts: number;
@@ -22,6 +22,7 @@ export type UserStats = {
   incorrect_puzzles: number;
   set_creates: number;
   hints: number;
+  puzzle_requests: number;
 };
 
 export type DailyStats = {
