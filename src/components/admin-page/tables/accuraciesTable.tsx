@@ -37,14 +37,15 @@ export default function AccuraciesTable({ data }: { data: AccuracyData[] }) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300">
-      <table className="min-w-full text-sm text-left">
+      <table className="w-full table-fixed text-[8px] sm:text-xs text-left">
+
         <thead className="bg-gray-100 text-gray-800 font-semibold">
           <tr>
             {headers.map(({ key, label }) => (
               <th
                 key={key}
                 onClick={() => requestSort(key)}
-                className="p-3 cursor-pointer select-none"
+                className="p-1 truncate whitespace-nowrap overflow-hidden"
               >
                 {label}
                 {sortConfig?.key === key && (
@@ -56,12 +57,12 @@ export default function AccuraciesTable({ data }: { data: AccuracyData[] }) {
         </thead>
         <tbody>
           {sortedData.map((item, idx) => (
-            <tr key={idx} className="border-t border-gray-200 hover:bg-gray-50">
-              <td className="p-3">{item.set_id}</td>
-              <td className="p-3">{item.repeat_index}</td>
-              <td className="p-3">{item.correct}</td>
-              <td className="p-3">{item.incorrect}</td>
-              <td className="p-3">{item.accuracy}</td>
+            <tr key={idx} className="border-t border-gray-200">
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{item.set_id}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{item.repeat_index}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{item.correct}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{item.incorrect}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{item.accuracy}</td>
             </tr>
           ))}
         </tbody>

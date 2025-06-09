@@ -31,14 +31,15 @@ export default function SetsTable({ data }: { data: SetData[] }) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300">
-      <table className="min-w-full text-sm text-left">
+      <table className="w-full table-fixed text-[8px] sm:text-xs text-left">
+
         <thead className="bg-gray-100 text-gray-800 font-semibold">
           <tr>
             {headers.map(({ key, label }) => (
               <th
                 key={key}
                 onClick={() => requestSort(key)}
-                className="p-3 cursor-pointer select-none"
+                className="p-1 truncate whitespace-nowrap overflow-hidden"
               >
                 {label}
                 {sortConfig?.key === key && (
@@ -50,14 +51,16 @@ export default function SetsTable({ data }: { data: SetData[] }) {
         </thead>
         <tbody>
           {sortedData.map((set, idx) => (
-            <tr key={idx} className="border-t border-gray-200 hover:bg-gray-50">
-              <td className="p-3">{set.set_id}</td>
-              <td className="p-3">{set.name}</td>
-              <td className="p-3">{set.email}</td>
-              <td className="p-3">{set.elo}</td>
-              <td className="p-3">{set.size}</td>
-              <td className="p-3">{set.repeats}</td>
-              <td className="p-3">
+            <tr key={idx} className="border-t border-gray-200">
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.set_id}</td>
+              {/* <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.name}</td> */}
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.name.length > 10 ? set.name.slice(0, 10)  : set.name}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.email.length > 10 ? set.email.slice(0, 10)  : set.email}</td>
+
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.elo}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.size}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{set.repeats}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">
                 {new Date(set.create_time).toLocaleDateString()}
               </td>
             </tr>

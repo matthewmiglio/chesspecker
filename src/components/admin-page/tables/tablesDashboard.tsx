@@ -72,29 +72,40 @@ export default function RawTables({
       </TabsList>
 
       <TabsContent value="accuracies">
-        <h2 className="text-xl font-semibold mb-2">Accuracy Data</h2>
-        <AccuraciesTable data={accuracyData} />
-      </TabsContent>
+  <div className="w-full max-w-[420px] mx-auto px-2">
+    <h2 className="text-xl font-semibold mb-2">Accuracy Data</h2>
+    <AccuraciesTable data={accuracyData} />
+  </div>
+</TabsContent>
 
-      <TabsContent value="streaks">
-        <h2 className="text-xl font-semibold mb-2">Login Streaks</h2>
-        <StreaksTable data={streaksData} />
-      </TabsContent>
+<TabsContent value="streaks">
+  <div className="w-full max-w-[420px] mx-auto px-2">
+    <h2 className="text-xl font-semibold mb-2">Login Streaks</h2>
+    <StreaksTable data={streaksData} />
+  </div>
+</TabsContent>
 
-      <TabsContent value="users">
-        <h2 className="text-xl font-semibold mb-2">Users</h2>
-        <UsersTable data={usersData} />
-      </TabsContent>
+<TabsContent value="users">
+  <div className="w-full max-w-[420px] mx-auto px-2">
+    <h2 className="text-xl font-semibold mb-2">Users</h2>
+    <UsersTable data={usersData} />
+  </div>
+</TabsContent>
 
-      <TabsContent value="daily">
-        <h2 className="text-xl font-semibold mb-2">Daily Stats</h2>
-        <DailyStatsTable data={dailydata} />
-      </TabsContent>
+<TabsContent value="daily">
+  <div className="w-full max-w-[420px] mx-auto px-2">
+    <h2 className="text-xl font-semibold mb-2">Daily Stats</h2>
+    <DailyStatsTable data={dailydata} />
+  </div>
+</TabsContent>
 
-      <TabsContent value="sets">
-        <h2 className="text-xl font-semibold mb-2">Sets</h2>
-        <SetsTable data={setsData} />
-      </TabsContent>
+<TabsContent value="sets">
+  <div className="w-full max-w-[420px] mx-auto px-2">
+    <h2 className="text-xl font-semibold mb-2">Sets</h2>
+    <SetsTable data={setsData} />
+  </div>
+</TabsContent>
+
     </Tabs>
   );
 }

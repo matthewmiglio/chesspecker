@@ -33,14 +33,15 @@ export default function UsersTable({ data }: { data: User[] }) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300">
-      <table className="min-w-full text-sm text-left">
+      <table className="w-full table-fixed text-[8px] sm:text-xs text-left">
+
         <thead className="bg-gray-100 text-gray-800 font-semibold">
           <tr>
             {headers.map(({ key, label }) => (
               <th
                 key={key}
                 onClick={() => requestSort(key)}
-                className="p-3 cursor-pointer select-none"
+                className="p-1 truncate whitespace-nowrap overflow-hidden"
               >
                 {label}
                 {sortConfig?.key === key && (
@@ -52,15 +53,16 @@ export default function UsersTable({ data }: { data: User[] }) {
         </thead>
         <tbody>
           {sortedData.map((user, idx) => (
-            <tr key={idx} className="border-t border-gray-200 hover:bg-gray-50">
-              <td className="p-3">{user.email}</td>
-              <td className="p-3">{new Date(user.created_at).toLocaleDateString()}</td>
-              <td className="p-3">{user.puzzle_starts}</td>
-              <td className="p-3">{user.correct_puzzles}</td>
-              <td className="p-3">{user.incorrect_puzzles}</td>
-              <td className="p-3">{user.set_creates}</td>
-              <td className="p-3">{user.hints}</td>
-              <td className="p-3">{user.puzzle_requests}</td>
+            <tr key={idx} className="border-t border-gray-200">
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.email.length > 10 ? user.email.slice(0, 10)  : user.email}</td>
+
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{new Date(user.created_at).toLocaleDateString()}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.puzzle_starts}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.correct_puzzles}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.incorrect_puzzles}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.set_creates}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.hints}</td>
+              <td className="p-1 truncate whitespace-nowrap overflow-hidden">{user.puzzle_requests}</td>
             </tr>
           ))}
         </tbody>
