@@ -1,11 +1,9 @@
-// src/lib/hooks/useSortableTable.ts
-
 import { useState, useMemo } from "react";
 
 type SortDirection = "asc" | "desc";
 type SortConfig<T> = { key: keyof T; direction: SortDirection } | null;
 
-export function useSortableTable<T>(data: T[]) {
+export function useSortableTable<T extends Record<string, unknown>>(data: T[]) {
   const [sortConfig, setSortConfig] = useState<SortConfig<T>>(null);
 
   const sortedData = useMemo(() => {
@@ -17,14 +15,30 @@ export function useSortableTable<T>(data: T[]) {
       const valA = a[key];
       const valB = b[key];
 
-      const isPercent = typeof valA === "string" && valA.toString().endsWith("%");
-      const isDate = typeof valA === "string" && Date.parse(valA);
+      const isPercent =
+        typeof valA === "string" && valA.trim().endsWith("%");
+      const isDate =
+        typeof valA === "string" && !isNaN(Date.parse(valA));
 
-      const parse = (val: any) => {
-        if (isPercent) return parseFloat(val.toString().replace("%", ""));
-        if (isDate && !isNaN(Date.parse(val))) return new Date(val).getTime();
-        if (!isNaN(Number(val))) return Number(val);
-        return val?.toString().toLowerCase() ?? "";
+      const parse = (val: unknown): number | string => {
+        if (typeof val === "string") {
+          if (val.trim().endsWith("%")) {
+            return parseFloat(val.replace("%", ""));
+          }
+          if (!isNaN(Date.parse(val))) {
+            return new Date(val).getTime();
+          }
+          if (!isNaN(Number(val))) {
+            return Number(val);
+          }
+          return val.toLowerCase();
+        }
+
+        if (typeof val === "number") {
+          return val;
+        }
+
+        return ""; // fallback for undefined/null/other types
       };
 
       const aParsed = parse(valA);
