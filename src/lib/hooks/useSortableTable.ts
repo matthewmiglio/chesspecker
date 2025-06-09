@@ -15,10 +15,7 @@ export function useSortableTable<T extends Record<string, unknown>>(data: T[]) {
       const valA = a[key];
       const valB = b[key];
 
-      const isPercent =
-        typeof valA === "string" && valA.trim().endsWith("%");
-      const isDate =
-        typeof valA === "string" && !isNaN(Date.parse(valA));
+
 
       const parse = (val: unknown): number | string => {
         if (typeof val === "string") {
