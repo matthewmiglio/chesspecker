@@ -1,13 +1,9 @@
-import CumulativeUsersOverTime from "./CumulativeUsersOverTime"; // Import the new chart
+import CumulativeUsersOverTime from "./CumulativeUsersOverTime"; 
 import { TimeSeriesPoint } from "@/lib/types";
-import { CreatesOverTime } from "./CreatesOverTime";
-import { PuzzlesOverTime } from "./PuzzlesOverTime";
-import { RequestsOverTime } from "./RequestsOverTime";
-import { StartsOverTime } from "./StartsOverTime";
 import { CurrentTotals } from "./CurrentTotals";
 import StreaksBarGraph from "./StreaksBarGraph";
 import { Streak } from "@/lib/types";
-
+import { CombinedLineGraph } from "./CombinedLineGraph";
 
 
 export default function FiguresDashboard({
@@ -30,12 +26,14 @@ export default function FiguresDashboard({
   return (
     <div className="space-y-6">
       <CurrentTotals totals={totals} />
-      <CreatesOverTime data={creates} />
-      <PuzzlesOverTime data={puzzles} />
-      <RequestsOverTime data={requests} />
-      <StartsOverTime data={starts} />
+      <CombinedLineGraph
+        creates={creates}
+        puzzles={puzzles}
+        requests={requests}
+        starts={starts}
+      />
       <CumulativeUsersOverTime userStats={userStats} />
-      <StreaksBarGraph data={streaks} /> {/* New figure */}
+      <StreaksBarGraph data={streaks} />
     </div>
   );
 }
