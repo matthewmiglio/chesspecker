@@ -16,8 +16,9 @@ export default function StreaksTable({ data }: { data: Streak[] }) {
   ];
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-300">
-      <table className="w-full table-fixed text-[8px] sm:text-xs text-left">
+<div className="overflow-x-auto rounded-lg border border-gray-300 w-full">
+      <table className="w-full table-auto text-xs sm:text-[10px] md:text-sm text-left">
+
 
         <thead className="bg-gray-100 text-gray-800 font-semibold">
           <tr>
