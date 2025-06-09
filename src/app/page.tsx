@@ -14,7 +14,6 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
   const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
-  const [loginStreak, setLoginStreak] = useState(0);
   const { data: session, status } = useSession();
   useEffect(() => {
   const run = async () => {
@@ -39,7 +38,6 @@ export default function Home() {
         }
 
         streak = result.login_count;
-        setLoginStreak(streak);
         console.log("Login streak count:", streak);
       } catch (err) {
         console.error("Error fetching login streak:", err);
