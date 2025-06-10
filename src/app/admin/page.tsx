@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import {
   fetchAccuracyData,
   fetchUserStats,
@@ -14,19 +15,28 @@ import FiguresDashboard from "@/components/admin-page/figures/figuresDashboard";
 import SideNavBar from "@/components/admin-page/sideNavBar";
 import Unauthorized from "@/components/admin-page/unauthorized";
 import { useSession } from "next-auth/react";
+import FeedbackTable from "@/components/admin-page/tables/FeedbackTable";
 
 import { AccuracyData, DailyStats, SetData, UserTableUser } from "@/lib/types";
+import { fetchAllFeedback } from "@/lib/api/feedbackApi"; // ✅ add this impo
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<"figures" | "tables">("figures");
+  const [activeTab, setActiveTab] = useState<"figures" | "tables" | "feedback">(
+    "figures"
+  );
+
   const [accuracy, setAccuracy] = useState<AccuracyData[]>([]);
   const [users, setUsers] = useState<UserTableUser[]>([]);
   const [daily, setDaily] = useState<DailyStats[]>([]);
-  const [streaks, setStreaks] = useState<{ email: string; login_count: number }[]>([]);
+  const [streaks, setStreaks] = useState<
+    { email: string; login_count: number }[]
+  >([]);
   const [sets, setSets] = useState<SetData[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [feedback, setFeedback] = useState<
+    { email:string, text:string, timestamp:string }[]
+  >([]);
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -42,19 +52,29 @@ export default function AdminPage() {
 
     async function loadData() {
       setLoading(true);
-      const [accuracyData, userData, dailyData, setsData, streakData] = await Promise.all([
+      const [
+        accuracyData,
+        userData,
+        dailyData,
+        setsData,
+        streakData,
+        feedbackData,
+      ] = await Promise.all([
         fetchAccuracyData(),
         fetchUserStats(),
         fetchDailyStats(),
         fetchSets(),
-        fetchAllLoginStreaks(), // New
+        fetchAllLoginStreaks(),
+        fetchAllFeedback(),
       ]);
 
       setAccuracy(accuracyData.sets || []);
       setUsers(userData.users || []);
       setDaily(dailyData.days || []);
       setSets(setsData.sets || []);
-      setStreaks(streakData.data || []); // New
+      setStreaks(streakData.data || []);
+      setFeedback(feedbackData || []);
+      console.log("Feedback data loaded:", feedbackData);
       setLoading(false);
     }
 
@@ -112,7 +132,7 @@ export default function AdminPage() {
             userStats={userStats}
             streaks={streaks}
           />
-        ) : (
+        ) : activeTab === "tables" ? (
           <RawTables
             accuracyData={accuracy}
             usersData={users}
@@ -120,6 +140,8 @@ export default function AdminPage() {
             setsData={sets}
             streaksData={streaks}
           />
+        ) : (
+          <FeedbackTable feedback={feedback} /> // ✅ new tab
         )}
       </div>
     </div>
