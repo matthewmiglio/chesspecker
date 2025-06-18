@@ -26,8 +26,7 @@ Chess.js (Chess engine logic)
 react-chessboard (interactive board UI)
 Recharts (statistics & graphs)
 Lichess API (live puzzles source)
-Framer Motion (animations) (optional, if you add more animated effects later)
-Custom-built API routes (/api) for database operations and Lichess fetches
+Framer Motion (animations)
 
 ## 📦 Getting Started
 
