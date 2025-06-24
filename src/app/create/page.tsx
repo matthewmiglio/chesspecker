@@ -16,7 +16,7 @@ import {
 } from "@/lib/api/dailyStatsApi";
 
 export default function CreatePuzzleSetPage() {
-  const maxSetSize = 200;
+  const maxSetSize = 500;
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user?.email;
 

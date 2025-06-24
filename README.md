@@ -3,6 +3,8 @@
 **Assemble. Practice. Repeat. Share.**  
 A modern platform for chess enthusiasts to build and solve custom puzzle sets.
 
+![image](https://github.com/user-attachments/assets/d598132a-8822-4e43-b0c2-5cd7e64e8dd8)
+
 
 ## 🚀 What is Chesspecker?
 
@@ -24,8 +26,7 @@ Chess.js (Chess engine logic)
 react-chessboard (interactive board UI)
 Recharts (statistics & graphs)
 Lichess API (live puzzles source)
-Framer Motion (animations) (optional, if you add more animated effects later)
-Custom-built API routes (/api) for database operations and Lichess fetches
+Framer Motion (animations)
 
 ## 📦 Getting Started
 
