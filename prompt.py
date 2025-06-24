@@ -1,7 +1,6 @@
 import os
 
 import pyperclip
-from regex import R
 
 
 def generate_copy_string(
@@ -84,13 +83,13 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r'H:\my_files\my_programs\chesspecker\src\app\puzzles\page.tsx',
-        r'H:\my_files\my_programs\chesspecker\src\app\dashboard\page.tsx',
-        r'H:\my_files\my_programs\chesspecker\src\app\create\page.tsx',
-        r'H:\my_files\my_programs\chesspecker\src\app\contact\page.tsx',
-        r'H:\my_files\my_programs\chesspecker\src\app\admin\page.tsx',
-        r'H:\my_files\my_programs\chesspecker\src\app\about\page.tsx',
-
+        r"H:\my_files\my_programs\kinivi_gesture_train\inference-lite\keypoint_classification.py",
+        r"H:\my_files\my_programs\kinivi_gesture_train\inference-lite\point_history_clasisfication.py",
+        r"H:\my_files\my_programs\kinivi_gesture_train\test-kinivi-gesture\camera_prediction.py",
+        r"H:\my_files\my_programs\kinivi_gesture_train\test-kinivi-gesture\storage_prediction.py",
+        r"H:\my_files\my_programs\kinivi_gesture_train\train-keypoint-classifier\train.py",
+        r"H:\my_files\my_programs\kinivi_gesture_train\train-point-history-classifier\add_point_history_data.ipynb",
+        r"H:\my_files\my_programs\kinivi_gesture_train\train-point-history-classifier\train.py",
     ]
 
     ignore_folders = [
