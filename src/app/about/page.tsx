@@ -56,11 +56,10 @@ export default function AboutPage() {
             is a focused chess training system built around intensive
             repetition.
           </p>
-          <div className="h-[1px] bg-border w-16 mx-auto mt-4" />
         </div>
 
         {/* STEPS GRID */}
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-10">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-10 mb-10">
           {steps.map((step, idx) => (
             <div
               key={idx}
@@ -83,7 +82,7 @@ export default function AboutPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-border pt-6 text-center text-sm text-muted-foreground">
+      <footer className=" pt-6 text-center text-sm text-muted-foreground">
         Built by a solo dev who loves chess—and hates fluff.
       </footer>
     </div>
