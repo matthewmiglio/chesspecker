@@ -104,7 +104,15 @@ export const CombinedLineGraph = ({
           />
           <YAxis allowDecimals={false} width={30} />
 
-          <Tooltip />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #ccc',
+            }}
+            labelStyle={{ color: 'grey' }}
+          />
+
           <Legend />
           {Object.entries(visible).map(
             ([key, show]) =>

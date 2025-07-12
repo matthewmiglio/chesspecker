@@ -28,7 +28,7 @@ const CustomTooltip = ({
 
   return (
     <div className="bg-gray-900 text-white text-sm p-2 rounded shadow-md">
-      <p className="text-xs text-gray-400">{label}</p>
+      <p className="text-xs text-gray-900">{label}</p>
       <p className="font-semibold text-violet-300">
         {payload[0].name} : {payload[0].value}
       </p>
