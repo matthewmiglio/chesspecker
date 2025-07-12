@@ -50,7 +50,10 @@ const CumulativeUsersOverTime = ({
         cumulativeUsers[joinDate] = (cumulativeUsers[joinDate] || 0) + 1;
       });
 
-      const sortedDates = Object.keys(cumulativeUsers).sort();
+      const sortedDates = Object.keys(cumulativeUsers).sort(
+        (a, b) => new Date(a).getTime() - new Date(b).getTime()
+      );
+
 
       const cumulativeData: TimeSeriesPoint[] = sortedDates.map(
         (date, index) => {
@@ -75,26 +78,26 @@ const CumulativeUsersOverTime = ({
     <div className="bg-card text-card-foreground rounded-lg shadow p-4">
       <h3 className="text-lg font-semibold mb-2">Cumulative Users Over Time</h3>
       <ResponsiveContainer width="100%" height={300}>
-  <LineChart
-    data={data}
-    margin={{ top: 10, right: 20, left: 10, bottom: 10 }} // ⬅️ tighter left
-  >
-    <CartesianGrid strokeDasharray="2 2" stroke="#444" strokeWidth={0.5} />
-    <YAxis allowDecimals={false} width={30} /> {/* ⬅️ tighter axis */}
-    <XAxis
-      dataKey="day"
-      tickFormatter={(day) => new Date(day).toLocaleDateString()}
-    />
-    <Tooltip content={<CustomTooltip />} />
-    <Line
-      type="monotone"
-      dataKey="value"
-      stroke="#8884d8"
-      strokeWidth={2}
-      dot={false}
-    />
-  </LineChart>
-</ResponsiveContainer>
+        <LineChart
+          data={data}
+          margin={{ top: 10, right: 20, left: 10, bottom: 10 }} // ⬅️ tighter left
+        >
+          <CartesianGrid strokeDasharray="2 2" stroke="#444" strokeWidth={0.5} />
+          <YAxis allowDecimals={false} width={30} /> {/* ⬅️ tighter axis */}
+          <XAxis
+            dataKey="day"
+            tickFormatter={(day) => new Date(day).toLocaleDateString()}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#8884d8"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
 
     </div>
   );
