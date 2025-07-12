@@ -7,32 +7,29 @@ type FeedbackEntry = {
 };
 
 export default function FeedbackTable({ feedback }: { feedback: FeedbackEntry[] }) {
-
   return (
-    <div className="overflow-x-auto">
+    <div className="space-y-4">
       <h2 className="text-2xl font-semibold mb-4">Feedback Submissions</h2>
 
       {feedback.length === 0 ? (
         <p className="text-gray-500 italic">No feedback submitted yet.</p>
       ) : (
-        <table className="w-full table-auto border-collapse text-sm md:text-base">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="px-4 py-2 border">Email</th>
-              <th className="px-4 py-2 border">Text</th>
-              <th className="px-4 py-2 border">Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {feedback.map((f, idx) => (
-              <tr key={idx} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2 border">{f.email}</td>
-                <td className="px-4 py-2 border max-w-[200px] truncate">{f.text || "—"}</td>
-                <td className="px-4 py-2 border whitespace-pre-wrap">{f.timestamp || "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="space-y-4">
+          {feedback.map((f, idx) => (
+            <li key={idx} className="bg-gray-800 text-white rounded-lg shadow p-4">
+              {/* Header row: email + timestamp */}
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-sm break-all">{f.email}</span>
+                <span className="text-xs text-gray-400">{new Date(f.timestamp).toLocaleString()}</span>
+              </div>
+
+              {/* Body: text */}
+              <div className="text-sm whitespace-pre-wrap">
+                {f.text || <span className="italic text-gray-400">No message</span>}
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
