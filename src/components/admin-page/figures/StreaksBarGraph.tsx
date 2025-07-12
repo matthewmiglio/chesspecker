@@ -18,19 +18,18 @@ const getUsername = (email: string) =>
 const StreaksBarGraph = ({ data }: { data: Streak[] }) => {
   const sorted = [...data].sort((a, b) => b.login_count - a.login_count);
 
-  // Convert data for display
   const displayData = sorted.map((entry) => ({
     ...entry,
     email: getUsername(entry.email),
   }));
 
+  const BAR_HEIGHT = 24; // 👈 Minimum height per bar in px
+  const CHART_HEIGHT = displayData.length * BAR_HEIGHT;
+
   return (
     <div className="bg-card text-card-foreground rounded-lg shadow p-4">
       <h3 className="text-lg font-semibold mb-2">Login Streaks by User</h3>
-      <ResponsiveContainer width="100%" height={600}>
-        {
-          // Single child: <BarChart> is wrapped directly
-        }
+      <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
         <BarChart
           layout="vertical"
           data={displayData}
@@ -48,9 +47,9 @@ const StreaksBarGraph = ({ data }: { data: Streak[] }) => {
           <Bar dataKey="login_count" fill="#4f46e5" />
         </BarChart>
       </ResponsiveContainer>
-
     </div>
   );
 };
+
 
 export default StreaksBarGraph;
