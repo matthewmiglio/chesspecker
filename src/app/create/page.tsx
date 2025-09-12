@@ -45,27 +45,6 @@ export default function CreatePuzzleSetPage() {
     );
   }, [resolvedTheme]);
 
-  const createSetAccuracy = async (setId: number, repeat_index: number) => {
-    try {
-      const res = await fetch("/api/accuracy/createSetAccuracy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ set_id: setId, repeat_index: repeat_index }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create accuracy row");
-      }
-
-      return true;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      error(`Error setting up accuracy tracking: ${message}`, "Setup Failed");
-      return false;
-    }
-  };
 
   const addNewSetToDatabase = async (
     email: string,
@@ -98,7 +77,6 @@ export default function CreatePuzzleSetPage() {
 
       const response = await res.json();
       const set = response.set;
-      const setId = set.set_id;
 
       info("Setting up accuracy tracking...", undefined, 4000);
 
