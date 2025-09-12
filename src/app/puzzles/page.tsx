@@ -160,7 +160,9 @@ export default function PuzzlesPage() {
         setSetAccuracies(accuracies);
         setSetProgressMap(progressMap);
       } catch (err) {
-        // Error during fetch
+          const message = err instanceof Error ? err.message : "Unknown error";
+          console.error("Error fetching set data:", message);
+
       }
 
       setIsSetDataLoaded(true);

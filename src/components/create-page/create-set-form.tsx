@@ -6,9 +6,7 @@ import SetSizeInput from "@/components/create-page/set-size-input";
 import { Button } from "@/components/ui/button";
 import {
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import FancyNameInput from "@/components/create-page/set-name-input";
 import RepeatCountInput from "@/components/create-page/repeat-count-input";
@@ -40,9 +38,7 @@ export default function CreateSetForm({
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton} className="space-y-6">
-      {/* <CardHeader className="pb-4">
-        <CardTitle className="text-lg">New Set</CardTitle>
-      </CardHeader> */}
+     
 
       <CardContent className="mt-8 space-y-6">
         <div className="space-y-2">

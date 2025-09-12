@@ -61,6 +61,8 @@ export default function CreatePuzzleSetPage() {
 
       return true;
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      error(`Error setting up accuracy tracking: ${message}`, "Setup Failed");
       return false;
     }
   };
@@ -111,7 +113,8 @@ export default function CreatePuzzleSetPage() {
       return set;
     } catch (err) {
       setIsCreatingSet(false);
-      error("An unexpected error occurred while creating the puzzle set.", "Creation Failed");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      error(`An unexpected error occurred while creating the puzzle set: ${message}`, "Creation Failed");
       return null;
     }
   };

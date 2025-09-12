@@ -93,6 +93,8 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
         setCategory("feature");
       }
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+        setError(`Submission failed: ${message}`);
       setSubmitted({ ok: false });
     } finally {
       setSubmitting(false);

@@ -23,6 +23,8 @@ export const addIncorrectAttempt = async (
 
     return true;
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Error in addIncorrectAttempt:", message);
     return false;
   }
 };
@@ -42,6 +44,8 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
 
     return true;
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Error in addCorrectAttempt:", message);
     return false;
   }
 };
@@ -76,6 +80,9 @@ export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
 
     return { correct: data.correct, incorrect: data.incorrect };
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Error in getSetAccuracy:", message);
+
     return null;
   }
 };

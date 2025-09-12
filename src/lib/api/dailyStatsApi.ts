@@ -9,6 +9,9 @@ async function postTo(endpoint: string): Promise<boolean> {
         if (!res.ok) throw new Error(data.error || `POST to ${endpoint} failed`);
         return true;
     } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+
+        console.error(`Error in ${endpoint}:`, message);
         return false;
     }
 }
@@ -28,6 +31,8 @@ export const incrementPuzzleRequest = async (count = 1) => {
         if (!res.ok) throw new Error(data.error || "POST to addPuzzleRequest failed");
         return true;
     } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        console.error("Error in incrementPuzzleRequest:", message);
         return false;
     }
 };
@@ -40,6 +45,10 @@ export const getAllDailyStats = async () => {
         if (!res.ok) throw new Error(data.error || "Failed to fetch daily stats");
         return data.days;
     } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+
+        console.error("Error fetching daily stats:", message);
+
         return null;
     }
 };
