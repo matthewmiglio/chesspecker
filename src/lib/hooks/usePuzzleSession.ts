@@ -66,7 +66,6 @@ export function usePuzzleSession({
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
 
   const handleIncorrectMove = async () => {
-    console.log('"[handleIncorrectMove] called!");');
     const setId = getSelectedSetId();
     if (!setId) return;
     showRedX();
@@ -78,7 +77,6 @@ export function usePuzzleSession({
     incrementUserIncorrect(email); //user stats
 
     await showSolution();
-    console.log("This puzzle was unsuccessful! Waiting 3 seconds before showing feedback buttons.");
     
     // Wait 3 seconds after solution replay before showing feedback buttons
     await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -89,17 +87,11 @@ export function usePuzzleSession({
   const handleSuccessfulPuzzle = async (forceFinish = false) => {
     const setId = getSelectedSetId();
     if (!setId) {
-      console.log(
-        "[handleSuccessfulPuzzle] no selectedSetId, returning early."
-      );
       return;
     }
 
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addCorrectAttempt(setId, currentRepeatIndex);
-    console.log(
-      "[handleSuccessfulPuzzle] recorded correct attempt on server-side."
-    );
     incrementCorrect(); //total daily stats
     if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email); //user stats
@@ -108,7 +100,6 @@ export function usePuzzleSession({
   };
 
   const handleHintAssistedSolve = async () => {
-    console.log("[handleHintAssistedSolve] called!");
     const setId = getSelectedSetId();
     if (!setId) return;
     
@@ -125,7 +116,6 @@ export function usePuzzleSession({
 
     // Show solution like incorrect moves do
     await showSolution();
-    console.log("Puzzle solved with hint assistance! Waiting 3 seconds before showing feedback buttons.");
     
     // Wait 3 seconds after solution replay before showing feedback buttons
     await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -135,14 +125,10 @@ export function usePuzzleSession({
 
   const handleMove = async (move: string, isCorrect: boolean) => {
     if (!isSessionActive) {
-      console.log("[handleMove] session not active, returning early.");
       return;
     }
 
     if (!isCorrect) {
-      console.log(
-        "[handleMove] move incorrect, calling handleIncorrectMove..."
-      );
       await handleIncorrectMove();
       return;
     }
@@ -166,13 +152,10 @@ export function usePuzzleSession({
     setFen(newFen);
 
     if (newSolvedIndex - 1 === solution.length) {
-      console.log("[handleMove] Puzzle finished. Deciding outcome...");
 
       if (hintUsed) {
-        console.log("[handleMove] Hint was used, showing warning and logging as incorrect.");
         await handleHintAssistedSolve();
       } else {
-        console.log("[handleMove] No hint used, logging as correct.");
         await handleSuccessfulPuzzle(true);
       }
     }
@@ -215,20 +198,15 @@ export function usePuzzleSession({
   };
 
   const handleNextPuzzle = async (forceFinish = false) => {
-    console.log("[handleNextPuzzle] called. forceFinish:", forceFinish);
     const setId = getSelectedSetId();
     if (!setId) return;
 
     if (setIsDone(userSets, setId, currentRepeatIndex)) {
-      console.log("[handleNextPuzzle] set is fully done! showing confetti.");
       showConfetti();
       return;
     }
 
     if (!forceFinish && !puzzleIsFinished(solution.length, solvedIndex)) {
-      console.log(
-        "[handleNextPuzzle] Puzzle not finished yet, returning early."
-      );
       return;
     }
 
@@ -236,9 +214,6 @@ export function usePuzzleSession({
     let nextPuzzleIndex = currentPuzzleIndex + 1;
 
     if (nextPuzzleIndex >= puzzleIds.length) {
-      console.log(
-        "[handleNextPuzzle] No more puzzles left. Starting new repeat..."
-      );
       nextRepeatIndex += 1;
       nextPuzzleIndex = 0;
     }
@@ -251,10 +226,6 @@ export function usePuzzleSession({
     const puzzle = await getPuzzleData(nextPuzzleId);
 
     if (!puzzle) {
-      console.error(
-        "[handleNextPuzzle] Failed to load puzzle with id",
-        nextPuzzleId
-      );
       return;
     }
 
@@ -282,9 +253,6 @@ export function usePuzzleSession({
 
     await updatePuzzleProgress(setId, nextRepeatIndex, nextPuzzleIndex);
 
-    console.log(
-      "[handleNextPuzzle] Puzzle loaded and server progress updated."
-    );
   };
 
   const handleStartSession = async () => {
@@ -300,9 +268,6 @@ export function usePuzzleSession({
     }
 
     if (!setId) {
-      console.log(
-        "⚠️ [handleStartSession] No selectedSetId after waiting. Exiting early."
-      );
       return;
     }
 
@@ -310,13 +275,11 @@ export function usePuzzleSession({
   };
 
   const handleContinueToNext = async () => {
-    console.log("[handleContinueToNext] User chose to continue to next puzzle");
     setShowFeedbackButtons(false);
     await handleNextPuzzle(true);
   };
 
   const handleRetryPuzzle = async () => {
-    console.log("[handleRetryPuzzle] User chose to retry puzzle");
     setShowFeedbackButtons(false);
     // Reset puzzle to initial state
     const setId = getSelectedSetId();
@@ -326,7 +289,6 @@ export function usePuzzleSession({
     const puzzle = await getPuzzleData(nextPuzzleId);
     
     if (!puzzle) {
-      console.error("[handleRetryPuzzle] Failed to reload puzzle");
       return;
     }
 
@@ -343,7 +305,6 @@ export function usePuzzleSession({
   };
 
   const handleShowReplay = async () => {
-    console.log("[handleShowReplay] User chose to replay the solution");
     setShowFeedbackButtons(false);
     
     // Get the current puzzle data to reset to initial position
@@ -354,7 +315,6 @@ export function usePuzzleSession({
     const puzzle = await getPuzzleData(currentPuzzleId);
     
     if (!puzzle) {
-      console.error("[handleShowReplay] Failed to load puzzle");
       return;
     }
 

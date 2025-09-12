@@ -43,7 +43,6 @@ export default function AdminPage() {
   useEffect(() => {
     if (!session) return;
     if (!adminEmail) {
-      console.error("Admin email is not set in environment variables.");
       return;
     }
     if (!session.user) return;
@@ -74,7 +73,6 @@ export default function AdminPage() {
       setSets(setsData.sets || []);
       setStreaks(streakData.data || []);
       setFeedback(feedbackData || []);
-      console.log("Feedback data loaded:", feedbackData);
       setLoading(false);
     }
 

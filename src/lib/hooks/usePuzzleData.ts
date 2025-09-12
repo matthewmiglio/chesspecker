@@ -20,7 +20,6 @@ export const updateThisSetAccuracy = async (
 ) => {
   const progress = await getSetProgress(setId);
   if (!progress) {
-    console.warn("No progress found for set id:", setId);
     return;
   }
 
@@ -40,19 +39,11 @@ export const updatePuzzleProgress = async (
   repeatIndex: number,
   puzzleIndex: number
 ) => {
-  console.log("[updatePuzzleProgress] updating progress for set id:", setId);
-  console.log(
-    "[updatePuzzleProgress] setting repeatIndex:",
-    repeatIndex,
-    "puzzleIndex:",
-    puzzleIndex
-  );
 
   const { setSetProgress } = await import("@/lib/api/puzzleApi");
 
   await setSetProgress(setId, repeatIndex, puzzleIndex);
 
-  console.log("[updatePuzzleProgress] server-side progress updated.");
 };
 
 export const incrementPuzzleIndex = async (
@@ -62,7 +53,6 @@ export const incrementPuzzleIndex = async (
 ) => {
   const progress = await getSetProgress(setId);
   if (!progress) {
-    console.warn("No progress found for set id:", setId);
     return 0;
   }
 
@@ -137,14 +127,12 @@ export const handleSetSelect = async (
   const set = userSets.find((s) => s.set_id === setId);
 
   if (!set || !set.elo || !set.size || set.puzzle_index == null) {
-    console.warn("⚠️ [handleSetSelect] Invalid set data:", set);
     return;
   }
 
   const puzzleIds = set.puzzle_ids;
   setPuzzleIds(puzzleIds);
 
-  console.log(puzzleIds[set.puzzle_index]);
 
   const { getPuzzleData } = await import("@/lib/api/puzzleApi");
   const puzzle = await getPuzzleData(puzzleIds[set.puzzle_index]);
@@ -169,23 +157,17 @@ export const handleSetSelect = async (
     const turn = chess.turn();
     setPlayerSide(turn);
   } else {
-    console.warn("⚠️ [handleSetSelect] Failed to load puzzle");
     return;
   }
 
   if (preloadedSet) {
-    console.log("📌 [handleSetSelect] Using preloadedSet:", preloadedSet);
     setCurrentRepeatIndex(preloadedSet.repeat_index);
     setCurrentPuzzleIndex(preloadedSet.puzzle_index);
   } else {
-    console.log("🌐 [handleSetSelect] Fetching set progress...");
     const progress = await getSetProgress(setId);
     if (progress) {
-      console.log("📌 [handleSetSelect] Server progress:", progress);
       setCurrentRepeatIndex(progress.repeat_index);
       setCurrentPuzzleIndex(progress.puzzle_index);
-    } else {
-      console.warn("⚠️ [handleSetSelect] Failed to fetch set progress");
     }
   }
 

@@ -96,56 +96,37 @@ export default function PuzzlesPage() {
         setSelectedSetId(null);
       }
       sessionStorage.removeItem("selected_set_id");
-    } else {
-      console.error("Failed to delete set");
     }
   };
 
   useEffect(() => {
-    console.log("[PuzzlePage] authStatus:", authStatus);
-    console.log("[PuzzlePage] session:", session);
 
     const run = async () => {
       if (authStatus === "loading") {
-        console.log("[PuzzlePage] Auth is still loading — skipping...");
         return;
       }
 
       if (authStatus !== "authenticated") {
-        console.log(
-          "[PuzzlePage] User is NOT authenticated — setting isSetDataLoaded = true"
-        );
         setIsSetDataLoaded(true);
         return;
       }
 
       if (!session?.user?.email) {
-        console.error(
-          "[PuzzlePage] session.user.email is missing — setting isSetDataLoaded = true"
-        );
         setIsSetDataLoaded(true);
         return;
       }
 
-      console.log(
-        "[PuzzlePage] Authenticated, fetching data for:",
-        session.user.email
-      );
 
       try {
         const email = session.user.email;
         const sets = await getAllSetData(email);
 
         if (!sets) {
-          console.error(
-            "[PuzzlePage] Failed to fetch user sets — setting isSetDataLoaded = true"
-          );
           setIsSetDataLoaded(true);
           return;
         }
 
         setUserSets(sets);
-        console.log("[PuzzlePage] Fetched user sets:", sets);
 
         const accuracies: Record<
           number,
@@ -178,13 +159,11 @@ export default function PuzzlesPage() {
 
         setSetAccuracies(accuracies);
         setSetProgressMap(progressMap);
-        console.log("[PuzzlePage] Accuracies and progressMap set.");
       } catch (err) {
-        console.error("[PuzzlePage] Unexpected error during fetch:", err);
+        // Error during fetch
       }
 
       setIsSetDataLoaded(true);
-      console.log("[PuzzlePage] setIsSetDataLoaded(true) complete.");
     };
 
     run();
