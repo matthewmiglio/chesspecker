@@ -103,8 +103,6 @@ export default function CreatePuzzleSetPage() {
       info("Setting up accuracy tracking...", undefined, 4000);
 
       for (let i = 0; i < repeats; i++) {
-        const accuracySuccess = await createSetAccuracy(setId, i);
-        // Don't fail the whole process for accuracy setup issues
         setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
       }
 

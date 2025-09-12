@@ -117,9 +117,6 @@ export const setSetProgress = async (
     body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
   });
 
-  const result = await response.json();
-
-
   return response.ok;
 };
 
