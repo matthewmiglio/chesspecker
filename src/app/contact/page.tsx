@@ -34,6 +34,17 @@ export default function ContactPage() {
             <span className="font-medium text-foreground">Discord:</span>{" "}
             <span className="text-primary">matt03416</span>
           </div>
+          <div>
+            <span className="font-medium text-foreground">Website:</span>{" "}
+            <a
+              href="https://www.matthewmiglio.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              matthewmiglio.dev
+            </a>
+          </div>
         </CardContent>
       </Card>
     </div>

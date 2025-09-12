@@ -21,6 +21,9 @@ export default function Footer() {
           <Link href="/contact" className="hover:text-foreground">
             Developer Contact
           </Link>
+          <Link href="https://www.matthewmiglio.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+            Portfolio
+          </Link>
           <span>Last Updated: April 2025</span>
         </div>
       </div>
