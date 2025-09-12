@@ -22,6 +22,7 @@
     "chess.js": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.486.0",
     "next": "15.2.4",
     "next-auth": "^4.24.11",
