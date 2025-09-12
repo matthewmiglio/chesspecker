@@ -13,12 +13,14 @@ import {
 
 import { PuzzleSet } from "@/lib/types";
 
+
 import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
 import SetSelectTable from "@/components/puzzles/set-select-table";
 import PuzzleBoardArea from "@/components/puzzles/PuzzleBoardArea";
 import PuzzleEmptyState from "@/components/puzzles/PuzzleEmptyState";
 import PuzzlePageLoading from "@/components/puzzles/PuzzlePageSkeleton";
 import { showConfirmDeletePopup } from "@/components/puzzles/ConfirmDeletePopup";
+import FeedbackCTA from "@/components/puzzles/FeedbackCTA";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
@@ -246,6 +248,9 @@ export default function PuzzlesPage() {
       ) : (
         <PuzzlePageLoading />
       )}
+
+      <FeedbackCTA />
     </div>
+
   );
 }
