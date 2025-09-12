@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import type { Session } from "next-auth";
 import { UserProvider } from "@/lib/context/UserContext";
+import { ToastProvider } from "@/lib/context/ToastContext";
 export function Providers({
   children,
   session,
@@ -19,9 +20,10 @@ export function Providers({
       refetchOnWindowFocus={false}
     >
       <UserProvider>
-        {" "}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </ThemeProvider>
       </UserProvider>
     </SessionProvider>

@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
+import { useToast } from "@/lib/hooks/useToast";
 
 import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
@@ -19,6 +20,7 @@ export default function CreatePuzzleSetPage() {
   const maxSetSize = 500;
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user?.email;
+  const { success, error, info } = useToast();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -75,36 +77,52 @@ export default function CreatePuzzleSetPage() {
     repeats: number,
     name: string
   ) => {
-    setIsCreatingSet(true);
-    setPuzzleProgress(0);
-    setAccuracyProgress(0);
+    try {
+      setIsCreatingSet(true);
+      setPuzzleProgress(0);
+      setAccuracyProgress(0);
+      
+      info("Creating puzzle set...", "Please wait", 6000);
 
-    const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
-    const res = await fetch("/api/sets/addSet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, elo, size, repeats, name, puzzleIds }),
-    });
+      const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
+      const res = await fetch("/api/sets/addSet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, elo, size, repeats, name, puzzleIds }),
+      });
 
-    if (!res.ok) {
-      console.error("Failed to add set:", res.status);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.error || `Server error (${res.status})`;
+        error(`Failed to create puzzle set: ${errorMessage}`, "Creation Failed");
+        setIsCreatingSet(false);
+        return null;
+      }
+
+      const response = await res.json();
+      const set = response.set;
+      const setId = set.set_id;
+
+      info("Setting up accuracy tracking...", undefined, 4000);
+
+      for (let i = 0; i < repeats; i++) {
+        const accuracySuccess = await createSetAccuracy(setId, i);
+        if (!accuracySuccess) {
+          console.error("Failed to create accuracy row for repeat", i);
+          // Don't fail the whole process for accuracy setup issues
+        }
+        setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
+      }
+
       setIsCreatingSet(false);
+      success(`"${name}" created successfully!`, "Puzzle Set Ready");
+      return set;
+    } catch (err) {
+      setIsCreatingSet(false);
+      error("An unexpected error occurred while creating the puzzle set.", "Creation Failed");
+      console.error("Error in addNewSetToDatabase:", err);
       return null;
     }
-
-    const response = await res.json();
-    const set = response.set;
-    const setId = set.set_id;
-
-    for (let i = 0; i < repeats; i++) {
-      const success = await createSetAccuracy(setId, i);
-      if (!success) {
-        console.error("Failed to create accuracy row for repeat", i);
-      }
-      setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
-    }
-
-    setIsCreatingSet(false);
   };
 
   const createNewPuzzle = async (difficulty: string) => {
@@ -219,28 +237,33 @@ export default function CreatePuzzleSetPage() {
   };
 
   const handleCreateSetButton = async (e: React.FormEvent) => {
-    console.log();
     e.preventDefault();
 
-    if (name.trim() === "" || setSize <= 0 || repeatCount <= 0) {
-      console.log("Please fill out name size and repeat count");
+    // Validation
+    if (name.trim() === "") {
+      error("Please enter a name for your puzzle set.", "Name Required");
+      return;
+    }
+
+    if (setSize <= 0 || repeatCount <= 0) {
+      error("Please ensure set size and repeat count are valid.", "Invalid Values");
       return;
     }
 
     const email = session?.user?.email;
     if (!email) {
-      console.error(
-        "Skipping handleCreateSetButton() in create set page. session?.user?.email is undefined!"
-      );
+      error("Please log in to create puzzle sets.", "Authentication Required");
       return;
     }
 
+    // Track usage statistics
     incrementSetCreate();
     incrementPuzzleRequest(setSize);
     incrementUserSetCreate(email);
     incrementUserPuzzleRequests(email, setSize);
 
-    await addNewSetToDatabase(
+    // Create the set
+    const result = await addNewSetToDatabase(
       email,
       difficultySliderValue,
       setSize,
@@ -248,7 +271,12 @@ export default function CreatePuzzleSetPage() {
       name
     );
 
-    window.location.href = "/puzzles";
+    // Only redirect if creation was successful
+    if (result) {
+      setTimeout(() => {
+        window.location.href = "/puzzles";
+      }, 1500); // Give time to see success toast
+    }
   };
 
   return (
