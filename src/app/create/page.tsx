@@ -23,7 +23,7 @@ export default function CreatePuzzleSetPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const [setSize, setSetSize] = useState<number>(100);
+  const [setSize, setSetSize] = useState<number>(200);
   const [repeatCount, setRepeatCount] = useState<number>(8);
   const [difficultySliderValue, setDifficultySliderValue] =
     useState<number>(1500);
@@ -260,6 +260,7 @@ export default function CreatePuzzleSetPage() {
           className="rounded-xl p-[2px] transition-all duration-300"
           style={{
             boxShadow: `0 0 12px ${themeColor}`,
+            border: `3px solid ${themeColor}`,
             borderRadius: "1rem",
           }}
         >

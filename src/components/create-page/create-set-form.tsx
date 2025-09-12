@@ -40,11 +40,11 @@ export default function CreateSetForm({
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton} className="space-y-6">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Puzzle Set Details</CardTitle>
-      </CardHeader>
+      {/* <CardHeader className="pb-4">
+        <CardTitle className="text-lg">New Set</CardTitle>
+      </CardHeader> */}
 
-      <CardContent className="space-y-6">
+      <CardContent className="mt-8 space-y-6">
         <div className="space-y-2">
 
           <FancyNameInput value={name} onChange={setName} />
