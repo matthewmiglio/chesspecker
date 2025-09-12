@@ -10,6 +10,10 @@ const supabase = createClient(
 export async function POST(req: Request) {
   const { email } = await req.json();
 
+  if (!email) {
+    return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  }
+
   const { data, error } = await supabase
     .from("PopupFlags")
     .select("*")
@@ -17,22 +21,12 @@ export async function POST(req: Request) {
     .limit(1)
     .maybeSingle();
 
-
-  console.log("[getFlag] Fetching popup flags for email:", email);
-  if (!email) {
-    console.error("[getFlag] No email provided");
-    return NextResponse.json({ error: "Email is required" }, { status: 400 });
-  }
-  if (!data) {
-    console.warn("[getFlag] No popup flags found for email:", email);
-    return NextResponse.json({ data: {} }, { status: 200 });
-  }
-  console.log("[getFlag] Popup flags data:", data);
-
-
   if (error) {
-    console.error("[getFlag] Supabase error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!data) {
+    return NextResponse.json({ data: {} }, { status: 200 });
   }
 
   return NextResponse.json({ data });

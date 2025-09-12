@@ -46,9 +46,6 @@ export default function CreatePuzzleSetPage() {
   }, [resolvedTheme]);
 
   const createSetAccuracy = async (setId: number, repeat_index: number) => {
-    console.log("createSetAccuracy()");
-    console.log("setId", setId);
-
     try {
       const res = await fetch("/api/accuracy/createSetAccuracy", {
         method: "POST",
@@ -62,10 +59,8 @@ export default function CreatePuzzleSetPage() {
         throw new Error(data.error || "Failed to create accuracy row");
       }
 
-      console.log(`Created accuracy row for set ${setId}`);
       return true;
     } catch (err) {
-      console.error("Error creating accuracy row:", err);
       return false;
     }
   };
@@ -107,10 +102,7 @@ export default function CreatePuzzleSetPage() {
 
       for (let i = 0; i < repeats; i++) {
         const accuracySuccess = await createSetAccuracy(setId, i);
-        if (!accuracySuccess) {
-          console.error("Failed to create accuracy row for repeat", i);
-          // Don't fail the whole process for accuracy setup issues
-        }
+        // Don't fail the whole process for accuracy setup issues
         setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
       }
 
@@ -120,7 +112,6 @@ export default function CreatePuzzleSetPage() {
     } catch (err) {
       setIsCreatingSet(false);
       error("An unexpected error occurred while creating the puzzle set.", "Creation Failed");
-      console.error("Error in addNewSetToDatabase:", err);
       return null;
     }
   };
@@ -158,7 +149,6 @@ export default function CreatePuzzleSetPage() {
     const difficulties = Object.keys(difficultyEloMap);
 
     if (puzzle_count > maxSetSize) {
-      console.log("⚠️ Requested set size exceeds max. Capping to", maxSetSize);
       puzzle_count = maxSetSize;
     }
 
@@ -176,10 +166,6 @@ export default function CreatePuzzleSetPage() {
     const difficultyCounts: Record<string, number> = {};
     let totalElo = 0;
 
-    console.log("🔧 Starting puzzle generation...");
-    console.log(`🎯 Target average ELO: ${targetElo}`);
-    console.log(`📦 Total puzzles to generate: ${puzzle_count}`);
-
     while (puzzleIds.size < puzzle_count) {
       const currentAvg = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
 
@@ -187,27 +173,15 @@ export default function CreatePuzzleSetPage() {
         currentAvg >= targetElo ? easierDifficulties : harderDifficulties;
 
       if (pool.length === 0) {
-        console.warn("⚠️ No suitable difficulty options based on target ELO.");
         break;
       }
 
       const selectedDifficulty = getRandom(pool);
 
-      console.log(
-        `➕ Adding puzzle ${
-          puzzleIds.size + 1
-        } of ${puzzle_count} — Chose "${selectedDifficulty}" (current avg: ${currentAvg.toFixed(
-          2
-        )})`
-      );
-
       const puzzle = await createNewPuzzle(selectedDifficulty);
       const puzzleId = puzzle.puzzle.id;
 
       if (puzzleIds.has(puzzleId)) {
-        console.log(
-          `♻️ Duplicate detected for difficulty "${selectedDifficulty}". Retrying...`
-        );
         continue;
       }
 
@@ -218,21 +192,8 @@ export default function CreatePuzzleSetPage() {
       onProgress(Math.floor((puzzleIds.size / puzzle_count) * 100));
     }
 
-    const finalAvg = totalElo / puzzleIds.size;
-
-    console.log("\n✅ Puzzle generation complete!");
-    console.log(`🎯 Target average ELO: ${targetElo}`);
-    console.log("📈 Final Average ELO:", finalAvg.toFixed(2));
-    console.log("📊 Difficulty Breakdown:");
-    for (const diff of difficulties) {
-      const count = difficultyCounts[diff] || 0;
-      console.log(`   • ${diff.padEnd(8)}: ${count} puzzle(s)`);
-    }
-
     const allPuzzleIds = Array.from(puzzleIds);
     const shuffledPuzzleIds = shuffleStringList(allPuzzleIds);
-    console.log("All puzzle IDs:", allPuzzleIds);
-    console.log("Shuffled puzzle IDs:", shuffledPuzzleIds);
     return shuffledPuzzleIds;
   };
 

@@ -11,7 +11,6 @@ export async function GET() {
   const { data, error } = await supabase.from("PopupFlags").select("*");
 
   if (error) {
-    console.error("[getAll PopupFlags] Supabase error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

@@ -16,7 +16,6 @@ export async function POST(req: Request) {
     .eq("email", email);
 
   if (error) {
-    console.error("[setFlag] Supabase error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

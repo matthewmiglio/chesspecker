@@ -9,7 +9,6 @@ async function postTo(endpoint: string): Promise<boolean> {
         if (!res.ok) throw new Error(data.error || `POST to ${endpoint} failed`);
         return true;
     } catch (err) {
-        console.error(`[dailyStatsApi] ${endpoint} error:`, err);
         return false;
     }
 }
@@ -29,7 +28,6 @@ export const incrementPuzzleRequest = async (count = 1) => {
         if (!res.ok) throw new Error(data.error || "POST to addPuzzleRequest failed");
         return true;
     } catch (err) {
-        console.error(`[dailyStatsApi] addPuzzleRequest error:`, err);
         return false;
     }
 };
@@ -42,7 +40,6 @@ export const getAllDailyStats = async () => {
         if (!res.ok) throw new Error(data.error || "Failed to fetch daily stats");
         return data.days;
     } catch (err) {
-        console.error("[dailyStatsApi] getAllDailyStats error:", err);
         return null;
     }
 };

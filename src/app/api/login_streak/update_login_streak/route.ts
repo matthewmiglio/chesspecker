@@ -19,7 +19,6 @@ export async function POST(req: Request) {
     .single();
 
   if (error && error.code !== "PGRST116") {
-    console.error("[update_login_streak] fetch error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
@@ -31,7 +30,6 @@ export async function POST(req: Request) {
       login_count: 1,
     });
     if (insertError) {
-      console.error("[update_login_streak] insert error:", insertError.message);
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
     return NextResponse.json({ login_count: 1 });
@@ -63,7 +61,6 @@ export async function POST(req: Request) {
     .eq("email", email);
 
   if (updateError) {
-    console.error("[update_login_streak] update error:", updateError.message);
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 

@@ -23,20 +23,12 @@ export const addIncorrectAttempt = async (
 
     return true;
   } catch (err) {
-    console.error("Error adding incorrect attempt:", err);
     return false;
   }
 };
 
 export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
   try {
-    console.log(
-      "[addCorrectAttempt] called with setId:",
-      setId,
-      "repeatIndex:",
-      repeatIndex
-    );
-    console.log("");
 
     const res = await fetch("/api/accuracy/addCorrect", {
       method: "POST",
@@ -50,7 +42,6 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
 
     return true;
   } catch (err) {
-    console.error("Error adding correct attempt:", err);
     return false;
   }
 };
@@ -85,7 +76,6 @@ export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
 
     return { correct: data.correct, incorrect: data.incorrect };
   } catch (err) {
-    console.error("Error fetching set accuracy:", err);
     return null;
   }
 };
@@ -113,11 +103,6 @@ export const setSetProgress = async (
   repeat_index: number,
   puzzle_index: number
 ) => {
-  console.log("🛰️ [setSetProgress] Sending to API:", {
-    set_id,
-    repeat_index,
-    puzzle_index,
-  });
 
   const response = await fetch("/api/sets/updateSetProgressStats", {
     method: "POST",
@@ -127,11 +112,6 @@ export const setSetProgress = async (
 
   const result = await response.json();
 
-  if (!response.ok) {
-    console.error("❌ [setSetProgress] API failed:", result.error);
-  } else {
-    console.log("✅ [setSetProgress] API success:", result.message);
-  }
 
   return response.ok;
 };
@@ -141,13 +121,10 @@ export const handleSetDelete = async (
   setUserSets: React.Dispatch<React.SetStateAction<PuzzleSet[]>>,
   setSelectedSetId: React.Dispatch<React.SetStateAction<number | null>>
 ) => {
-  console.log("User clicked remove on this set:", setId);
   const confirmed = await showConfirmDeletePopup();
   if (!confirmed) {
-    console.log("User cancelled set deletion.");
     return;
   }
-  console.log("User confirmed set deletion.");
 
   const res = await fetch("/api/sets/removeSet", {
     method: "POST",
@@ -156,7 +133,6 @@ export const handleSetDelete = async (
   });
 
   if (!res.ok) {
-    console.log("Failed to delete set");
     return;
   }
 
