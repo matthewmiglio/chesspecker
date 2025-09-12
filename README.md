@@ -36,3 +36,6 @@ Clone the repo and install dependencies:
 git clone https://github.com/your-username/chesspecker.git
 cd chesspecker
 npm install
+```
+<img width="1531" height="703" alt="image" src="https://github.com/user-attachments/assets/7b8acd8a-b295-4e15-93b2-8ce44c20e3d3" />
+
