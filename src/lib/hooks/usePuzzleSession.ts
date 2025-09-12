@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Chess } from "chess.js";
-import { showConfetti, showGreenCheck, showRedX } from "@/lib/visuals";
+import { showConfetti, showGreenCheck, showRedX, showYellowWarning } from "@/lib/visuals";
 import {
   parseUCIMove,
   puzzleIsFinished,
@@ -63,6 +63,7 @@ export function usePuzzleSession({
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
+  const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
 
   const handleIncorrectMove = async () => {
     console.log('"[handleIncorrectMove] called!");');
@@ -77,8 +78,12 @@ export function usePuzzleSession({
     incrementUserIncorrect(email); //user stats
 
     await showSolution();
-    console.log("This puzzle was unsuccessful!");
-    await handleNextPuzzle(true);
+    console.log("This puzzle was unsuccessful! Waiting 3 seconds before showing feedback buttons.");
+    
+    // Wait 3 seconds after solution replay before showing feedback buttons
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    
+    setShowFeedbackButtons(true);
   };
 
   const handleSuccessfulPuzzle = async (forceFinish = false) => {
@@ -100,6 +105,32 @@ export function usePuzzleSession({
     incrementUserCorrect(email); //user stats
 
     await handleNextPuzzle(forceFinish);
+  };
+
+  const handleHintAssistedSolve = async () => {
+    console.log("[handleHintAssistedSolve] called!");
+    const setId = getSelectedSetId();
+    if (!setId) return;
+    
+    // Show yellow warning instead of red X
+    showYellowWarning();
+    
+    // Still mark as incorrect for stats (maintains current scoring logic)
+    const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
+    await addIncorrectAttempt(setId, currentRepeatIndex);
+
+    incrementIncorrect(); //total daily stats
+    if (!email) email = "unauthenticated@email.com";
+    incrementUserIncorrect(email); //user stats
+
+    // Show solution like incorrect moves do
+    await showSolution();
+    console.log("Puzzle solved with hint assistance! Waiting 3 seconds before showing feedback buttons.");
+    
+    // Wait 3 seconds after solution replay before showing feedback buttons
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    
+    setShowFeedbackButtons(true);
   };
 
   const handleMove = async (move: string, isCorrect: boolean) => {
@@ -138,8 +169,8 @@ export function usePuzzleSession({
       console.log("[handleMove] Puzzle finished. Deciding outcome...");
 
       if (hintUsed) {
-        console.log("[handleMove] Hint was used, logging as incorrect.");
-        await handleIncorrectMove();
+        console.log("[handleMove] Hint was used, showing warning and logging as incorrect.");
+        await handleHintAssistedSolve();
       } else {
         console.log("[handleMove] No hint used, logging as correct.");
         await handleSuccessfulPuzzle(true);
@@ -153,6 +184,24 @@ export function usePuzzleSession({
 
     for (let i = 0; i < remainingSolution.length; i++) {
       const moveUci = remainingSolution[i];
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      chess.move({
+        from: moveUci.slice(0, 2),
+        to: moveUci.slice(2, 4),
+        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+      });
+
+      setFen(chess.fen());
+    }
+  };
+
+  const showFullSolution = async (startingFen: string) => {
+    const chess = new Chess(startingFen);
+    
+    // Play all solution moves from the beginning
+    for (let i = 0; i < solution.length; i++) {
+      const moveUci = solution[i];
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       chess.move({
@@ -260,6 +309,85 @@ export function usePuzzleSession({
     setIsSessionActive(true);
   };
 
+  const handleContinueToNext = async () => {
+    console.log("[handleContinueToNext] User chose to continue to next puzzle");
+    setShowFeedbackButtons(false);
+    await handleNextPuzzle(true);
+  };
+
+  const handleRetryPuzzle = async () => {
+    console.log("[handleRetryPuzzle] User chose to retry puzzle");
+    setShowFeedbackButtons(false);
+    // Reset puzzle to initial state
+    const setId = getSelectedSetId();
+    if (!setId) return;
+    
+    const nextPuzzleId = puzzleIds[currentPuzzleIndex];
+    const puzzle = await getPuzzleData(nextPuzzleId);
+    
+    if (!puzzle) {
+      console.error("[handleRetryPuzzle] Failed to reload puzzle");
+      return;
+    }
+
+    await loadPuzzleAndInitialize(
+      puzzle,
+      setFen,
+      setSolution,
+      setSolvedIndex,
+      setHighlight
+    );
+    
+    // Reset hint state
+    setHintUsed(false);
+  };
+
+  const handleShowReplay = async () => {
+    console.log("[handleShowReplay] User chose to replay the solution");
+    setShowFeedbackButtons(false);
+    
+    // Get the current puzzle data to reset to initial position
+    const setId = getSelectedSetId();
+    if (!setId) return;
+    
+    const currentPuzzleId = puzzleIds[currentPuzzleIndex];
+    const puzzle = await getPuzzleData(currentPuzzleId);
+    
+    if (!puzzle) {
+      console.error("[handleShowReplay] Failed to load puzzle");
+      return;
+    }
+
+    // Reset to initial position and capture starting FEN
+    await loadPuzzleAndInitialize(
+      puzzle,
+      setFen,
+      setSolution,
+      setSolvedIndex,
+      setHighlight
+    );
+    
+    // Get the starting FEN for the full replay
+    const chess = new Chess();
+    let startingFen;
+    if (puzzle.game.fen) {
+      chess.load(puzzle.game.fen);
+      startingFen = puzzle.game.fen;
+    } else {
+      chess.loadPgn(puzzle.game.pgn);
+      startingFen = chess.fen();
+    }
+    
+    // Small delay before starting replay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Show the full solution from the beginning
+    await showFullSolution(startingFen);
+    
+    // After replay, show feedback buttons again
+    setShowFeedbackButtons(true);
+  };
+
   return {
     isSessionActive,
     handleIncorrectMove,
@@ -268,5 +396,9 @@ export function usePuzzleSession({
     handleNextPuzzle,
     handleStartSession,
     setHintUsed,
+    showFeedbackButtons,
+    handleContinueToNext,
+    handleRetryPuzzle,
+    handleShowReplay,
   };
 }

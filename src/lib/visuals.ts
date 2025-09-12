@@ -10,14 +10,16 @@ export async function showConfetti() {
 
 const feedbackIconDisplayTime = 400;
 
-function createFloatingIcon(type: "check" | "x") {
+function createFloatingIcon(type: "check" | "x" | "warning") {
   const div = document.createElement("div");
 
   // Choose color from global CSS variables
   const iconColor =
     type === "check"
       ? getComputedStyle(document.documentElement).getPropertyValue("--icon-green")
-      : getComputedStyle(document.documentElement).getPropertyValue("--icon-red");
+      : type === "x"
+      ? getComputedStyle(document.documentElement).getPropertyValue("--icon-red")
+      : getComputedStyle(document.documentElement).getPropertyValue("--icon-yellow");
 
   div.className = `
     fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
@@ -28,7 +30,7 @@ function createFloatingIcon(type: "check" | "x") {
     transition-all duration-200 ease-out z-[1000]
   `;
 
-  div.innerText = type === "check" ? "✓" : "✕";
+  div.innerText = type === "check" ? "✓" : type === "x" ? "✕" : "⚠";
   div.style.backgroundColor = iconColor;
 
   document.body.appendChild(div);
@@ -60,4 +62,8 @@ export async function showGreenCheck() {
 
 export async function showRedX() {
   createFloatingIcon("x");
+}
+
+export async function showYellowWarning() {
+  createFloatingIcon("warning");
 }

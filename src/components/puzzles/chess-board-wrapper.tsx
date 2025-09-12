@@ -1,9 +1,10 @@
-import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Search, Download, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
+import { useTheme } from "next-themes";
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -13,7 +14,11 @@ type ChessBoardWrapperProps = {
     handleMove: (move: string, isCorrect: boolean) => Promise<void>;
     isSessionActive: boolean;
     handleStartSession: () => Promise<void>;
-    setHintUsed: (used: boolean) => void; // <-- NEW
+    setHintUsed: (used: boolean) => void;
+    showFeedbackButtons: boolean;
+    handleContinueToNext: () => Promise<void>;
+    handleRetryPuzzle: () => Promise<void>;
+    handleShowReplay: () => Promise<void>;
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -43,7 +48,9 @@ export default function ChessBoardWrapper({
   selectedSet,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
+  const { resolvedTheme } = useTheme();
   const [glow, setGlow] = useState(false);
+  const [showHintHighlight, setShowHintHighlight] = useState(false);
 
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
@@ -54,9 +61,47 @@ export default function ChessBoardWrapper({
     }
   }, [selectedSetId, puzzleSession]);
 
+  // Timer for hint button highlighting
+  useEffect(() => {
+    setShowHintHighlight(false); // Reset highlight state for new puzzle
+    
+    const timer = setTimeout(() => {
+      setShowHintHighlight(true);
+    }, 7000); // 7 seconds
+
+    return () => clearTimeout(timer); // Cleanup timer
+  }, [currentPuzzleIndex, currentRepeatIndex]); // Reset when puzzle changes
+
+  // Create hint button styling based on theme and highlight state
+  const getHintButtonClasses = () => {
+    const baseClasses = "flex items-center p-2 transition-all duration-300";
+    if (!showHintHighlight) {
+      return baseClasses;
+    }
+    
+    const outlineColor = resolvedTheme === "dark" 
+      ? "rgb(244, 67, 54)" // red for dark mode
+      : "rgb(66, 165, 245)"; // blue for light mode
+      
+    return `${baseClasses} border-2 rounded-md`;
+  };
+
+  const getHintButtonStyle = () => {
+    if (!showHintHighlight) return {};
+    
+    const outlineColor = resolvedTheme === "dark" 
+      ? "rgb(244, 67, 54)" // red for dark mode
+      : "rgb(66, 165, 245)"; // blue for light mode
+      
+    return { 
+      borderColor: outlineColor,
+      boxShadow: `0 0 8px ${outlineColor}40` // 40 for opacity
+    };
+  };
+
   return (
     <div className="mx-auto ">
-      <Card className="">
+      <Card className={`transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
         <CardContent className="px-0 mx-auto ">
           <div
             className=" transition-all duration-300"
@@ -118,7 +163,8 @@ export default function ChessBoardWrapper({
             <div className="flex items-center">
               <Button
                 variant="ghost"
-                className="flex items-center p-0"
+                className={getHintButtonClasses()}
+                style={getHintButtonStyle()}
                 onClick={() => {
                   const move = solution[solvedIndex];
                   if (move) {
@@ -136,6 +182,64 @@ export default function ChessBoardWrapper({
           </div>
         </CardFooter>
       </Card>
+
+      {/* Feedback Buttons Overlay */}
+      {puzzleSession.showFeedbackButtons && (
+        <div className={`fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`bg-card/70 backdrop-blur-md border border-border rounded-xl p-6 max-w-md mx-4 transform transition-all duration-500 ${puzzleSession.showFeedbackButtons ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
+            <div className="space-y-3">
+              {/* Continue to Next */}
+              <Button
+                onClick={puzzleSession.handleContinueToNext}
+                className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-primary/90 py-3"
+              >
+                <ArrowRight className="h-4 w-4" />
+                Continue
+              </Button>
+
+              {/* Retry Puzzle */}
+              <Button
+                onClick={puzzleSession.handleRetryPuzzle}
+                variant="outline"
+                className="w-full flex items-center justify-center gap-3 py-3"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Retry Puzzle
+              </Button>
+
+              {/* Show Replay */}
+              <Button
+                onClick={puzzleSession.handleShowReplay}
+                variant="outline"
+                className="w-full flex items-center justify-center gap-3 py-3"
+              >
+                <Play className="h-4 w-4" />
+                Show Replay
+              </Button>
+
+              {/* Analyze Puzzle - Disabled */}
+              <Button
+                disabled
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-3 py-3 opacity-50 cursor-not-allowed"
+              >
+                <Search className="h-4 w-4" />
+                Analyze Puzzle
+              </Button>
+
+              {/* Export - Disabled */}
+              <Button
+                disabled
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-3 py-3 opacity-50 cursor-not-allowed"
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
