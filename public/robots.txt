@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /dashboard/private/
+
+# Important pages
+Allow: /
+Allow: /puzzles
+Allow: /about
+Allow: /create
+Allow: /contact
+Allow: /feedback
+
+Sitemap: https://chesspecker.org/sitemap.xml

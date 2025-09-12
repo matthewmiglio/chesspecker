@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import FeedbackPopup from "@/components/ui/FeedbackPopup";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import HomeStructuredData from "@/components/structured-data/HomeStructuredData";
 
 /* ---------- Testimonials Data ---------- */
 type Testimonial = {
@@ -225,12 +226,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
+      <HomeStructuredData />
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
         <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform">
           <Image
             src={heroImage}
-            alt="Chess Thinker Hero"
+            alt="Chess tactics training with ChessPecker - Woodpecker Method for pattern recognition"
             fill
             style={{ objectFit: "contain" }}
             priority

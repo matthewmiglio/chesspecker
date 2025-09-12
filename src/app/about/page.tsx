@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import AboutStructuredData from "@/components/structured-data/AboutStructuredData";
 
 export default function AboutPage() {
   const steps = [
@@ -42,6 +43,7 @@ export default function AboutPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-8 mt-12 ">
+      <AboutStructuredData />
       {/* TITLE + TAGLINE */}
       <div className="flex flex-col items-center text-center space-y-6">
         <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-12">About ChessPecker</h1>
@@ -52,7 +54,7 @@ export default function AboutPage() {
       <div className="relative w-full aspect-square max-w-[400px] mx-auto">
         <Image
           src={heroImage}
-          alt="Chess tactic diagram"
+          alt="Chess study position demonstrating tactical patterns and Woodpecker Method training"
           fill
           className={`object-contain ${shadowClass}`}
           priority

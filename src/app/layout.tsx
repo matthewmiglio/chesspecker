@@ -7,12 +7,65 @@ import Navbar from "@/components/header-footer/navbar";
 import Footer from "@/components/header-footer/footer";
 import { Analytics } from "@vercel/analytics/react";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true
+});
 
 export const metadata: Metadata = {
-  title: "ChessPecker",
-  description:
-    "An online tool for creating and sharing and practicing personalized chess puzzle sets.",
+  metadataBase: new URL('https://chesspecker.org'),
+  title: {
+    default: 'ChessPecker | Chess Puzzle Practice & Training',
+    template: '%s | ChessPecker'
+  },
+  description: 'Master chess tactics with the Woodpecker Method. Create, practice, and track progress with personalized puzzle sets.',
+  keywords: ['chess puzzles', 'tactics training', 'woodpecker method', 'chess practice', 'tactical training', 'pattern recognition'],
+  authors: [{ name: 'Matthew Miglio', url: 'https://matthewmiglio.dev' }],
+  creator: 'Matthew Miglio',
+  publisher: 'ChessPecker',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://chesspecker.org',
+    siteName: 'ChessPecker',
+    title: 'ChessPecker | Chess Puzzle Practice & Training',
+    description: 'Master chess tactics with the Woodpecker Method. Create, practice, and track progress with personalized puzzle sets.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ChessPecker - Chess Tactics Training with the Woodpecker Method'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ChessPecker | Chess Puzzle Practice & Training',
+    description: 'Master chess tactics with the Woodpecker Method. Create, practice, and track progress with personalized puzzle sets.',
+    images: ['/og-image.png'],
+    creator: '@matthewmiglio'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-site-verification-code', // You'll need to add this later
+  }
 };
 
 export default function RootLayout({
