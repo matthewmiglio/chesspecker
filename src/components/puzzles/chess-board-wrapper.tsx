@@ -64,7 +64,7 @@ export default function ChessBoardWrapper({
   // Timer for hint button highlighting
   useEffect(() => {
     setShowHintHighlight(false); // Reset highlight state for new puzzle
-    
+
     const timer = setTimeout(() => {
       setShowHintHighlight(true);
     }, 7000); // 7 seconds
@@ -78,22 +78,19 @@ export default function ChessBoardWrapper({
     if (!showHintHighlight) {
       return baseClasses;
     }
-    
-    const outlineColor = resolvedTheme === "dark" 
-      ? "rgb(244, 67, 54)" // red for dark mode
-      : "rgb(66, 165, 245)"; // blue for light mode
-      
+
+
     return `${baseClasses} border-2 rounded-md`;
   };
 
   const getHintButtonStyle = () => {
     if (!showHintHighlight) return {};
-    
-    const outlineColor = resolvedTheme === "dark" 
+
+    const outlineColor = resolvedTheme === "dark"
       ? "rgb(244, 67, 54)" // red for dark mode
       : "rgb(66, 165, 245)"; // blue for light mode
-      
-    return { 
+
+    return {
       borderColor: outlineColor,
       boxShadow: `0 0 8px ${outlineColor}40` // 40 for opacity
     };
@@ -134,11 +131,11 @@ export default function ChessBoardWrapper({
               <span className="font-medium">
                 {selectedSetId !== null && setAccuracies[selectedSetId]
                   ? `${Math.round(
-                      (setAccuracies[selectedSetId].correct /
-                        (setAccuracies[selectedSetId].correct +
-                          setAccuracies[selectedSetId].incorrect || 1)) *
-                        100
-                    )}%`
+                    (setAccuracies[selectedSetId].correct /
+                      (setAccuracies[selectedSetId].correct +
+                        setAccuracies[selectedSetId].incorrect || 1)) *
+                    100
+                  )}%`
                   : "N/A"}
               </span>
             </div>
