@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 
 interface LoginButtonProps {
   loginText?: string;
@@ -12,6 +13,11 @@ export default function LoginButton({
   showLogout = true,
 }: LoginButtonProps) {
   const { data: session } = useSession();
+  const { resolvedTheme } = useTheme();
+  
+  const buttonClasses = resolvedTheme === "dark" 
+    ? "bg-white text-black" 
+    : "bg-gray-600 text-white";
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
@@ -23,7 +29,7 @@ export default function LoginButton({
           {showLogout && (
             <button
               onClick={() => signOut()}
-              className="bg-white px-4 py-2 text-black rounded"
+              className={`px-4 py-2 rounded ${buttonClasses}`}
             >
               Logout
             </button>
@@ -32,7 +38,7 @@ export default function LoginButton({
       ) : (
         <button
           onClick={() => signIn("google")}
-          className="bg-white px-4 py-2 text-black rounded"
+          className={`px-4 py-2 rounded ${buttonClasses}`}
         >
           <span className="px-3 whitespace-nowrap">{loginText}</span>
         </button>

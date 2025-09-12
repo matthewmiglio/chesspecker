@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function AboutPage() {
   const steps = [
@@ -22,6 +24,21 @@ export default function AboutPage() {
   ];
 
   const themeColor = useThemeAccentColor();
+  const { resolvedTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
+  const heroImage =
+    resolvedTheme === "dark"
+      ? "/heros/table_study_white.png"
+      : "/heros/table_study_black.png";
+      
+  const shadowClass = resolvedTheme === "dark" ? "shadow-lg" : "";
 
   return (
     <div className="max-w-6xl mx-auto px-8 mt-12 ">
@@ -34,10 +51,10 @@ export default function AboutPage() {
       {/* IMAGE with max-width */}
       <div className="relative w-full aspect-square max-w-[400px] mx-auto">
         <Image
-          src="/heros/table_study.png"
+          src={heroImage}
           alt="Chess tactic diagram"
           fill
-          className="object-contain  shadow-lg "
+          className={`object-contain ${shadowClass}`}
           priority
         />
       </div>

@@ -16,6 +16,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navLinks = [
+    { name: "Home", href: "/" },
     { name: "Practice", href: "/puzzles" },
     { name: "Create", href: "/create" },
     { name: "Performance", href: "/dashboard" },

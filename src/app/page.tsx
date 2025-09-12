@@ -253,7 +253,7 @@ export default function Home() {
             className="rounded-xl transition-all duration-300"
             style={{ boxShadow: `0 0 22px ${themeColor}` }}
           >
-            <Button asChild size="lg" className="rounded-xl shadow-none bg-white">
+            <Button asChild size="lg" className="rounded-xl shadow-none bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/puzzles">Start Training</Link>
             </Button>
           </div>

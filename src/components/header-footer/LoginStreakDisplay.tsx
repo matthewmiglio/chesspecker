@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { updateLoginStreak, getLoginStreak } from "@/lib/api/loginStreakApi";
 import { Flame } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const LoginStreakDisplay = () => {
   const { data: session, status } = useSession();
   const [streak, setStreak] = useState<number | null>(null);
   const [hasUpdated, setHasUpdated] = useState(false); // to prevent double updates
+  const { resolvedTheme } = useTheme();
+  
+  const streakClasses = resolvedTheme === "dark" 
+    ? "bg-orange-50 text-orange-600 border-orange-300 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700"
+    : "bg-blue-50 text-blue-600 border-blue-300";
 
   useEffect(() => {
     const run = async () => {
@@ -40,7 +46,7 @@ const LoginStreakDisplay = () => {
   if (status !== "authenticated" || streak === null) return null;
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1 rounded-md text-sm bg-orange-50 text-orange-600 dark:bg-orange-900 dark:text-orange-200 border border-orange-300 dark:border-orange-700 shadow-sm">
+    <div className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm border shadow-sm ${streakClasses}`}>
       <Flame className="w-4 h-4" />
       <span>{streak}-day streak</span>
     </div>

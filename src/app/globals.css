@@ -65,6 +65,7 @@
   --violet-color: rgb(138, 43, 226);
   --icon-green: var(--green-progress-color);
   --icon-red: var(--red-progress-color);
+  --icon-yellow: rgb(255, 193, 7);
 
   --foreground: rgb(37, 37, 37);
 
@@ -117,6 +118,7 @@ html.dark {
   --violet-color: rgb(138, 43, 226);
   --icon-green: var(--green-progress-color);
   --icon-red: var(--red-progress-color);
+  --icon-yellow: rgb(255, 193, 7);
 
 
   --foreground: rgb(245, 245, 245);
