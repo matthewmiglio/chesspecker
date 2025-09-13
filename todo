@@ -1,8 +1,0 @@
--when user makes an incorrect move, restart the puzzle from the beginning, then do the replay
--manually contine to next puzzle after incorrect replay plays out
--make like a puzzle focus mode, where the screen stops scrolling down
--fix home page on lightmode
--fix admin streak bar graph figure on mobile
--feedback popup for active users only
--rate limiting to prevent spam
--home page, "Start Training" button, light mode, the button is white on white
