@@ -51,6 +51,7 @@ export default function ChessBoardWrapper({
   const { resolvedTheme } = useTheme();
   const [glow, setGlow] = useState(false);
   const [showHintHighlight, setShowHintHighlight] = useState(false);
+  const [isAnimatingIn, setIsAnimatingIn] = useState(false);
 
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
@@ -61,16 +62,35 @@ export default function ChessBoardWrapper({
     }
   }, [selectedSetId, puzzleSession]);
 
+  // Handle smooth popup enter animation
+  useEffect(() => {
+    if (puzzleSession.showFeedbackButtons) {
+      // Small delay before content animation for smooth entry
+      const timer = setTimeout(() => {
+        setIsAnimatingIn(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      // Reset animation state when hiding
+      setIsAnimatingIn(false);
+    }
+  }, [puzzleSession.showFeedbackButtons]);
+
   // Timer for hint button highlighting
   useEffect(() => {
-    setShowHintHighlight(false); // Reset highlight state for new puzzle
+    setShowHintHighlight(false); // Reset highlight state
+    
+    // Only start timer when puzzle session is active (fully loaded)
+    if (!puzzleSession.isSessionActive) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setShowHintHighlight(true);
-    }, 7000); // 7 seconds
+    }, 7000); // 7 seconds after puzzle loads or user makes a move
 
     return () => clearTimeout(timer); // Cleanup timer
-  }, [currentPuzzleIndex, currentRepeatIndex]); // Reset when puzzle changes
+  }, [puzzleSession.isSessionActive, solvedIndex]); // Reset when puzzle loads or user makes moves
 
   // Create hint button styling based on theme and highlight state
   const getHintButtonClasses = () => {
@@ -182,8 +202,8 @@ export default function ChessBoardWrapper({
 
       {/* Feedback Buttons Overlay */}
       {puzzleSession.showFeedbackButtons && (
-        <div className={`fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-100' : 'opacity-0'}`}>
-          <div className={`bg-card/70 backdrop-blur-md border border-border rounded-xl p-6 max-w-md mx-4 transform transition-all duration-500 ${puzzleSession.showFeedbackButtons ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
+        <div className={`fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 ease-out ${puzzleSession.showFeedbackButtons ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`bg-card/70 backdrop-blur-md border border-border rounded-xl p-6 max-w-md mx-4 transform transition-all duration-300 ease-out ${isAnimatingIn ? 'scale-100 translate-y-0 opacity-100' : 'scale-90 translate-y-8 opacity-0'}`}>
             <div className="space-y-3">
               {/* Continue to Next */}
               <Button
