@@ -31,6 +31,7 @@ type ChessBoardWrapperProps = {
     repeats: number;
     size: number;
   };
+  puzzleIds: string[];
 };
 
 export default function ChessBoardWrapper({
@@ -46,6 +47,7 @@ export default function ChessBoardWrapper({
   currentPuzzleIndex,
   currentRepeatIndex,
   selectedSet,
+  puzzleIds,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
   const { resolvedTheme } = useTheme();
@@ -114,6 +116,32 @@ export default function ChessBoardWrapper({
       borderColor: outlineColor,
       boxShadow: `0 0 8px ${outlineColor}40` // 40 for opacity
     };
+  };
+
+  const handleExportPuzzle = () => {
+    if (!puzzleIds || puzzleIds.length === 0 || currentPuzzleIndex >= puzzleIds.length) {
+      return;
+    }
+
+    const currentPuzzleId = puzzleIds[currentPuzzleIndex];
+    const filename = `chesspecker_${currentPuzzleId}.fen`;
+
+    // Create a blob with the FEN data
+    const blob = new Blob([fen], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -231,7 +259,7 @@ export default function ChessBoardWrapper({
                 className="w-full flex items-center justify-center gap-3 py-3"
               >
                 <Play className="h-4 w-4" />
-                Show Replay
+                Replay Solution
               </Button>
 
               {/* Analyze Puzzle - Disabled */}
@@ -244,11 +272,11 @@ export default function ChessBoardWrapper({
                 Analyze Puzzle
               </Button>
 
-              {/* Export - Disabled */}
+              {/* Export */}
               <Button
-                disabled
+                onClick={handleExportPuzzle}
                 variant="ghost"
-                className="w-full flex items-center justify-center gap-3 py-3 opacity-50 cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 py-3"
               >
                 <Download className="h-4 w-4" />
                 Export

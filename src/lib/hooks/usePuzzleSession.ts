@@ -181,11 +181,13 @@ export function usePuzzleSession({
 
   const showFullSolution = async (startingFen: string) => {
     const chess = new Chess(startingFen);
+
+    const moveSpeed = 1200; // milliseconds per move
     
     // Play all solution moves from the beginning
     for (let i = 0; i < solution.length; i++) {
       const moveUci = solution[i];
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, moveSpeed));
 
       chess.move({
         from: moveUci.slice(0, 2),
@@ -343,7 +345,11 @@ export function usePuzzleSession({
     
     // Show the full solution from the beginning
     await showFullSolution(startingFen);
-    
+
+    //wait for 1 second
+    const postReplayDelay = 2000; // milliseconds
+    await new Promise((resolve) => setTimeout(resolve, postReplayDelay));
+
     // After replay, show feedback buttons again
     setShowFeedbackButtons(true);
   };

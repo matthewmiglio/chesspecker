@@ -191,6 +191,7 @@ export default function PuzzlesPage() {
                 setAccuracies={setAccuracies}
                 currentPuzzleIndex={currentPuzzleIndex}
                 currentRepeatIndex={currentRepeatIndex}
+                puzzleIds={puzzleIds}
               />
             ) : (
               <PuzzleEmptyState

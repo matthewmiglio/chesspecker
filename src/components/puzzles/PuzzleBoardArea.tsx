@@ -19,6 +19,7 @@ type PuzzleBoardAreaProps = {
   setAccuracies: Record<number, { correct: number; incorrect: number }>;
   currentPuzzleIndex: number;
   currentRepeatIndex: number;
+  puzzleIds: string[];
 };
 
 export default function PuzzleBoardArea({
@@ -35,6 +36,7 @@ export default function PuzzleBoardArea({
   setAccuracies,
   currentPuzzleIndex,
   currentRepeatIndex,
+  puzzleIds,
 }: PuzzleBoardAreaProps) {
   return (
     <div>
@@ -54,6 +56,7 @@ export default function PuzzleBoardArea({
           currentRepeatIndex={currentRepeatIndex}
           selectedSet={selectedSet}
           selectedSetId={selectedSetId}
+          puzzleIds={puzzleIds}
         />
       )}
     </div>
