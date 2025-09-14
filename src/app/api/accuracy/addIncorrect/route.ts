@@ -17,14 +17,18 @@ export async function POST(req: NextRequest) {
     .from("chessPeckerSetAccuracies")
     .select("incorrect")
     .eq("set_id", set_id)
-    .eq("repeat_index", repeat_index)
-    .single();
+    .eq("repeat_index", repeat_index);
 
-  if (fetchError || !data) {
-    return NextResponse.json({ error: fetchError?.message || "Accuracy row not found" }, { status: 500 });
+  if (fetchError) {
+    return NextResponse.json({ error: fetchError.message }, { status: 500 });
   }
 
-  const newIncorrect = data.incorrect + 1;
+  if (!data || data.length === 0) {
+    return NextResponse.json({ error: "No accuracy record found" }, { status: 404 });
+  }
+
+  // Use first record if duplicates exist (handles duplicate rows gracefully)
+  const newIncorrect = data[0].incorrect + 1;
 
   const { error: updateError } = await supabase
     .from("chessPeckerSetAccuracies")
