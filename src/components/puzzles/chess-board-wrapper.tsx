@@ -54,6 +54,7 @@ export default function ChessBoardWrapper({
   const [glow, setGlow] = useState(false);
   const [showHintHighlight, setShowHintHighlight] = useState(false);
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
+  const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
 
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
@@ -77,6 +78,17 @@ export default function ChessBoardWrapper({
       setIsAnimatingIn(false);
     }
   }, [puzzleSession.showFeedbackButtons]);
+
+  // Auto-advance to next puzzle when auto mode is enabled
+  useEffect(() => {
+    if (autoNextPuzzle && puzzleSession.showFeedbackButtons) {
+      const timer = setTimeout(() => {
+        puzzleSession.handleContinueToNext();
+      }, 1000); // 1 second delay before auto-advancing
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoNextPuzzle, puzzleSession.showFeedbackButtons, puzzleSession.handleContinueToNext]);
 
   // Timer for hint button highlighting
   useEffect(() => {
@@ -146,6 +158,7 @@ export default function ChessBoardWrapper({
 
   return (
     <div className="mx-auto ">
+
       <Card className={`transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
         <CardContent className="px-0 mx-auto ">
           <div
@@ -204,6 +217,29 @@ export default function ChessBoardWrapper({
               </span>
             </div>
 
+            {/* Auto Next Puzzle Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">Auto Next</span>
+              <button
+                onClick={() => setAutoNextPuzzle(!autoNextPuzzle)}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  autoNextPuzzle
+                    ? 'bg-primary focus:ring-primary'
+                    : 'bg-muted focus:ring-muted'
+                }`}
+                style={{
+                  backgroundColor: autoNextPuzzle ? themeColor : undefined,
+                  boxShadow: autoNextPuzzle ? `0 0 6px ${themeColor}40` : undefined
+                }}
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-200 ${
+                    autoNextPuzzle ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
             {/* Hint Button */}
             <div className="flex items-center">
               <Button
@@ -228,8 +264,20 @@ export default function ChessBoardWrapper({
         </CardFooter>
       </Card>
 
+      {/* Auto Next Indicator */}
+      {puzzleSession.showFeedbackButtons && autoNextPuzzle && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-card/90 backdrop-blur-md border border-border rounded-xl p-4 max-w-sm mx-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-primary">
+              <ArrowRight className="h-5 w-5 animate-pulse" />
+              <span className="font-medium">Auto advancing...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Buttons Overlay */}
-      {puzzleSession.showFeedbackButtons && (
+      {puzzleSession.showFeedbackButtons && !autoNextPuzzle && (
         <div className={`fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 ease-out ${puzzleSession.showFeedbackButtons ? 'opacity-100' : 'opacity-0'}`}>
           <div className={`bg-card/70 backdrop-blur-md border border-border rounded-xl p-6 max-w-md mx-4 transform transition-all duration-300 ease-out ${isAnimatingIn ? 'scale-100 translate-y-0 opacity-100' : 'scale-90 translate-y-8 opacity-0'}`}>
             <div className="space-y-3">
