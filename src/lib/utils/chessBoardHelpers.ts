@@ -1,6 +1,6 @@
 "use client";
 
-import { Chess, Square } from "chess.js";
+import { Chess, Square, Move } from "chess.js";
 
 export function getSquareFromMouseEvent(
   e: React.MouseEvent,
@@ -130,4 +130,115 @@ export function handleRightMouseUpHelper(
     );
   }
   setArrowStart(null);
+}
+
+// Click-to-move helper functions
+export function getValidMovesForSquare(game: Chess, square: Square): Move[] {
+  try {
+    return game.moves({ square, verbose: true });
+  } catch (error) {
+    console.warn("[getValidMovesForSquare] Error getting moves for", square, error);
+    return [];
+  }
+}
+
+export function isSquareOccupiedByCurrentPlayer(game: Chess, square: Square): boolean {
+  const piece = game.get(square);
+  return piece !== null && piece !== undefined && piece.color === game.turn();
+}
+
+export function handleSquareClickHelper({
+  square,
+  game,
+  selectedSquare,
+  validMoves,
+  solution,
+  solvedIndex,
+  isSessionActive,
+  isBoardLocked,
+}: {
+  square: Square;
+  game: Chess;
+  selectedSquare: Square | null;
+  validMoves: Move[];
+  solution: string[];
+  solvedIndex: number;
+  isSessionActive: boolean;
+  isBoardLocked: boolean;
+}): {
+  action: "select" | "deselect" | "move" | "none";
+  newSelectedSquare?: Square | null;
+  newValidMoves?: Move[];
+  moveResult?: {
+    valid: boolean;
+    moveWasCorrect: boolean;
+    newFen?: string;
+    nextGame?: Chess;
+  };
+} {
+  if (!isSessionActive || isBoardLocked) {
+    return { action: "none" };
+  }
+
+  // If no square is currently selected
+  if (!selectedSquare) {
+    // Check if clicked square has a piece belonging to current player
+    if (isSquareOccupiedByCurrentPlayer(game, square)) {
+      const moves = getValidMovesForSquare(game, square);
+      return {
+        action: "select",
+        newSelectedSquare: square,
+        newValidMoves: moves,
+      };
+    }
+    return { action: "none" };
+  }
+
+  // If clicking the same square, deselect
+  if (selectedSquare === square) {
+    return {
+      action: "deselect",
+      newSelectedSquare: null,
+      newValidMoves: [],
+    };
+  }
+
+  // Check if clicked square is a valid move destination
+  const targetMove = validMoves.find(move => move.to === square);
+  if (targetMove) {
+    // Execute the move using existing logic
+    const moveResult = handlePieceDropHelper({
+      sourceSquare: selectedSquare,
+      targetSquare: square,
+      game,
+      solution,
+      solvedIndex,
+      isSessionActive,
+      isBoardLocked,
+    });
+
+    return {
+      action: "move",
+      newSelectedSquare: null,
+      newValidMoves: [],
+      moveResult,
+    };
+  }
+
+  // If clicking another piece of the same color, switch selection
+  if (isSquareOccupiedByCurrentPlayer(game, square)) {
+    const moves = getValidMovesForSquare(game, square);
+    return {
+      action: "select",
+      newSelectedSquare: square,
+      newValidMoves: moves,
+    };
+  }
+
+  // Otherwise, deselect
+  return {
+    action: "deselect",
+    newSelectedSquare: null,
+    newValidMoves: [],
+  };
 }
