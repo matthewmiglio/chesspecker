@@ -81,18 +81,18 @@ export default function ChessBoardWrapper({
   // Timer for hint button highlighting
   useEffect(() => {
     setShowHintHighlight(false); // Reset highlight state
-    
-    // Only start timer when puzzle session is active (fully loaded)
-    if (!puzzleSession.isSessionActive) {
+
+    // Only start timer when session is active AND we have a loaded puzzle
+    if (!puzzleSession.isSessionActive || !fen) {
       return;
     }
 
     const timer = setTimeout(() => {
       setShowHintHighlight(true);
-    }, 7000); // 7 seconds after puzzle loads or user makes a move
+    }, 7000); // 7 seconds after puzzle loads
 
     return () => clearTimeout(timer); // Cleanup timer
-  }, [puzzleSession.isSessionActive, solvedIndex]); // Reset when puzzle loads or user makes moves
+  }, [puzzleSession.isSessionActive, fen]); // Reset only when puzzle loads, not when user makes moves
 
   // Create hint button styling based on theme and highlight state
   const getHintButtonClasses = () => {
