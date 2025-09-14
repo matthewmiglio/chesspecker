@@ -347,7 +347,7 @@ export function usePuzzleSession({
     await showFullSolution(startingFen);
 
     //wait for 1 second
-    const postReplayDelay = 2000; // milliseconds
+    const postReplayDelay = 1000; // milliseconds
     await new Promise((resolve) => setTimeout(resolve, postReplayDelay));
 
     // After replay, show feedback buttons again
