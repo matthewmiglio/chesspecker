@@ -83,19 +83,8 @@ export default function PuzzleSetCreationProgress({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
-      <div className="w-full max-w-md mx-4 p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-primary/10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-3 animate-bounce">
-            {currentStep.icon}
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Creating Puzzle Set
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Step {currentStep.step} of 3
-          </p>
-        </div>
+      <div className="w-full max-w-sm mx-4 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-primary/10">
+       
 
         {/* Current Step Information */}
         <div className="mb-8 p-4 bg-muted/50 rounded-lg">
@@ -209,23 +198,7 @@ export default function PuzzleSetCreationProgress({
           </div>
         </div>
 
-        {/* Debug info (only visible in development) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-4 pt-4 border-t border-border">
-            <details className="text-xs text-muted-foreground">
-              <summary className="cursor-pointer hover:text-foreground">
-                Debug Information
-              </summary>
-              <div className="mt-2 space-y-1 font-mono">
-                <div>Current Step: {currentStep.step}</div>
-                <div>Puzzle Progress: {puzzleProgress}%</div>
-                <div>Accuracy Progress: {accuracyProgress}%</div>
-                <div>Phase Complete: {puzzlePhaseComplete ? 'Yes' : 'No'}</div>
-                <div>Total Progress: {totalProgress.toFixed(2)}%</div>
-              </div>
-            </details>
-          </div>
-        )}
+       
       </div>
     </div>
   );
