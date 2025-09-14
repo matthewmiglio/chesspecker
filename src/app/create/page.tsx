@@ -377,7 +377,7 @@ export default function CreatePuzzleSetPage() {
     // Only redirect if creation was successful
     if (result) {
       setTimeout(() => {
-        // window.location.href = "/puzzles";
+        window.location.href = "/puzzles";
       }, 1500); // Give time to see success toast
     }
   };
