@@ -81,8 +81,9 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
       const email = session!.user!.email!;
       const payload = {
         email,
-        name,
-        message: `[${category.toUpperCase()}][${rating}★] ${message}`,
+        text: message,
+        stars: rating,
+        category,
       };
       const ok = await submitFeedback(payload);
       setSubmitted({ ok });
@@ -94,7 +95,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
-        setError(`Submission failed: ${message}`);
+      setError(`Submission failed: ${message}`);
       setSubmitted({ ok: false });
     } finally {
       setSubmitting(false);
@@ -108,7 +109,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
   }, [submitting, submitted]);
 
   return (
-    <div className={join("relative", className || "")}> 
+    <div className={join("relative", className || "")}>
       <Card className="overflow-hidden border" data-testid="enhanced-feedback-card">
         <CardContent className="p-0">
           {/* Header */}
@@ -162,12 +163,12 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               <div>
                 <label className="block text-sm font-medium mb-1">Rating (optional)</label>
                 <div className="flex items-center gap-1" aria-label="rating">
-                  {[1,2,3,4,5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <button
                       type="button"
                       key={i}
                       onClick={() => setRating(i === rating ? 0 : i)}
-                      aria-label={`${i} star${i>1?"s":""}`}
+                      aria-label={`${i} star${i > 1 ? "s" : ""}`}
                       className={join(
                         "p-1 rounded",
                         i <= rating ? "text-yellow-500" : "text-muted-foreground hover:text-foreground"
@@ -175,7 +176,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
                     >
                       {/* star */}
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.785 1.402 8.168L12 18.897l-7.336 3.867 1.402-8.168L.132 9.211l8.2-1.193z"/>
+                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.785 1.402 8.168L12 18.897l-7.336 3.867 1.402-8.168L.132 9.211l8.2-1.193z" />
                       </svg>
                     </button>
                   ))}
@@ -222,9 +223,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               <Button type="submit" className="w-full sm:w-auto" disabled={!canSubmit} aria-disabled={!canSubmit}>
                 {label}
               </Button>
-              <Button asChild variant="secondary" className="hidden sm:inline-flex">
-                <Link href="/feedback">Open Full Feedback Page</Link>
-              </Button>
+
             </motion.div>
           </form>
         </CardContent>

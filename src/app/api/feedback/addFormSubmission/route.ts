@@ -8,15 +8,17 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { email, name, message } = await req.json();
+  const { email, text, stars, category } = await req.json();
 
-  if (!email || !message) {
-    return NextResponse.json({ error: "Missing email or message" }, { status: 400 });
+  if (!email || !text) {
+    return NextResponse.json({ error: "Missing email or text" }, { status: 400 });
   }
 
   const { error } = await supabase.from("ChessPeckerFeedback").insert({
     email,
-    text: `[${name ?? "Anonymous"}] ${message}`,
+    text,
+    stars,
+    category,
     timestamp: new Date().toISOString(),
   });
 

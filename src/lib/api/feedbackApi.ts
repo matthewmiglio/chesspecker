@@ -5,18 +5,20 @@ const BASE = "/api/feedback";
 
 export async function submitFeedback({
   email,
-  name,
-  message,
+  text,
+  stars,
+  category,
 }: {
   email: string;
-  name: string;
-  message: string;
+  text: string;
+  stars: number;
+  category: string;
 }): Promise<boolean> {
   try {
     const res = await fetch(`${BASE}/addFormSubmission`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, message }),
+      body: JSON.stringify({ email, text, stars, category }),
     });
 
     const data = await res.json();
