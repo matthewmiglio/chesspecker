@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Chess } from "chess.js";
 import { showConfetti, showGreenCheck, showRedX, showYellowWarning } from "@/lib/visuals";
 import {
@@ -65,9 +65,26 @@ export function usePuzzleSession({
   const [hintUsed, setHintUsed] = useState(false);
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
 
+  // One-time marking logic to prevent duplicate accuracy records
+  const [puzzleAttempted, setPuzzleAttempted] = useState(false);
+  const [puzzleOutcome, setPuzzleOutcome] = useState<'correct' | 'incorrect' | null>(null);
+
+  // Reset puzzle tracking when moving to a new puzzle
+  useEffect(() => {
+    setPuzzleAttempted(false);
+    setPuzzleOutcome(null);
+  }, [currentPuzzleIndex, currentRepeatIndex]);
+
   const handleIncorrectMove = async () => {
+    // Only mark as incorrect once per puzzle
+    if (puzzleAttempted) return;
+
     const setId = getSelectedSetId();
     if (!setId) return;
+
+    setPuzzleAttempted(true);
+    setPuzzleOutcome('incorrect');
+
     showRedX();
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addIncorrectAttempt(setId, currentRepeatIndex);
@@ -77,18 +94,25 @@ export function usePuzzleSession({
     incrementUserIncorrect(email); //user stats
 
     await showSolution();
-    
+
     // Wait 3 seconds after solution replay before showing feedback buttons
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    
+
     setShowFeedbackButtons(true);
   };
 
   const handleSuccessfulPuzzle = async (forceFinish = false) => {
+    // Don't mark if already attempted and failed, or already succeeded
+    if (puzzleAttempted && puzzleOutcome === 'incorrect') return;
+    if (puzzleAttempted && puzzleOutcome === 'correct') return;
+
     const setId = getSelectedSetId();
     if (!setId) {
       return;
     }
+
+    setPuzzleAttempted(true);
+    setPuzzleOutcome('correct');
 
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addCorrectAttempt(setId, currentRepeatIndex);
@@ -100,26 +124,32 @@ export function usePuzzleSession({
   };
 
   const handleHintAssistedSolve = async () => {
+    // Only mark once per puzzle
+    if (puzzleAttempted) return;
+
     const setId = getSelectedSetId();
     if (!setId) return;
-    
+
+    setPuzzleAttempted(true);
+    setPuzzleOutcome('correct');
+
     // Show yellow warning instead of red X
     showYellowWarning();
-    
-    // Still mark as incorrect for stats (maintains current scoring logic)
-    const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
-    await addIncorrectAttempt(setId, currentRepeatIndex);
 
-    incrementIncorrect(); //total daily stats
+    // Mark as correct for stats (hints should count as correct)
+    const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
+    await addCorrectAttempt(setId, currentRepeatIndex);
+
+    incrementCorrect(); //total daily stats
     if (!email) email = "unauthenticated@email.com";
-    incrementUserIncorrect(email); //user stats
+    incrementUserCorrect(email); //user stats
 
     // Show solution like incorrect moves do
     await showSolution();
-    
+
     // Wait 3 seconds after solution replay before showing feedback buttons
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    
+
     setShowFeedbackButtons(true);
   };
 

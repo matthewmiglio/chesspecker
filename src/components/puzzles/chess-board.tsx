@@ -162,11 +162,11 @@ export default function AnimatedBoard({
 
         // Add delay for animation BEFORE updating position
         setTimeout(() => {
-          if (result.moveResult.newFen) {
+          if (result.moveResult?.newFen) {
             setBoardPosition(result.moveResult.newFen);
           }
 
-          if (result.moveResult.nextGame) {
+          if (result.moveResult?.nextGame) {
             const nextGame = result.moveResult.nextGame;
 
             setTimeout(() => {
