@@ -64,12 +64,9 @@ export default function CreatePuzzleSetPage() {
       info("Creating puzzle set...", "Please wait", 6000);
 
       // Phase 1: Puzzle Generation
-      const puzzleStartTime = performance.now();
       const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
-      const puzzleEndTime = performance.now();
 
       // Phase 2: Database Insertion
-      const dbStartTime = performance.now();
       const requestPayload = { email, elo, size, repeats, name, puzzleIds };
 
       const res = await fetch("/api/sets/addSet", {
@@ -78,7 +75,6 @@ export default function CreatePuzzleSetPage() {
         body: JSON.stringify(requestPayload),
       });
 
-      const dbEndTime = performance.now();
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -111,9 +107,6 @@ export default function CreatePuzzleSetPage() {
             body: JSON.stringify({ set_id: set.set_id, repeat_index: i }),
           });
 
-          const rowEndTime = performance.now();
-          const rowDuration = rowEndTime - rowStartTime;
-
           if (!accuracyRes.ok) {
             const errorData = await accuracyRes.json().catch(() => ({}));
             const errorDetail = errorData.error || 'Unknown error';
@@ -122,13 +115,10 @@ export default function CreatePuzzleSetPage() {
             failedAccuracyRows++;
             error(`Failed to create accuracy tracking for repeat ${i + 1}: ${errorDetail}`, "Accuracy Setup Failed");
           } else {
-            const accuracyData = await accuracyRes.json();
+            await accuracyRes.json();
             successfulAccuracyRows++;
           }
         } catch (accuracyErr) {
-          const rowEndTime = performance.now();
-          const rowDuration = rowEndTime - rowStartTime;
-
           accuracyErrors.push({ index: i, error: accuracyErr.message, exception: true });
           failedAccuracyRows++;
           error(`Exception creating accuracy tracking for repeat ${i + 1}`, "Accuracy Setup Error");
@@ -138,8 +128,6 @@ export default function CreatePuzzleSetPage() {
         setAccuracyProgress(Math.floor(((i + 1) / repeats) * 100));
       }
 
-      const accuracyEndTime = performance.now();
-      const accuracyDuration = accuracyEndTime - accuracyStartTime;
 
       // Final Summary
       const totalEndTime = performance.now();
@@ -150,8 +138,6 @@ export default function CreatePuzzleSetPage() {
       return set;
 
     } catch (err) {
-      const errorEndTime = performance.now();
-      const errorDuration = errorEndTime - startTime;
 
       setIsCreatingSet(false);
       const message = err instanceof Error ? err.message : "Unknown error";
@@ -162,16 +148,13 @@ export default function CreatePuzzleSetPage() {
 
   const createNewPuzzle = async (difficulty: string, retryCount = 0) => {
     const maxRetries = 3;
-    const callId = Math.random().toString(36).substr(2, 4);
 
     try {
-      const startTime = performance.now();
       const response = await fetch("/api/lichess/getPuzzles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ difficulty }),
       });
-      const endTime = performance.now();
 
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'No response body');
@@ -226,7 +209,6 @@ export default function CreatePuzzleSetPage() {
     targetElo: number,
     onProgress: (progress: number) => void
   ): Promise<string[]> => {
-    const generationId = Math.random().toString(36).substr(2, 6);
     const startTime = performance.now();
 
     const difficultyEloMap: Record<string, number> = {
@@ -256,22 +238,14 @@ export default function CreatePuzzleSetPage() {
     const puzzleIds: Set<string> = new Set();
     const difficultyCounts: Record<string, number> = {};
     let totalElo = 0;
-    let apiCalls = 0;
-    let duplicates = 0;
     let consecutiveFailures = 0;
     const maxConsecutiveFailures = 10;
-
-    // API call tracking
-    const apiCallTimes: number[] = [];
-    let fastestCall = Infinity;
-    let slowestCall = 0;
 
     while (puzzleIds.size < puzzle_count) {
       const iterationStart = performance.now();
       const currentAvg = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
 
       const pool = currentAvg >= targetElo ? easierDifficulties : harderDifficulties;
-      const poolChoice = currentAvg >= targetElo ? 'easier' : 'harder';
 
       if (pool.length === 0) {
         break;
@@ -280,17 +254,8 @@ export default function CreatePuzzleSetPage() {
       const selectedDifficulty = getRandom(pool);
 
       try {
-        const callStart = performance.now();
-        apiCalls++;
 
         const puzzle = await createNewPuzzle(selectedDifficulty);
-
-        const callEnd = performance.now();
-        const callDuration = callEnd - callStart;
-        apiCallTimes.push(callDuration);
-
-        if (callDuration < fastestCall) fastestCall = callDuration;
-        if (callDuration > slowestCall) slowestCall = callDuration;
 
         if (!puzzle?.puzzle?.id) {
           consecutiveFailures++;
@@ -300,7 +265,6 @@ export default function CreatePuzzleSetPage() {
         const puzzleId = puzzle.puzzle.id;
 
         if (puzzleIds.has(puzzleId)) {
-          duplicates++;
           consecutiveFailures++;
 
           if (consecutiveFailures >= maxConsecutiveFailures) {
@@ -315,14 +279,11 @@ export default function CreatePuzzleSetPage() {
         difficultyCounts[selectedDifficulty] = (difficultyCounts[selectedDifficulty] || 0) + 1;
         consecutiveFailures = 0;
 
-        const iterationEnd = performance.now();
-        const iterationDuration = iterationEnd - iterationStart;
-        const newAvg = totalElo / puzzleIds.size;
         const progress = Math.floor((puzzleIds.size / puzzle_count) * 100);
 
         onProgress(progress);
 
-      } catch (puzzleErr) {
+      } catch {
         consecutiveFailures++;
         if (consecutiveFailures >= maxConsecutiveFailures) {
           break;
@@ -330,8 +291,6 @@ export default function CreatePuzzleSetPage() {
       }
     }
 
-    const endTime = performance.now();
-    const totalDuration = endTime - startTime;
 
     const allPuzzleIds = Array.from(puzzleIds);
     const shuffledPuzzleIds = shuffleStringList(allPuzzleIds);

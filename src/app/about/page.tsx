@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import AboutStructuredData from "@/components/structured-data/AboutStructuredData";
@@ -16,10 +15,6 @@ export default function AboutPage() {
 
   if (!isMounted) return null;
 
-  const heroImage =
-    resolvedTheme === "dark"
-      ? "/heros/table_study_white.png"
-      : "/heros/table_study_black.png";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -87,7 +82,7 @@ export default function AboutPage() {
 
             <div className="space-y-8">
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                I'm 23, and last year something clicked. I became absolutely
+                I&apos;m 23, and last year something clicked. I became absolutely
                 <span className="text-foreground font-medium"> obsessed with chess</span>.
                 What started as casual games quickly evolved into studying grandmaster games at 2 AM,
                 analyzing positions for hours, and dreaming about tactical patterns.
@@ -96,15 +91,15 @@ export default function AboutPage() {
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 But as I dove deeper into training, I realized most chess improvement is really a
                 data problem — you need the right puzzles,
-                at the right difficulty, reviewed at the right intervals. It's not just about solving
-                thousands of random tactics; it's about creating a <span className="text-foreground font-medium">systematic approach</span> where each puzzle
+                at the right difficulty, reviewed at the right intervals. It&apos;s not just about solving
+                thousands of random tactics; it&apos;s about creating a <span className="text-foreground font-medium">systematic approach</span> where each puzzle
                 builds on the last, <span className="text-foreground font-medium">reinforcing patterns</span> until they become automatic.
               </p>
 
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 Yet existing systems felt unintelligent.
                 Random puzzles thrown at you with no context. No real progression tracking beyond simple ratings.
-                No understanding of what you actually need to work on, or which specific patterns you're struggling with.
+                No understanding of what you actually need to work on, or which specific patterns you&apos;re struggling with.
                 Most platforms seemed built for engagement metrics rather than <span className="text-foreground font-medium">actual learning efficiency</span>.
               </p>
 
@@ -116,7 +111,7 @@ export default function AboutPage() {
 
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 I started coding ChessPecker in 2024, combining my software development background
-                with this newfound chess passion. There's something
+                with this newfound chess passion. There&apos;s something
                 <span className="text-foreground font-medium"> magical</span> about building exactly
                 the training tool I wished existed.
               </p>
@@ -137,7 +132,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Thanks for being part of the ChessPecker journey. Whether you want to learn more about the development
-              or support the project, I'd love to connect.
+              or support the project, I&apos;d love to connect.
             </p>
           </div>
 

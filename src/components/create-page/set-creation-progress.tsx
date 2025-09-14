@@ -31,8 +31,6 @@ export default function PuzzleSetCreationProgress({
   }, [puzzleProgress, puzzlePhaseComplete]);
 
   const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-  const remainingSeconds = elapsedSeconds % 60;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
