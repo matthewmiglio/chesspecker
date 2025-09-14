@@ -24,6 +24,9 @@ export default function Footer() {
           <Link href="https://www.matthewmiglio.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
             Portfolio
           </Link>
+          <Link href="https://donate.stripe.com/4gM7sN3Vj4vO2u4dzF4Ja04" target="_blank" rel="noopener noreferrer" className="hover:text-foreground text-orange-500 hover:text-orange-400">
+            Donate ❤️
+          </Link>
           <span>Last Updated: September 2025</span>
         </div>
       </div>
