@@ -1,35 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { puzzleService } from "@/lib/services/puzzleService";
 
 export async function POST(req: NextRequest) {
   const { difficulty = "normal", theme } = await req.json();
 
-  try {
-    // Get random puzzle from our CSV data
-    const puzzle = await puzzleService.getRandomPuzzle(difficulty);
+  const url = new URL("https://lichess.org/api/puzzle/next");
+  url.searchParams.set("difficulty", difficulty);
+  if (theme) url.searchParams.set("theme", theme);
 
-    if (!puzzle) {
-      return NextResponse.json({ error: "No puzzle found for difficulty" }, { status: 404 });
+  try {
+    const res = await fetch(url.toString(), {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      return NextResponse.json({ error: "Failed to fetch puzzle" }, { status: 500 });
     }
 
-    // Format response to match previous Lichess API structure
-    const response = {
-      puzzle: {
-        id: puzzle.id,
-        rating: puzzle.rating,
-        themes: puzzle.themes
-      },
-      game: {
-        fen: puzzle.fen,
-        pgn: "", // We don't have PGN data, but FEN is what we need
-        moves: puzzle.moves
-      }
-    };
-
-    return NextResponse.json(response);
+    const data = await res.json();
+    return NextResponse.json(data);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("Failed to get puzzle from CSV:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

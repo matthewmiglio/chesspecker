@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { puzzleService } from "@/lib/services/puzzleService";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -10,40 +9,23 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    console.log(`🎯 API: Getting puzzle by ID: ${id}`);
+    const res = await fetch(`https://lichess.org/api/puzzle/${id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_LICHESS_KEY}`,
+        Accept: "application/json",
+      },
+    });
 
-    // Get full puzzle data from our CSV service
-    const puzzle = await puzzleService.getFullPuzzle(id);
-
-    if (!puzzle) {
-      console.log(`❌ API: Puzzle ${id} not found`);
+    if (!res.ok) {
       return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
     }
 
-    console.log(`✅ API: Found puzzle ${id}, rating: ${puzzle.rating}`);
-
-    // Format response to match previous Lichess API structure
-    const response = {
-      puzzle: {
-        id: puzzle.id,
-        rating: puzzle.rating,
-        themes: puzzle.themes,
-        solution: puzzle.moves
-      },
-      game: {
-        fen: puzzle.fen,
-        pgn: "", // We don't have PGN data in CSV
-        moves: puzzle.moves,
-        url: puzzle.gameUrl
-      }
-    };
-
-    return NextResponse.json(response);
+    const data = await res.json();
+    return NextResponse.json(data);
   } catch (err) {
-    console.error("❌ API Error: Failed to fetch puzzle by ID:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Failed to fetch puzzle by ID:", err);
     return NextResponse.json(
-      { error: `Failed to fetch puzzle: ${message}` },
+      { error: "Failed to fetch puzzle" },
       { status: 500 }
     );
   }
