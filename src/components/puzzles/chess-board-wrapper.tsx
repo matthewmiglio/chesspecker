@@ -88,7 +88,7 @@ export default function ChessBoardWrapper({
 
       return () => clearTimeout(timer);
     }
-  }, [autoNextPuzzle, puzzleSession.showFeedbackButtons, puzzleSession.handleContinueToNext]);
+  }, [autoNextPuzzle, puzzleSession, puzzleSession.showFeedbackButtons, puzzleSession.handleContinueToNext]);
 
   // Timer for hint button highlighting
   useEffect(() => {
