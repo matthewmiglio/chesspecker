@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_KEY!
 );
 
-export async function GET(req: Request) {
+export async function GET() {
   console.log('[get_events] Starting analytics events request');
 
   try {

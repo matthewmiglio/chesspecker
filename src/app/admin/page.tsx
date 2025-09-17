@@ -21,6 +21,20 @@ import FeedbackTable from "@/components/admin-page/tables/FeedbackTable";
 import { AccuracyData, DailyStats, SetData, UserTableUser } from "@/lib/types";
 import { fetchAllFeedback } from "@/lib/api/feedbackApi"; // ✅ add this impo
 
+type AnalyticsEvent = {
+  id: string;
+  ts: string;
+  path: string;
+  referrer: string | null;
+  visitor_id: string | null;
+  session_id: string | null;
+  ua: string | null;
+  ip_hash: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+};
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState<"figures" | "tables" | "feedback">(
@@ -38,7 +52,7 @@ export default function AdminPage() {
   const [feedback, setFeedback] = useState<
     { email:string, text:string, timestamp:string }[]
   >([]);
-  const [analytics, setAnalytics] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsEvent[]>([]);
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
