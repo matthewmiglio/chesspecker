@@ -91,15 +91,10 @@ export default function CreatePuzzleSetPage() {
       // Phase 3: Accuracy Tracking Setup
       info("Setting up accuracy tracking...", undefined, 4000);
 
-      const accuracyStartTime = performance.now();
-      let successfulAccuracyRows = 0;
-      let failedAccuracyRows = 0;
       const accuracyErrors = [];
 
       // Create accuracy rows for each repeat index
       for (let i = 0; i < repeats; i++) {
-        const rowStartTime = performance.now();
-
         try {
           const accuracyRes = await fetch("/api/accuracy/createSetAccuracy", {
             method: "POST",
@@ -112,15 +107,12 @@ export default function CreatePuzzleSetPage() {
             const errorDetail = errorData.error || 'Unknown error';
 
             accuracyErrors.push({ index: i, error: errorDetail, status: accuracyRes.status });
-            failedAccuracyRows++;
             error(`Failed to create accuracy tracking for repeat ${i + 1}: ${errorDetail}`, "Accuracy Setup Failed");
           } else {
             await accuracyRes.json();
-            successfulAccuracyRows++;
           }
         } catch (accuracyErr) {
           accuracyErrors.push({ index: i, error: accuracyErr.message, exception: true });
-          failedAccuracyRows++;
           error(`Exception creating accuracy tracking for repeat ${i + 1}`, "Accuracy Setup Error");
         }
 
@@ -209,7 +201,6 @@ export default function CreatePuzzleSetPage() {
     targetElo: number,
     onProgress: (progress: number) => void
   ): Promise<string[]> => {
-    const startTime = performance.now();
 
     const difficultyEloMap: Record<string, number> = {
       easiest: 1,
@@ -242,7 +233,6 @@ export default function CreatePuzzleSetPage() {
     const maxConsecutiveFailures = 10;
 
     while (puzzleIds.size < puzzle_count) {
-      const iterationStart = performance.now();
       const currentAvg = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
 
       const pool = currentAvg >= targetElo ? easierDifficulties : harderDifficulties;

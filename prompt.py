@@ -83,13 +83,6 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
-        r"H:\my_files\my_programs\kinivi_gesture_train\inference-lite\keypoint_classification.py",
-        r"H:\my_files\my_programs\kinivi_gesture_train\inference-lite\point_history_clasisfication.py",
-        r"H:\my_files\my_programs\kinivi_gesture_train\test-kinivi-gesture\camera_prediction.py",
-        r"H:\my_files\my_programs\kinivi_gesture_train\test-kinivi-gesture\storage_prediction.py",
-        r"H:\my_files\my_programs\kinivi_gesture_train\train-keypoint-classifier\train.py",
-        r"H:\my_files\my_programs\kinivi_gesture_train\train-point-history-classifier\add_point_history_data.ipynb",
-        r"H:\my_files\my_programs\kinivi_gesture_train\train-point-history-classifier\train.py",
     ]
 
     ignore_folders = [

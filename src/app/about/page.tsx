@@ -6,7 +6,6 @@ import AboutStructuredData from "@/components/structured-data/AboutStructuredDat
 import { Heart } from "lucide-react";
 
 export default function AboutPage() {
-  const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
