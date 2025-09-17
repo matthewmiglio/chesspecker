@@ -6,6 +6,7 @@ import UsersTable from "@/components/admin-page/tables/usersTable";
 import DailyStatsTable from "@/components/admin-page/tables/dailyStatsTable";
 import SetsTable from "@/components/admin-page/tables/setsTable";
 import StreaksTable from "@/components/admin-page/tables/StreaksTable";
+import RawPageViewTable from "@/components/admin-page/tables/RawPageViewTable";
 import { Streak } from "@/lib/types";
 
 
@@ -46,12 +47,27 @@ type AccuracyData = {
   incorrect: number;
 };
 
+type AnalyticsEvent = {
+  id: string;
+  ts: string;
+  path: string;
+  referrer: string | null;
+  visitor_id: string | null;
+  session_id: string | null;
+  ua: string | null;
+  ip_hash: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+};
+
 type RawTablesProps = {
   accuracyData: AccuracyData[];
   usersData: UserTableUser[];
   dailydata: DailyStats[];
   setsData: SetData[];
   streaksData: Streak[];
+  analyticsData: AnalyticsEvent[];
 };
 
 export default function RawTables({
@@ -60,15 +76,17 @@ export default function RawTables({
   dailydata,
   setsData,
   streaksData,
+  analyticsData,
 }: RawTablesProps) {
   return (
     <Tabs defaultValue="accuracies" className="w-full">
-      <TabsList className="grid grid-cols-5 w-full mb-4">
+      <TabsList className="grid grid-cols-6 w-full mb-4">
         <TabsTrigger value="accuracies">Accuracy</TabsTrigger>
         <TabsTrigger value="users">Users</TabsTrigger>
         <TabsTrigger value="daily">Daily Stats</TabsTrigger>
         <TabsTrigger value="sets">Sets</TabsTrigger>
         <TabsTrigger value="streaks">Streaks</TabsTrigger>
+        <TabsTrigger value="pageviews">Page View Stats</TabsTrigger>
       </TabsList>
 
       <TabsContent value="accuracies">
@@ -103,6 +121,12 @@ export default function RawTables({
   <div className="w-full max-w-[420px] md:max-w-none mx-auto px-2">
     <h2 className="text-xl font-semibold mb-2">Sets</h2>
     <SetsTable data={setsData} />
+  </div>
+</TabsContent>
+
+<TabsContent value="pageviews">
+  <div className="w-full max-w-[420px] md:max-w-none mx-auto px-2">
+    <RawPageViewTable data={analyticsData} />
   </div>
 </TabsContent>
 

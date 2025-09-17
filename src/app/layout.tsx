@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import Navbar from "@/components/header-footer/navbar";
 import Footer from "@/components/header-footer/footer";
 import { Analytics } from "@vercel/analytics/react";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -77,10 +78,12 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <Navbar />
-          {children}
-          <Footer />
-          <Analytics />
+          <AnalyticsProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <Analytics />
+          </AnalyticsProvider>
         </Providers>
       </body>
     </html>

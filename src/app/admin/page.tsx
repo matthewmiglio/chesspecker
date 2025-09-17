@@ -7,6 +7,7 @@ import {
   fetchUserStats,
   fetchDailyStats,
   fetchSets,
+  fetchAnalyticsEvents,
 } from "@/lib/api/adminDataApi";
 
 import RawTables from "@/components/admin-page/tables/tablesDashboard";
@@ -37,6 +38,7 @@ export default function AdminPage() {
   const [feedback, setFeedback] = useState<
     { email:string, text:string, timestamp:string }[]
   >([]);
+  const [analytics, setAnalytics] = useState<any[]>([]);
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -58,6 +60,7 @@ export default function AdminPage() {
         setsData,
         streakData,
         feedbackData,
+        analyticsData,
       ] = await Promise.all([
         fetchAccuracyData(),
         fetchUserStats(),
@@ -65,6 +68,7 @@ export default function AdminPage() {
         fetchSets(),
         fetchAllLoginStreaks(),
         fetchAllFeedback(),
+        fetchAnalyticsEvents(),
       ]);
 
       setAccuracy(accuracyData.sets || []);
@@ -73,6 +77,7 @@ export default function AdminPage() {
       setSets(setsData.sets || []);
       setStreaks(streakData.data || []);
       setFeedback(feedbackData || []);
+      setAnalytics(analyticsData.events || []);
       setLoading(false);
     }
 
@@ -137,6 +142,7 @@ export default function AdminPage() {
             dailydata={daily}
             setsData={sets}
             streaksData={streaks}
+            analyticsData={analytics}
           />
         ) : (
           <FeedbackTable feedback={feedback} /> // ✅ new tab
