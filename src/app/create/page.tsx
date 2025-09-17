@@ -198,7 +198,11 @@ export default function CreatePuzzleSetPage() {
           }
         } catch (accuracyErr) {
           console.log(`💥 EXCEPTION in accuracy row ${i + 1}:`, accuracyErr);
-          accuracyErrors.push({ index: i, error: accuracyErr.message, exception: true });
+          const errorMessage =
+            typeof accuracyErr === "object" && accuracyErr !== null && "message" in accuracyErr
+              ? String((accuracyErr as { message?: unknown }).message)
+              : String(accuracyErr);
+          accuracyErrors.push({ index: i, error: errorMessage, exception: true });
           failedAccuracyRows++;
           error(`Exception creating accuracy tracking for repeat ${i + 1}`, "Accuracy Setup Error");
         }
