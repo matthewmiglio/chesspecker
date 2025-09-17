@@ -29,7 +29,7 @@ function getSessionId(): string {
   return sessionId
 }
 
-export async function trackPageView(path: string): Promise<{ success: boolean; error?: unknown; data?: any }> {
+export async function trackPageView(path: string): Promise<{ success: boolean; error?: unknown; data?: { success: boolean; data: unknown } }> {
   const eventData = {
     path: path || window.location.pathname,
     referrer: document.referrer || null,
