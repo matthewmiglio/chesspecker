@@ -338,18 +338,18 @@ export default function CreatePuzzleSetPage() {
     } catch (err) {
       console.log(`💥 [${puzzleRequestId}] EXCEPTION caught in createNewPuzzle:`, err);
       console.log(`🔍 [${puzzleRequestId}] Error analysis:`, {
-        type: err.constructor.name,
-        message: err.message,
+        type: err instanceof Error ? err.constructor.name : 'Unknown',
+        message: err instanceof Error ? err.message : String(err),
         isNetworkError: err instanceof TypeError && err.message.includes('fetch'),
-        isNetworkErrorByName: err.name === 'NetworkError',
-        isNetworkErrorByMessage: err.message && err.message.includes('network')
+        isNetworkErrorByName: err instanceof Error && err.name === 'NetworkError',
+        isNetworkErrorByMessage: err instanceof Error && err.message && err.message.includes('network')
       });
 
       // Retry on network errors
       if (retryCount < maxRetries && (
         err instanceof TypeError && err.message.includes('fetch') ||
-        err.name === 'NetworkError' ||
-        err.message.includes('network')
+        (err instanceof Error && err.name === 'NetworkError') ||
+        (err instanceof Error && err.message.includes('network'))
       )) {
         const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 8000);
         console.log(`🔄 [${puzzleRequestId}] Network error detected, retrying in ${backoffDelay}ms... (${retryCount + 1}/${maxRetries})`);
