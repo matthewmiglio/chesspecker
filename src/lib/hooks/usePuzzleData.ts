@@ -82,15 +82,35 @@ export const loadPuzzleAndInitialize = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
+  console.log('🎨 [RETRY DEBUG] loadPuzzleAndInitialize - START');
+  console.log('🎨 [RETRY DEBUG] puzzleData received:', {
+    puzzleId: puzzleData.puzzle.id,
+    initialPly: puzzleData.puzzle.initialPly,
+    solutionLength: puzzleData.puzzle.solution.length,
+    solution: puzzleData.puzzle.solution,
+    rating: puzzleData.puzzle.rating
+  });
+
   const fen = getFenAtPly(
     puzzleData.game.pgn,
     puzzleData.puzzle.initialPly + 1
   );
+  console.log('🎨 [RETRY DEBUG] Generated FEN:', fen);
 
+  console.log('🎨 [RETRY DEBUG] Setting puzzle state:');
+  console.log('🎨 [RETRY DEBUG] - Setting FEN to:', fen);
   setFen(fen);
+
+  console.log('🎨 [RETRY DEBUG] - Setting solution to:', puzzleData.puzzle.solution);
   setSolution(puzzleData.puzzle.solution);
+
+  console.log('🎨 [RETRY DEBUG] - Setting solvedIndex to: 0');
   setSolvedIndex(0);
+
+  console.log('🎨 [RETRY DEBUG] - Setting highlight to: null');
   setHighlight(null);
+
+  console.log('🎨 [RETRY DEBUG] loadPuzzleAndInitialize - END');
 };
 
 export const handleSetSelect = async (

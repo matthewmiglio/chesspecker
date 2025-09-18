@@ -59,11 +59,18 @@ export default function ChessBoardWrapper({
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
 
   useEffect(() => {
+    console.log('🏁 [RETRY DEBUG] ChessBoardWrapper useEffect - Session startup check');
+    console.log('🏁 [RETRY DEBUG] selectedSetId:', selectedSetId);
+    console.log('🏁 [RETRY DEBUG] puzzleSession exists:', !!puzzleSession);
+    console.log('🏁 [RETRY DEBUG] isSessionActive:', puzzleSession?.isSessionActive);
+
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
       console.log(
-        "[ChessBoardWrapper] selectedSetId ready. Starting session..."
+        "🏁 [RETRY DEBUG] [ChessBoardWrapper] selectedSetId ready. Starting session..."
       );
       puzzleSession.handleStartSession();
+    } else {
+      console.log('🏁 [RETRY DEBUG] Not starting session - conditions not met');
     }
   }, [selectedSetId, puzzleSession]);
 
@@ -297,7 +304,11 @@ export default function ChessBoardWrapper({
 
               {/* Retry Puzzle */}
               <Button
-                onClick={puzzleSession.handleRetryPuzzle}
+                onClick={() => {
+                  console.log('🔄 [RETRY DEBUG] RETRY BUTTON CLICKED!');
+                  console.log('🔄 [RETRY DEBUG] About to call handleRetryPuzzle');
+                  puzzleSession.handleRetryPuzzle();
+                }}
                 variant="outline"
                 className="w-full flex items-center justify-center gap-3 py-3"
               >
