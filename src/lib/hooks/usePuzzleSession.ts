@@ -9,6 +9,7 @@ import {
   setIsDone,
 } from "@/lib/utils/puzzleUtils";
 import { getPuzzleData } from "@/lib/api/puzzleApi";
+import { PuzzleData } from "@/lib/types";
 import {
   loadPuzzleAndInitialize,
   updateThisSetAccuracy,
@@ -64,6 +65,7 @@ export function usePuzzleSession({
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
+  const [currentPuzzleData, setCurrentPuzzleData] = useState<PuzzleData | null>(null);
 
   // One-time marking logic to prevent duplicate accuracy records
   const [puzzleAttempted, setPuzzleAttempted] = useState(false);
@@ -256,6 +258,7 @@ export function usePuzzleSession({
 
     const nextPuzzleId = puzzleIds[nextPuzzleIndex];
     const puzzle = await getPuzzleData(nextPuzzleId);
+    setCurrentPuzzleData(puzzle);
 
     if (!puzzle) {
       return;
@@ -319,7 +322,8 @@ export function usePuzzleSession({
     
     const nextPuzzleId = puzzleIds[currentPuzzleIndex];
     const puzzle = await getPuzzleData(nextPuzzleId);
-    
+    setCurrentPuzzleData(puzzle);
+
     if (!puzzle) {
       return;
     }
@@ -345,7 +349,8 @@ export function usePuzzleSession({
     
     const currentPuzzleId = puzzleIds[currentPuzzleIndex];
     const puzzle = await getPuzzleData(currentPuzzleId);
-    
+    setCurrentPuzzleData(puzzle);
+
     if (!puzzle) {
       return;
     }
@@ -396,5 +401,6 @@ export function usePuzzleSession({
     handleContinueToNext,
     handleRetryPuzzle,
     handleShowReplay,
+    currentPuzzleData,
   };
 }

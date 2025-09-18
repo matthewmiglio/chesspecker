@@ -99,4 +99,5 @@ export type Puzzle = {
 
 export type Game = {
   pgn: string;
+  fen?: string;
 };
