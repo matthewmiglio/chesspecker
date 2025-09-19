@@ -42,7 +42,7 @@ export default function AboutPage() {
 
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 <span className="text-foreground font-medium">Smart curation</span> means puzzles matched to your skill level, not random selections.
-                <span className="text-foreground font-medium">Cycle training</span> lets you re-solve the same sets for pattern mastery, building neural pathways
+                <span className="text-foreground font-medium"> Cycle training</span> lets you re-solve the same sets for pattern mastery, building neural pathways
                 that make tactical recognition automatic. <span className="text-foreground font-medium">Progress tracking</span> provides detailed analytics to see your improvement,
                 including accuracy trends, speed improvements, and weak pattern identification across each training cycle.
               </p>
