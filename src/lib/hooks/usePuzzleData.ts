@@ -88,7 +88,6 @@ export const loadPuzzleAndInitialize = async (
     initialPly: puzzleData.puzzle.initialPly,
     solutionLength: puzzleData.puzzle.solution.length,
     solution: puzzleData.puzzle.solution,
-    rating: puzzleData.puzzle.rating
   });
 
   const fen = getFenAtPly(
