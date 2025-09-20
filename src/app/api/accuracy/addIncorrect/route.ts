@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { set_id, repeat_index } = await req.json();
+  const { set_id, repeat_index, time_taken = 0 } = await req.json();
 
   if (!set_id || repeat_index === undefined) {
     return NextResponse.json({ error: "Missing set_id or repeat_index" }, { status: 400 });
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   const { data, error: fetchError } = await supabase
     .from("chessPeckerSetAccuracies")
-    .select("incorrect")
+    .select("incorrect, time_taken")
     .eq("set_id", set_id)
     .eq("repeat_index", repeat_index);
 
@@ -29,10 +29,11 @@ export async function POST(req: NextRequest) {
 
   // Use first record if duplicates exist (handles duplicate rows gracefully)
   const newIncorrect = data[0].incorrect + 1;
+  const newTimeTaken = (data[0].time_taken || 0) + time_taken;
 
   const { error: updateError } = await supabase
     .from("chessPeckerSetAccuracies")
-    .update({ incorrect: newIncorrect })
+    .update({ incorrect: newIncorrect, time_taken: newTimeTaken })
     .eq("set_id", set_id)
     .eq("repeat_index", repeat_index);
 

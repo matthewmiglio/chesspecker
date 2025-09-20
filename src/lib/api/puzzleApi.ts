@@ -7,13 +7,14 @@ import { showConfirmDeletePopup } from "@/lib/utils/uiHelpers";
 
 export const addIncorrectAttempt = async (
   setId: number,
-  repeatIndex: number
+  repeatIndex: number,
+  timeTaken: number = 0
 ) => {
   try {
     const res = await fetch("/api/accuracy/addIncorrect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex, time_taken: timeTaken }),
     });
 
     const data = await res.json();
@@ -29,13 +30,13 @@ export const addIncorrectAttempt = async (
   }
 };
 
-export const addCorrectAttempt = async (setId: number, repeatIndex: number) => {
+export const addCorrectAttempt = async (setId: number, repeatIndex: number, timeTaken: number = 0) => {
   try {
 
     const res = await fetch("/api/accuracy/addCorrect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
+      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex, time_taken: timeTaken }),
     });
 
     const data = await res.json();

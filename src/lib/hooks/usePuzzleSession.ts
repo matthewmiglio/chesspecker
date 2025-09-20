@@ -67,6 +67,9 @@ export function usePuzzleSession({
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
   const [currentPuzzleData, setCurrentPuzzleData] = useState<PuzzleData | null>(null);
 
+  // Timing state for puzzle duration tracking
+  const [puzzleStartTime, setPuzzleStartTime] = useState<number | null>(null);
+
   // One-time marking logic to prevent duplicate accuracy records
   const [puzzleAttempted, setPuzzleAttempted] = useState(false);
   const [puzzleOutcome, setPuzzleOutcome] = useState<'correct' | 'incorrect' | null>(null);
@@ -108,6 +111,8 @@ export function usePuzzleSession({
     console.log('🔄 [RETRY DEBUG] Resetting puzzleAttempted to false and puzzleOutcome to null');
     setPuzzleAttempted(false);
     setPuzzleOutcome(null);
+    // Start timing for new puzzle
+    setPuzzleStartTime(Date.now());
   }, [currentPuzzleIndex, currentRepeatIndex]);
 
   const handleIncorrectMove = async () => {
@@ -135,9 +140,13 @@ export function usePuzzleSession({
 
     console.log('🚨 [RETRY DEBUG] Showing red X visual feedback');
     showRedX();
+
+    // Calculate elapsed time
+    const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0; // Convert to seconds
+
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     console.log('🚨 [RETRY DEBUG] Adding incorrect attempt to database');
-    await addIncorrectAttempt(setId, currentRepeatIndex);
+    await addIncorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
     console.log('🚨 [RETRY DEBUG] Incrementing stats');
     incrementIncorrect(); //total daily stats
@@ -170,8 +179,11 @@ export function usePuzzleSession({
     setPuzzleAttempted(true);
     setPuzzleOutcome('correct');
 
+    // Calculate elapsed time
+    const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0; // Convert to seconds
+
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
-    await addCorrectAttempt(setId, currentRepeatIndex);
+    await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
     incrementCorrect(); //total daily stats
     if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email); //user stats
@@ -192,9 +204,12 @@ export function usePuzzleSession({
     // Show yellow warning instead of red X
     showYellowWarning();
 
+    // Calculate elapsed time
+    const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0; // Convert to seconds
+
     // Mark as correct for stats (hints should count as correct)
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
-    await addCorrectAttempt(setId, currentRepeatIndex);
+    await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
     incrementCorrect(); //total daily stats
     if (!email) email = "unauthenticated@email.com";
@@ -389,6 +404,8 @@ export function usePuzzleSession({
 
     console.log('🚀 [RETRY DEBUG] Setting session active with setId:', setId);
     setIsSessionActive(true);
+    // Start timing for the first puzzle
+    setPuzzleStartTime(Date.now());
     console.log('🚀 [RETRY DEBUG] handleStartSession - END');
   };
 
