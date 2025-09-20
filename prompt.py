@@ -83,6 +83,12 @@ if __name__ == "__main__":
     file_tree_top_dir = os.getcwd()
 
     files_to_print = [
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
+        r'',
     ]
 
     ignore_folders = [
