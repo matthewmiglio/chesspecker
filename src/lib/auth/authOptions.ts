@@ -36,6 +36,14 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_AUTH_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+          scope: "openid email profile"
+        }
+      }
     }),
   ],
   session: { strategy: "jwt" },
@@ -74,12 +82,10 @@ export const authOptions: NextAuthOptions = {
           console.warn('[authOptions] WARNING: Google account has no id_token');
         }
       } else if (!hasExistingSupabaseData && token?.email) {
-        // Handle existing session without Supabase data - attempt recovery
-        console.log('[authOptions] Existing session without Supabase data, attempting recovery for:', token.email);
-
-        // For existing sessions, we don't have the Google ID token, so we'll need to
-        // either force re-login or use a different approach
-        console.log('[authOptions] No account object and no existing Supabase data - user needs to re-login for Supabase integration');
+        // Handle existing session without Supabase data - need re-login
+        console.log('[authOptions] Existing session without Supabase data for:', token.email);
+        console.log('[authOptions] SOLUTION: User must completely log out and log back in to trigger fresh Google OAuth flow');
+        console.log('[authOptions] The account object with Google ID token is only available during initial OAuth, not subsequent JWT refreshes');
       } else if (hasExistingSupabaseData) {
         console.log('[authOptions] Using existing Supabase data from token');
       } else {

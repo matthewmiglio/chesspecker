@@ -18,9 +18,23 @@ export function SupabaseReauthBanner() {
     return null;
   }
 
-  const handleReauth = () => {
-    // Sign out and redirect to home page for fresh login
-    signOut({ callbackUrl: "/" });
+  const handleReauth = async () => {
+    console.log('[SupabaseReauthBanner] Starting complete logout and fresh login process');
+
+    // Clear any browser storage that might cache credentials
+    if (typeof window !== 'undefined') {
+      // Clear localStorage
+      localStorage.clear();
+      // Clear sessionStorage
+      sessionStorage.clear();
+      console.log('[SupabaseReauthBanner] Cleared browser storage');
+    }
+
+    // Force complete logout with redirect - this should clear all NextAuth cookies
+    await signOut({
+      callbackUrl: "/auth/signin?force=true",
+      redirect: true
+    });
   };
 
   return (
