@@ -18,6 +18,7 @@ interface ExtendedSession extends Session {
     user_id: string | null;
     expires_at: number | undefined;
   };
+  needsSupabaseReauth?: boolean;
 }
 
 interface GoogleAccount extends Account {
@@ -51,62 +52,81 @@ export const authOptions: NextAuthOptions = {
 
       const extendedToken = token as ExtendedJWT;
 
+      // Check if we already have Supabase data
+      const hasExistingSupabaseData = !!extendedToken.supabase?.access_token;
+      console.log('[authOptions] Existing Supabase data check:', {
+        hasExistingSupabaseData,
+        existingUserId: extendedToken.supabase?.user_id || 'none',
+        existingTokenLength: extendedToken.supabase?.access_token?.length || 0
+      });
+
+      // Handle initial Google login (account present) OR existing session without Supabase data
       if (account?.provider === "google") {
-        console.log('[authOptions] Google account detected:', {
+        console.log('[authOptions] Google account detected (initial login):', {
           hasIdToken: !!(account as GoogleAccount).id_token,
           idTokenLength: (account as GoogleAccount).id_token?.length || 0,
-          accountKeys: Object.keys(account),
-          fullAccount: account
+          accountKeys: Object.keys(account)
         });
 
         if ((account as GoogleAccount).id_token) {
-          const idToken = (account as GoogleAccount).id_token!;
-          console.log('[authOptions] Attempting Supabase signInWithIdToken with token length:', idToken.length);
-
-          try {
-            const { data, error } = await supabase.auth.signInWithIdToken({
-              provider: "google",
-              token: idToken,
-            });
-
-            console.log('[authOptions] Supabase signInWithIdToken result:', {
-              hasError: !!error,
-              errorMessage: error?.message || 'none',
-              errorStatus: error?.status || 'none',
-              hasData: !!data,
-              hasSession: !!data?.session,
-              hasUser: !!data?.user,
-              sessionAccessToken: data?.session?.access_token ? 'present' : 'missing',
-              sessionRefreshToken: data?.session?.refresh_token ? 'present' : 'missing',
-              sessionExpiresAt: data?.session?.expires_at || 'none',
-              userId: data?.user?.id || 'none',
-              userEmail: data?.user?.email || 'none',
-              fullError: error,
-              fullData: data
-            });
-
-            if (!error && data.session) {
-              console.log('[authOptions] SUCCESS: Storing Supabase session in JWT');
-              extendedToken.supabase = {
-                access_token: data.session.access_token,
-                refresh_token: data.session.refresh_token,
-                expires_at: data.session.expires_at,
-                user_id: data.user?.id ?? null,
-              };
-            } else {
-              console.error('[authOptions] FAILED: Supabase signInWithIdToken failed:', {
-                error: error?.message,
-                hasSession: !!data?.session
-              });
-            }
-          } catch (e) {
-            console.error('[authOptions] EXCEPTION during Supabase signInWithIdToken:', e);
-          }
+          await attemptSupabaseExchange(extendedToken, (account as GoogleAccount).id_token!);
         } else {
           console.warn('[authOptions] WARNING: Google account has no id_token');
         }
+      } else if (!hasExistingSupabaseData && token?.email) {
+        // Handle existing session without Supabase data - attempt recovery
+        console.log('[authOptions] Existing session without Supabase data, attempting recovery for:', token.email);
+
+        // For existing sessions, we don't have the Google ID token, so we'll need to
+        // either force re-login or use a different approach
+        console.log('[authOptions] No account object and no existing Supabase data - user needs to re-login for Supabase integration');
+      } else if (hasExistingSupabaseData) {
+        console.log('[authOptions] Using existing Supabase data from token');
       } else {
-        console.log('[authOptions] Not a Google account, skipping Supabase exchange');
+        console.log('[authOptions] No Google account, no existing Supabase data, skipping exchange');
+      }
+
+      async function attemptSupabaseExchange(token: ExtendedJWT, idToken: string) {
+        console.log('[authOptions] Attempting Supabase signInWithIdToken with token length:', idToken.length);
+
+        try {
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: idToken,
+          });
+
+          console.log('[authOptions] Supabase signInWithIdToken result:', {
+            hasError: !!error,
+            errorMessage: error?.message || 'none',
+            errorStatus: error?.status || 'none',
+            hasData: !!data,
+            hasSession: !!data?.session,
+            hasUser: !!data?.user,
+            sessionAccessToken: data?.session?.access_token ? 'present' : 'missing',
+            sessionRefreshToken: data?.session?.refresh_token ? 'present' : 'missing',
+            sessionExpiresAt: data?.session?.expires_at || 'none',
+            userId: data?.user?.id || 'none',
+            userEmail: data?.user?.email || 'none'
+          });
+
+          if (!error && data.session) {
+            console.log('[authOptions] SUCCESS: Storing Supabase session in JWT');
+            token.supabase = {
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+              expires_at: data.session.expires_at,
+              user_id: data.user?.id ?? null,
+            };
+          } else {
+            console.error('[authOptions] FAILED: Supabase signInWithIdToken failed:', {
+              error: error?.message,
+              hasSession: !!data?.session,
+              fullError: error
+            });
+          }
+        } catch (e) {
+          console.error('[authOptions] EXCEPTION during Supabase signInWithIdToken:', e);
+        }
       }
 
       const supa = extendedToken.supabase;
@@ -184,12 +204,15 @@ export const authOptions: NextAuthOptions = {
         };
         console.log('[authOptions] Added Supabase data to session');
       } else {
-        console.log('[authOptions] No Supabase data to add to session');
+        console.log('[authOptions] No Supabase data to add to session - user may need to re-login');
+        // Add a flag to indicate missing Supabase integration
+        extendedSession.needsSupabaseReauth = true;
       }
 
       console.log('[authOptions] Final session state:', {
         hasSessionSupabaseData: !!extendedSession.supabase,
-        sessionSupabaseUserId: extendedSession.supabase?.user_id || 'none'
+        sessionSupabaseUserId: extendedSession.supabase?.user_id || 'none',
+        needsReauth: extendedSession.needsSupabaseReauth || false
       });
 
       return extendedSession;

@@ -17,6 +17,7 @@ import SideNavBar from "@/components/admin-page/sideNavBar";
 import Unauthorized from "@/components/admin-page/unauthorized";
 import { useSession } from "next-auth/react";
 import FeedbackTable from "@/components/admin-page/tables/FeedbackTable";
+import { SupabaseReauthBanner } from "@/components/auth/SupabaseReauthBanner";
 
 import { AccuracyData, DailyStats, SetData, UserTableUser } from "@/lib/types";
 import { fetchAllFeedback } from "@/lib/api/feedbackApi"; // ✅ add this impo
@@ -173,6 +174,8 @@ export default function AdminPage() {
       <SideNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="flex-1 max-w-6xl mx-auto px-0 md:px-8 py-7 md:py-24 space-y-5  md:space-y-12">
         <h1 className="text-3xl font-bold ">Admin Dashboard</h1>
+
+        <SupabaseReauthBanner />
 
         {loading ? (
           <p>Loading data...</p>
