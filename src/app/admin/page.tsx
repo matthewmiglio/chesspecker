@@ -57,46 +57,83 @@ export default function AdminPage() {
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   useEffect(() => {
-    if (!session) return;
-    if (!adminEmail) {
+    console.log('[AdminPage] useEffect triggered:', {
+      hasSession: !!session,
+      sessionStatus: status,
+      sessionUser: session?.user,
+      adminEmail: adminEmail,
+      userEmail: session?.user?.email,
+      isAdminMatch: session?.user?.email === adminEmail
+    });
+
+    if (!session) {
+      console.log('[AdminPage] No session, returning early');
       return;
     }
-    if (!session.user) return;
-    if (!session?.user?.email) return;
-    if (session?.user?.email !== adminEmail) return;
+    if (!adminEmail) {
+      console.log('[AdminPage] No admin email configured, returning early');
+      return;
+    }
+    if (!session.user) {
+      console.log('[AdminPage] No session.user, returning early');
+      return;
+    }
+    if (!session?.user?.email) {
+      console.log('[AdminPage] No session.user.email, returning early');
+      return;
+    }
+    if (session?.user?.email !== adminEmail) {
+      console.log('[AdminPage] User email does not match admin email, returning early');
+      return;
+    }
+
+    console.log('[AdminPage] All checks passed, proceeding to load data');
 
     async function loadData() {
+      console.log('[AdminPage] loadData: Starting data fetch');
       setLoading(true);
-      const [
-        accuracyData,
-        userData,
-        dailyData,
-        setsData,
-        streakData,
-        feedbackData,
-        analyticsData,
-      ] = await Promise.all([
-        fetchAccuracyData(),
-        fetchUserStats(),
-        fetchDailyStats(),
-        fetchSets(),
-        fetchAllLoginStreaks(),
-        fetchAllFeedback(),
-        fetchAnalyticsEvents(),
-      ]);
 
-      setAccuracy(accuracyData.sets || []);
-      setUsers(userData.users || []);
-      setDaily(dailyData.days || []);
-      setSets(setsData.sets || []);
-      setStreaks(streakData.data || []);
-      setFeedback(feedbackData || []);
-      setAnalytics(analyticsData.events || []);
-      setLoading(false);
+      try {
+        console.log('[AdminPage] loadData: Fetching analytics events...');
+        const analyticsData = await fetchAnalyticsEvents();
+        console.log('[AdminPage] loadData: Analytics events result:', analyticsData);
+
+        console.log('[AdminPage] loadData: Fetching all other data...');
+        const [
+          accuracyData,
+          userData,
+          dailyData,
+          setsData,
+          streakData,
+          feedbackData,
+        ] = await Promise.all([
+          fetchAccuracyData(),
+          fetchUserStats(),
+          fetchDailyStats(),
+          fetchSets(),
+          fetchAllLoginStreaks(),
+          fetchAllFeedback(),
+        ]);
+
+        console.log('[AdminPage] loadData: All data fetched, setting state...');
+        setAccuracy(accuracyData.sets || []);
+        setUsers(userData.users || []);
+        setDaily(dailyData.days || []);
+        setSets(setsData.sets || []);
+        setStreaks(streakData.data || []);
+        setFeedback(feedbackData || []);
+        setAnalytics(analyticsData.events || []);
+
+        console.log('[AdminPage] loadData: Analytics events set in state:', analyticsData.events?.length || 0);
+        setLoading(false);
+      } catch (error) {
+        console.error('[AdminPage] loadData: Error occurred:', error);
+        setLoading(false);
+      }
     }
 
     loadData();
-  }, [session, adminEmail]);
+  }, [session, adminEmail, status]);
 
   if (status === "loading") return <p className="p-6">Authenticating...</p>;
   if (session?.user?.email !== adminEmail) return <Unauthorized />;
