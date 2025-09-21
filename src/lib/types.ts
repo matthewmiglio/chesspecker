@@ -66,6 +66,7 @@ export type RepeatAccuracy = {
   repeat: number;
   correct: number;
   incorrect: number;
+  time_taken?: number;
 };
 
 export type PuzzleSet = {

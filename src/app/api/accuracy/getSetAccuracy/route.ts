@@ -18,22 +18,28 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("chessPeckerSetAccuracies")
-    .select("correct, incorrect")
+    .select("set_id, repeat_index, correct, incorrect, time_taken")
     .eq("set_id", set_id)
     .eq("repeat_index", repeat_index)
     .maybeSingle();
 
   if (error) {
     console.error("Supabase error in getSetAccuracy:", error);
-    return NextResponse.json({ correct: 0, incorrect: 0 }, { status: 200 }); // Treat error as empty data
+    return NextResponse.json({ correct: 0, incorrect: 0, time_taken: null }, { status: 200 }); // Treat error as empty data
   }
 
   if (!data) {
-    return NextResponse.json({ correct: 0, incorrect: 0 }, { status: 200 }); // No data yet? Fine, zero
+    return NextResponse.json({ correct: 0, incorrect: 0, time_taken: null }, { status: 200 }); // No data yet? Fine, zero
   }
 
   return NextResponse.json(
-    { correct: data.correct ?? 0, incorrect: data.incorrect ?? 0 },
+    {
+      set_id: data.set_id,
+      repeat_index: data.repeat_index,
+      correct: data.correct ?? 0,
+      incorrect: data.incorrect ?? 0,
+      time_taken: data.time_taken ?? null
+    },
     { status: 200 }
   );
 }

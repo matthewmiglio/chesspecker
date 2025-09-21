@@ -35,8 +35,8 @@ export const fetchAccuracyData = async (
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ set_id, repeat_index: i }),
       })
-        .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0 }))
-        .catch(() => ({ correct: 0, incorrect: 0 }))
+        .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0, time_taken: null }))
+        .catch(() => ({ correct: 0, incorrect: 0, time_taken: null }))
     )
   );
 
@@ -50,6 +50,7 @@ export const fetchAccuracyData = async (
         repeat: i,
         correct,
         incorrect,
+        time_taken: data.time_taken || null,
         correctPercent: total > 0 ? (correct / total) * 100 : 0,
         incorrectPercent: total > 0 ? (incorrect / total) * 100 : 0,
       };
