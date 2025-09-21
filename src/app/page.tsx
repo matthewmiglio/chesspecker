@@ -9,6 +9,7 @@ import FeedbackPopup from "@/components/ui/FeedbackPopup";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import HomeStructuredData from "@/components/structured-data/HomeStructuredData";
+import { AuthDebugInfo } from "@/components/debug/AuthDebugInfo";
 
 /* ---------- Testimonials Data ---------- */
 type Testimonial = {
@@ -277,6 +278,9 @@ export default function Home() {
           onDismiss={async () => { setShowFeedbackPopup(false); }}
         />
       )}
+
+      {/* Auth Debug Info */}
+      <AuthDebugInfo />
     </div>
   );
 }
