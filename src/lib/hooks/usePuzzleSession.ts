@@ -73,6 +73,8 @@ export function usePuzzleSession({
   // One-time marking logic to prevent duplicate accuracy records
   const [puzzleAttempted, setPuzzleAttempted] = useState(false);
   const [puzzleOutcome, setPuzzleOutcome] = useState<'correct' | 'incorrect' | null>(null);
+  // Track retry cycles to prevent stale state issues
+  const [retryCounter, setRetryCounter] = useState(0);
 
   // Debug logs for state changes
   useEffect(() => {
@@ -111,6 +113,7 @@ export function usePuzzleSession({
     console.log('🔄 [RETRY DEBUG] Resetting puzzleAttempted to false and puzzleOutcome to null');
     setPuzzleAttempted(false);
     setPuzzleOutcome(null);
+    setRetryCounter(0); // Reset retry counter for new puzzle
     // Start timing for new puzzle
     setPuzzleStartTime(Date.now());
   }, [currentPuzzleIndex, currentRepeatIndex]);
@@ -167,9 +170,18 @@ export function usePuzzleSession({
   };
 
   const handleSuccessfulPuzzle = async (forceFinish = false) => {
-    // Don't mark if already attempted and failed, or already succeeded
-    if (puzzleAttempted && puzzleOutcome === 'incorrect') return;
-    if (puzzleAttempted && puzzleOutcome === 'correct') return;
+    console.log('✅ [RETRY DEBUG] handleSuccessfulPuzzle - START');
+    console.log('✅ [RETRY DEBUG] puzzleAttempted:', puzzleAttempted, 'puzzleOutcome:', puzzleOutcome, 'retryCounter:', retryCounter);
+
+    // More specific guards: only prevent if this puzzle was already marked as correct in this attempt cycle
+    // Don't block completion after a retry (retryCounter > 0 means we've retried)
+    if (puzzleAttempted && puzzleOutcome === 'correct' && retryCounter === 0) {
+      console.log('✅ [RETRY DEBUG] Puzzle already completed in this cycle, returning early');
+      return;
+    }
+
+    // Allow successful completion even if previously failed, since user might retry
+    console.log('✅ [RETRY DEBUG] Proceeding with puzzle completion');
 
     const setId = getSelectedSetId();
     if (!setId) {
@@ -188,7 +200,9 @@ export function usePuzzleSession({
     if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email); //user stats
 
+    console.log('✅ [RETRY DEBUG] Calling handleNextPuzzle with forceFinish:', forceFinish);
     await handleNextPuzzle(forceFinish);
+    console.log('✅ [RETRY DEBUG] handleSuccessfulPuzzle - END');
   };
 
   const handleHintAssistedSolve = async () => {
@@ -275,10 +289,21 @@ export function usePuzzleSession({
       console.log('🎯 [RETRY DEBUG] Puzzle completed!');
       if (hintUsed) {
         console.log('🎯 [RETRY DEBUG] Hint was used, calling handleHintAssistedSolve');
-        await handleHintAssistedSolve();
+        try {
+          await handleHintAssistedSolve();
+        } catch (error) {
+          console.error('🚨 [RETRY DEBUG] Error in handleHintAssistedSolve, showing feedback buttons:', error);
+          setShowFeedbackButtons(true);
+        }
       } else {
         console.log('🎯 [RETRY DEBUG] No hint used, calling handleSuccessfulPuzzle');
-        await handleSuccessfulPuzzle(true);
+        try {
+          await handleSuccessfulPuzzle(true);
+        } catch (error) {
+          console.error('🚨 [RETRY DEBUG] Error in handleSuccessfulPuzzle, forcing progression:', error);
+          // Defensive fallback: force progression even if handleSuccessfulPuzzle fails
+          await handleNextPuzzle(true);
+        }
       }
     }
     console.log('🎯 [RETRY DEBUG] handleMove - END');
@@ -323,17 +348,25 @@ export function usePuzzleSession({
   };
 
   const handleNextPuzzle = async (forceFinish = false) => {
+    console.log('🚀 [RETRY DEBUG] handleNextPuzzle - START, forceFinish:', forceFinish);
     const setId = getSelectedSetId();
-    if (!setId) return;
+    if (!setId) {
+      console.log('🚀 [RETRY DEBUG] No setId, returning early');
+      return;
+    }
 
     if (setIsDone(userSets, setId, currentRepeatIndex)) {
+      console.log('🚀 [RETRY DEBUG] Set is done, showing confetti');
       showConfetti();
       return;
     }
 
     if (!forceFinish && !puzzleIsFinished(solution.length, solvedIndex)) {
+      console.log('🚀 [RETRY DEBUG] Puzzle not finished and not forcing, returning');
       return;
     }
+
+    console.log('🚀 [RETRY DEBUG] Proceeding with next puzzle logic');
 
     let nextRepeatIndex = currentRepeatIndex;
     let nextPuzzleIndex = currentPuzzleIndex + 1;
@@ -428,6 +461,13 @@ export function usePuzzleSession({
     console.log('🔄 [RETRY DEBUG] Hiding feedback buttons');
     setShowFeedbackButtons(false);
 
+    // CRITICAL: Reset puzzle tracking state FIRST before any async operations
+    console.log('🔄 [RETRY DEBUG] Resetting puzzle attempt tracking IMMEDIATELY');
+    setPuzzleAttempted(false);
+    setPuzzleOutcome(null);
+    setRetryCounter(prev => prev + 1); // Increment retry counter
+    console.log('🔄 [RETRY DEBUG] State reset complete - puzzleAttempted: false, puzzleOutcome: null');
+
     // Reset puzzle to initial state
     const setId = getSelectedSetId();
     console.log('🔄 [RETRY DEBUG] setId:', setId);
@@ -470,17 +510,14 @@ export function usePuzzleSession({
     console.log('🔄 [RETRY DEBUG] Resetting hint state');
     setHintUsed(false);
 
-    console.log('🔄 [RETRY DEBUG] Resetting puzzle attempt tracking');
-    console.log('🔄 [RETRY DEBUG] Before reset - puzzleAttempted:', puzzleAttempted, 'puzzleOutcome:', puzzleOutcome);
-    // Reset the puzzle tracking state for retry
-    setPuzzleAttempted(false);
-    setPuzzleOutcome(null);
-    console.log('🔄 [RETRY DEBUG] After reset - should be false/null');
+    // Restart puzzle timing
+    setPuzzleStartTime(Date.now());
 
     console.log('🔄 [RETRY DEBUG] handleRetryPuzzle - END');
     console.log('🔄 [RETRY DEBUG] Final state:');
     console.log('🔄 [RETRY DEBUG] - isSessionActive should still be:', isSessionActive);
     console.log('🔄 [RETRY DEBUG] - showFeedbackButtons should be:', false);
+    console.log('🔄 [RETRY DEBUG] - retryCounter incremented to indicate fresh attempt');
   };
 
   const handleShowReplay = async () => {
