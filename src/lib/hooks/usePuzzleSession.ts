@@ -41,6 +41,7 @@ export function usePuzzleSession({
   currentPuzzleIndex,
   setPlayerSide,
   email, // ← ✅ add email
+  autoShowSolution = true, // ← ✅ add autoShowSolution with default true
 }: {
   getSelectedSetId: () => number | null;
   currentRepeatIndex: number;
@@ -61,6 +62,7 @@ export function usePuzzleSession({
   currentPuzzleIndex: number;
   setPlayerSide: (side: "w" | "b") => void;
   email: string | null;
+  autoShowSolution?: boolean;
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
@@ -156,13 +158,17 @@ export function usePuzzleSession({
     if (!email) email = "unauthenticated@email.com";
     incrementUserIncorrect(email); //user stats
 
-    console.log('🚨 [RETRY DEBUG] Starting solution replay');
-    await showSolution();
-    console.log('🚨 [RETRY DEBUG] Solution replay completed');
+    if (autoShowSolution) {
+      console.log('🚨 [RETRY DEBUG] Starting solution replay');
+      await showSolution();
+      console.log('🚨 [RETRY DEBUG] Solution replay completed');
 
-    // Wait 3 seconds after solution replay before showing feedback buttons
-    console.log('🚨 [RETRY DEBUG] Waiting 3 seconds before showing feedback buttons');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Wait 3 seconds after solution replay before showing feedback buttons
+      console.log('🚨 [RETRY DEBUG] Waiting 3 seconds before showing feedback buttons');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    } else {
+      console.log('🚨 [RETRY DEBUG] Auto show solution disabled, showing feedback buttons immediately');
+    }
 
     console.log('🚨 [RETRY DEBUG] Showing feedback buttons');
     setShowFeedbackButtons(true);
@@ -520,13 +526,32 @@ export function usePuzzleSession({
     console.log('🔄 [RETRY DEBUG] - retryCounter incremented to indicate fresh attempt');
   };
 
+  const handleManualShowSolution = async () => {
+    console.log('🔍 [SOLUTION DEBUG] handleManualShowSolution - START');
+
+    // Hide feedback buttons during solution display
+    setShowFeedbackButtons(false);
+
+    console.log('🔍 [SOLUTION DEBUG] Starting solution replay');
+    await showSolution();
+    console.log('🔍 [SOLUTION DEBUG] Solution replay completed');
+
+    // Wait 3 seconds after solution replay before showing feedback buttons
+    console.log('🔍 [SOLUTION DEBUG] Waiting 3 seconds before showing feedback buttons');
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    console.log('🔍 [SOLUTION DEBUG] Showing feedback buttons');
+    setShowFeedbackButtons(true);
+    console.log('🔍 [SOLUTION DEBUG] handleManualShowSolution - END');
+  };
+
   const handleShowReplay = async () => {
     setShowFeedbackButtons(false);
-    
+
     // Get the current puzzle data to reset to initial position
     const setId = getSelectedSetId();
     if (!setId) return;
-    
+
     const currentPuzzleId = puzzleIds[currentPuzzleIndex];
     const puzzle = await getPuzzleData(currentPuzzleId);
     setCurrentPuzzleData(puzzle);
@@ -543,7 +568,7 @@ export function usePuzzleSession({
       setSolvedIndex,
       setHighlight
     );
-    
+
     // Get the starting FEN for the full replay
     const chess = new Chess();
     let startingFen;
@@ -554,10 +579,10 @@ export function usePuzzleSession({
       chess.loadPgn(puzzle.game.pgn);
       startingFen = chess.fen();
     }
-    
+
     // Small delay before starting replay
     await new Promise((resolve) => setTimeout(resolve, 500));
-    
+
     // Show the full solution from the beginning
     await showFullSolution(startingFen);
 
@@ -581,6 +606,7 @@ export function usePuzzleSession({
     handleContinueToNext,
     handleRetryPuzzle,
     handleShowReplay,
+    handleManualShowSolution,
     currentPuzzleData,
   };
 }

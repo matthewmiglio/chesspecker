@@ -51,6 +51,8 @@ export default function PuzzlesPage() {
     Record<number, { repeat_index: number; puzzle_index: number }>
   >({});
 
+  const [autoShowSolution, setAutoShowSolution] = useState(true);
+
   const puzzleSession = usePuzzleSession({
     getSelectedSetId: () => selectedSetId,
     currentRepeatIndex,
@@ -69,6 +71,7 @@ export default function PuzzlesPage() {
     currentPuzzleIndex,
     setPlayerSide,
     email,
+    autoShowSolution,
   });
 
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
@@ -192,6 +195,8 @@ export default function PuzzlesPage() {
                 currentPuzzleIndex={currentPuzzleIndex}
                 currentRepeatIndex={currentRepeatIndex}
                 puzzleIds={puzzleIds}
+                autoShowSolution={autoShowSolution}
+                setAutoShowSolution={setAutoShowSolution}
               />
             ) : (
               <PuzzleEmptyState

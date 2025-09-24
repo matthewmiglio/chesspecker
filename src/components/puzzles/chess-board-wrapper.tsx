@@ -20,6 +20,7 @@ type ChessBoardWrapperProps = {
     handleContinueToNext: () => Promise<void>;
     handleRetryPuzzle: () => Promise<void>;
     handleShowReplay: () => Promise<void>;
+    handleManualShowSolution: () => Promise<void>;
     currentPuzzleData: PuzzleData | null;
   };
   highlight: string | null;
@@ -34,6 +35,8 @@ type ChessBoardWrapperProps = {
     size: number;
   };
   puzzleIds: string[];
+  autoShowSolution: boolean;
+  setAutoShowSolution: (value: boolean) => void;
 };
 
 export default function ChessBoardWrapper({
@@ -50,6 +53,8 @@ export default function ChessBoardWrapper({
   currentRepeatIndex,
   selectedSet,
   puzzleIds,
+  autoShowSolution,
+  setAutoShowSolution,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
   const { resolvedTheme } = useTheme();
@@ -252,6 +257,29 @@ export default function ChessBoardWrapper({
               </button>
             </div>
 
+            {/* Auto Show Solution Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">Auto Solution</span>
+              <button
+                onClick={() => setAutoShowSolution(!autoShowSolution)}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  autoShowSolution
+                    ? 'bg-primary focus:ring-primary'
+                    : 'bg-muted focus:ring-muted'
+                }`}
+                style={{
+                  backgroundColor: autoShowSolution ? themeColor : undefined,
+                  boxShadow: autoShowSolution ? `0 0 6px ${themeColor}40` : undefined
+                }}
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-200 ${
+                    autoShowSolution ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
             {/* Hint Button */}
             <div className="flex items-center">
               <Button
@@ -316,14 +344,14 @@ export default function ChessBoardWrapper({
                 Retry Puzzle
               </Button>
 
-              {/* Show Replay */}
+              {/* Show/Replay Solution Button */}
               <Button
-                onClick={puzzleSession.handleShowReplay}
+                onClick={autoShowSolution ? puzzleSession.handleShowReplay : puzzleSession.handleManualShowSolution}
                 variant="outline"
                 className="w-full flex items-center justify-center gap-3 py-3"
               >
                 <Play className="h-4 w-4" />
-                Replay Solution
+                {autoShowSolution ? "Replay Solution" : "Show Solution"}
               </Button>
 
               {/* Analyze Puzzle - Disabled */}

@@ -20,6 +20,8 @@ type PuzzleBoardAreaProps = {
   currentPuzzleIndex: number;
   currentRepeatIndex: number;
   puzzleIds: string[];
+  autoShowSolution: boolean;
+  setAutoShowSolution: (value: boolean) => void;
 };
 
 export default function PuzzleBoardArea({
@@ -37,6 +39,8 @@ export default function PuzzleBoardArea({
   currentPuzzleIndex,
   currentRepeatIndex,
   puzzleIds,
+  autoShowSolution,
+  setAutoShowSolution,
 }: PuzzleBoardAreaProps) {
   return (
     <div>
@@ -57,6 +61,8 @@ export default function PuzzleBoardArea({
           selectedSet={selectedSet}
           selectedSetId={selectedSetId}
           puzzleIds={puzzleIds}
+          autoShowSolution={autoShowSolution}
+          setAutoShowSolution={setAutoShowSolution}
         />
       )}
     </div>
