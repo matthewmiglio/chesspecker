@@ -84,7 +84,13 @@ export function handlePieceDropHelper({
 
   const moveStr = sourceSquare + targetSquare;
   const expectedMoveStr = solution[solvedIndex].slice(0, 4);
-  const isCorrect = moveStr === expectedMoveStr;
+
+  // Check if move results in checkmate - any checkmate is correct for mate-in-1 puzzles
+  const isCheckmate = tempGame.isCheckmate();
+  // Keep original string comparison for non-mate puzzles
+  const matchesOriginalSolution = moveStr === expectedMoveStr;
+  // Accept either checkmate OR original solution match
+  const isCorrect = isCheckmate || matchesOriginalSolution;
 
   const nextGame = new Chess(game.fen());
   nextGame.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
