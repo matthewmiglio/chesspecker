@@ -21,29 +21,23 @@ export default function DonatePage() {
             Support ChessPecker
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            No ads. No premium tiers. Just a broke student building something for chess nerds.
+            No ads. No premium tiers.
           </p>
         </div>
 
         {/* Why Donations Matter Section */}
         <div className="mb-20">
-          <h2 className="text-2xl font-bold mb-8">The honest truth about server costs</h2>
+          <h2 className="text-2xl font-bold mb-2">The honest truth about server costs</h2>
 
-          <p className="text-lg mb-6 leading-relaxed">
-            Running ChessPecker costs me about $40-60 every month. That includes hosting the website,
-            paying for the domain, processing thousands of chess puzzles, and maintaining the database
-            that stores all your progress and puzzle data. As a broke student, those bills add up fast.
+          <p className="text-lg text-gray-400 mb-6 leading-relaxed">
+            Running ChessPecker takes real resources — from puzzle generation costs like compute and storage, to scaling the database that keeps everyone’s progress safe, plus the occasional development push to improve the platform. Every dollar donated helps thousands of players train better every day. Because we don’t run ads or premium tiers, your support is what keeps ChessPecker fast, stable, and aligned with our mission: all training, no fluff. Think of it as chipping in to keep a community tool alive and accessible to everyone.
           </p>
 
-          <p className="text-lg mb-8 leading-relaxed">
-            Donations help me keep this running without constantly stressing about whether I can afford
-            next month's expenses.
+          <p className="text-lg text-gray-400 mb-6 leading-relaxed">
+            Small contributions go a long way. One dollar can cover a month of puzzle storage. Ten dollars keeps the servers running for a week. Twenty-five dollars offsets a big portion of the monthly hosting bill. Your support not only keeps the lights on but also ensures we can keep listening to feedback and evolving the site in ways that match your training needs.
           </p>
 
-          <div className="space-y-4 text-lg">
-            <p>A $5 donation helps me cover groceries for the week</p>
-            <p>A $20 donation helps me cover next month's hosting bill</p>
-          </div>
+         
         </div>
 
         {/* Call to Action Section */}
