@@ -9,7 +9,7 @@ import {
   setIsDone,
 } from "@/lib/utils/puzzleUtils";
 import { getPuzzleData } from "@/lib/api/puzzleApi";
-import { PuzzleData } from "@/lib/types";
+import { ChessPeckerPuzzle } from "@/lib/types";
 import {
   loadPuzzleAndInitialize,
   updateThisSetAccuracy,
@@ -67,7 +67,7 @@ export function usePuzzleSession({
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
-  const [currentPuzzleData, setCurrentPuzzleData] = useState<PuzzleData | null>(null);
+  const [currentPuzzleData, setCurrentPuzzleData] = useState<{ puzzle: ChessPeckerPuzzle } | null>(null);
 
   // Timing state for puzzle duration tracking
   const [puzzleStartTime, setPuzzleStartTime] = useState<number | null>(null);
@@ -387,15 +387,15 @@ export function usePuzzleSession({
     setCurrentPuzzleIndex(nextPuzzleIndex);
 
     const nextPuzzleId = puzzleIds[nextPuzzleIndex];
-    const puzzle = await getPuzzleData(nextPuzzleId);
-    setCurrentPuzzleData(puzzle);
+    const puzzleData = await getPuzzleData(nextPuzzleId);
+    setCurrentPuzzleData(puzzleData);
 
-    if (!puzzle) {
+    if (!puzzleData) {
       return;
     }
 
     await loadPuzzleAndInitialize(
-      puzzle,
+      puzzleData.puzzle,
       setFen,
       setSolution,
       setSolvedIndex,
@@ -405,13 +405,7 @@ export function usePuzzleSession({
     // Reset hint state for new puzzle
     setHintUsed(false);
 
-    const chess = new Chess();
-    if (puzzle.game.fen) {
-      chess.load(puzzle.game.fen);
-    } else {
-      chess.loadPgn(puzzle.game.pgn);
-    }
-
+    const chess = new Chess(puzzleData.puzzle.FEN);
     setPlayerSide(chess.turn());
 
     await updateThisSetAccuracy(setId, setAccuracies);
@@ -485,26 +479,25 @@ export function usePuzzleSession({
     const nextPuzzleId = puzzleIds[currentPuzzleIndex];
     console.log('🔄 [RETRY DEBUG] Getting puzzle data for ID:', nextPuzzleId);
     console.log('🔄 [RETRY DEBUG] currentPuzzleIndex:', currentPuzzleIndex);
-    const puzzle = await getPuzzleData(nextPuzzleId);
-    console.log('🔄 [RETRY DEBUG] Retrieved puzzle data:', puzzle ? 'SUCCESS' : 'FAILED');
-    if (puzzle) {
+    const puzzleData = await getPuzzleData(nextPuzzleId);
+    console.log('🔄 [RETRY DEBUG] Retrieved puzzle data:', puzzleData ? 'SUCCESS' : 'FAILED');
+    if (puzzleData) {
       console.log('🔄 [RETRY DEBUG] Puzzle details:', {
-        id: puzzle.puzzle.id,
-        themes: puzzle.puzzle.themes,
-        rating: puzzle.puzzle.rating,
-        initialPly: puzzle.puzzle.initialPly
+        id: puzzleData.puzzle.PuzzleId,
+        themes: puzzleData.puzzle.Themes,
+        rating: puzzleData.puzzle.Rating,
       });
     }
-    setCurrentPuzzleData(puzzle);
+    setCurrentPuzzleData(puzzleData);
 
-    if (!puzzle) {
+    if (!puzzleData) {
       console.log('🔄 [RETRY DEBUG] No puzzle data received, returning');
       return;
     }
 
     console.log('🔄 [RETRY DEBUG] Calling loadPuzzleAndInitialize');
     await loadPuzzleAndInitialize(
-      puzzle,
+      puzzleData.puzzle,
       setFen,
       setSolution,
       setSolvedIndex,
@@ -553,16 +546,16 @@ export function usePuzzleSession({
     if (!setId) return;
 
     const currentPuzzleId = puzzleIds[currentPuzzleIndex];
-    const puzzle = await getPuzzleData(currentPuzzleId);
-    setCurrentPuzzleData(puzzle);
+    const puzzleData = await getPuzzleData(currentPuzzleId);
+    setCurrentPuzzleData(puzzleData);
 
-    if (!puzzle) {
+    if (!puzzleData) {
       return;
     }
 
     // Reset to initial position and capture starting FEN
     await loadPuzzleAndInitialize(
-      puzzle,
+      puzzleData.puzzle,
       setFen,
       setSolution,
       setSolvedIndex,
@@ -570,15 +563,7 @@ export function usePuzzleSession({
     );
 
     // Get the starting FEN for the full replay
-    const chess = new Chess();
-    let startingFen;
-    if (puzzle.game.fen) {
-      chess.load(puzzle.game.fen);
-      startingFen = puzzle.game.fen;
-    } else {
-      chess.loadPgn(puzzle.game.pgn);
-      startingFen = chess.fen();
-    }
+    const startingFen = puzzleData.puzzle.FEN;
 
     // Small delay before starting replay
     await new Promise((resolve) => setTimeout(resolve, 500));

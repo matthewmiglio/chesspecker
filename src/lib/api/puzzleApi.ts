@@ -88,7 +88,7 @@ export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
   }
 };
 
-export const getPuzzleData = async (puzzleId: string) => {
+export const getPuzzleData = async (puzzleId: string): Promise<{ puzzle: import("@/types/supabasePuzzle").ChessPeckerPuzzle } | null> => {
   const response = await fetch(`/api/puzzles/${puzzleId}`);
   if (!response.ok) return null;
   return await response.json();

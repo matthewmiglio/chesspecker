@@ -5,8 +5,7 @@ import {
   getSetProgress,
   setSetProgress,
 } from "@/lib/api/puzzleApi";
-import { PuzzleData } from "@/lib/types";
-import { getFenAtPly } from "@/lib/utils/puzzleUtils";
+import { ChessPeckerPuzzle } from "@/lib/types";
 
 import { incrementPuzzleStart } from "@/lib/api/dailyStatsApi";
 
@@ -76,32 +75,26 @@ export const incrementPuzzleIndex = async (
 };
 
 export const loadPuzzleAndInitialize = async (
-  puzzleData: PuzzleData,
+  puzzle: ChessPeckerPuzzle,
   setFen: (fen: string) => void,
   setSolution: (solution: string[]) => void,
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
   console.log('🎨 [RETRY DEBUG] loadPuzzleAndInitialize - START');
-  console.log('🎨 [RETRY DEBUG] puzzleData received:', {
-    puzzleId: puzzleData.puzzle.id,
-    initialPly: puzzleData.puzzle.initialPly,
-    solutionLength: puzzleData.puzzle.solution.length,
-    solution: puzzleData.puzzle.solution,
+  console.log('🎨 [RETRY DEBUG] puzzle received:', {
+    puzzleId: puzzle.PuzzleId,
+    solutionLength: puzzle.Moves.length,
+    solution: puzzle.Moves,
+    fen: puzzle.FEN,
   });
 
-  const fen = getFenAtPly(
-    puzzleData.game.pgn,
-    puzzleData.puzzle.initialPly + 1
-  );
-  console.log('🎨 [RETRY DEBUG] Generated FEN:', fen);
-
   console.log('🎨 [RETRY DEBUG] Setting puzzle state:');
-  console.log('🎨 [RETRY DEBUG] - Setting FEN to:', fen);
-  setFen(fen);
+  console.log('🎨 [RETRY DEBUG] - Setting FEN to:', puzzle.FEN);
+  setFen(puzzle.FEN);
 
-  console.log('🎨 [RETRY DEBUG] - Setting solution to:', puzzleData.puzzle.solution);
-  setSolution(puzzleData.puzzle.solution);
+  console.log('🎨 [RETRY DEBUG] - Setting solution to:', puzzle.Moves);
+  setSolution(puzzle.Moves);
 
   console.log('🎨 [RETRY DEBUG] - Setting solvedIndex to: 0');
   setSolvedIndex(0);
@@ -154,11 +147,11 @@ export const handleSetSelect = async (
 
 
   const { getPuzzleData } = await import("@/lib/api/puzzleApi");
-  const puzzle = await getPuzzleData(puzzleIds[set.puzzle_index]);
+  const puzzleData = await getPuzzleData(puzzleIds[set.puzzle_index]);
 
-  if (puzzle) {
+  if (puzzleData) {
     await loadPuzzleAndInitialize(
-      puzzle,
+      puzzleData.puzzle,
       setFen,
       setSolution,
       setSolvedIndex,
@@ -166,13 +159,7 @@ export const handleSetSelect = async (
     );
 
     const { Chess } = await import("chess.js");
-    const chess = new Chess();
-    if (puzzle.game.fen) {
-      chess.load(puzzle.game.fen);
-    } else if (puzzle.game.pgn) {
-      chess.loadPgn(puzzle.game.pgn);
-    }
-
+    const chess = new Chess(puzzleData.puzzle.FEN);
     const turn = chess.turn();
     setPlayerSide(turn);
   } else {

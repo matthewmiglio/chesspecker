@@ -1,5 +1,4 @@
 "use client";
-import { Chess } from "chess.js";
 
 /**
  * Parses a UCI move string (like "e2e4" or "e7e8q") into a move object.
@@ -9,23 +8,6 @@ export const parseUCIMove = (uci: string) => ({
   to: uci.slice(2, 4),
   promotion: uci.length > 4 ? uci.slice(4) : undefined,
 });
-
-/**
- * Gets the FEN string after playing a certain number of moves in a PGN game.
- */
-export const getFenAtPly = (pgn: string, initialPly: number) => {
-  const chess = new Chess();
-  chess.loadPgn(pgn);
-  const history = chess.history({ verbose: true });
-  const replay = new Chess();
-
-  for (let i = 0; i < initialPly && i < history.length; i++) {
-    const move = history[i];
-    replay.move(move);
-  }
-
-  return replay.fen();
-};
 
 /**
  * Checks if the current puzzle solution has been finished.

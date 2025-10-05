@@ -5,7 +5,7 @@ import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { useTheme } from "next-themes";
-import { PuzzleData } from "@/lib/types";
+import { ChessPeckerPuzzle } from "@/lib/types";
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -21,7 +21,7 @@ type ChessBoardWrapperProps = {
     handleRetryPuzzle: () => Promise<void>;
     handleShowReplay: () => Promise<void>;
     handleManualShowSolution: () => Promise<void>;
-    currentPuzzleData: PuzzleData | null;
+    currentPuzzleData: { puzzle: ChessPeckerPuzzle } | null;
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -153,7 +153,7 @@ export default function ChessBoardWrapper({
     const filename = `chesspecker_${currentPuzzleId}.fen`;
 
     // Get the starting FEN from puzzle data (not current position)
-    const startingFen = puzzleSession.currentPuzzleData?.game?.fen || fen;
+    const startingFen = puzzleSession.currentPuzzleData?.puzzle?.FEN || fen;
 
     // Create a blob with the starting FEN data
     const blob = new Blob([startingFen], { type: 'text/plain' });
