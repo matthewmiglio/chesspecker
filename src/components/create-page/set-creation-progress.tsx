@@ -43,7 +43,7 @@ export default function PuzzleSetCreationProgress({
       return {
         step: 1,
         title: "Generating Puzzles",
-        description: "Fetching tactical puzzles from Lichess database...",
+        description: "Fetching tactical puzzles from database...",
         substep: puzzleProgress < 25 ? "Initializing puzzle generation..." :
                 puzzleProgress < 50 ? "Collecting puzzles from API..." :
                 puzzleProgress < 75 ? "Balancing difficulty distribution..." :

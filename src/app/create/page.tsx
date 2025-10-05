@@ -277,24 +277,29 @@ export default function CreatePuzzleSetPage() {
 
     console.log(`🎲 [${puzzleRequestId}] Requesting puzzle - Difficulty: ${difficulty}, Retry: ${retryCount}/${maxRetries}`);
 
+    const difficultyEloMap: Record<string, number> = {
+      easiest: 1,
+      easier: 999,
+      normal: 1499,
+      harder: 2249,
+      hardest: 3001,
+    };
+
+    const rating = difficultyEloMap[difficulty];
+
     try {
       const apiCallStartTime = performance.now();
-      const requestPayload = { difficulty };
-      console.log(`📦 [${puzzleRequestId}] API payload:`, requestPayload);
+      console.log(`📦 [${puzzleRequestId}] Requesting puzzle with rating < ${rating}`);
 
-      const response = await fetch("/api/lichess/getPuzzles", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestPayload),
-      });
+      const response = await fetch(`/api/puzzles/random-under?rating=${rating}`);
 
       const apiCallEndTime = performance.now();
       const apiCallDuration = apiCallEndTime - apiCallStartTime;
-      console.log(`📡 [${puzzleRequestId}] Lichess API response received in ${apiCallDuration.toFixed(2)}ms`);
+      console.log(`📡 [${puzzleRequestId}] Supabase API response received in ${apiCallDuration.toFixed(2)}ms`);
       console.log(`📊 [${puzzleRequestId}] Response status: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
-        console.log(`❌ [${puzzleRequestId}] Lichess API request FAILED!`);
+        console.log(`❌ [${puzzleRequestId}] Supabase API request FAILED!`);
         const errorText = await response.text().catch(() => 'No response body');
         console.log(`💥 [${puzzleRequestId}] Error details:`, {
           status: response.status,
@@ -320,20 +325,28 @@ export default function CreatePuzzleSetPage() {
       const data = await response.json();
       console.log(`📝 [${puzzleRequestId}] Parsing response data...`);
 
-      if (!data || !data.puzzle || !data.puzzle.id) {
+      if (!data || !data.puzzle || !data.puzzle.PuzzleId) {
         console.log(`❌ [${puzzleRequestId}] Invalid puzzle data received:`, data);
         throw new Error(`Invalid puzzle data received: ${JSON.stringify(data)}`);
       }
 
       console.log(`✅ [${puzzleRequestId}] Puzzle received successfully!`);
       console.log(`🎯 [${puzzleRequestId}] Puzzle details:`, {
-        id: data.puzzle.id,
-        rating: data.puzzle.rating,
-        themes: data.puzzle.themes,
-        url: data.puzzle.url
+        id: data.puzzle.PuzzleId,
+        rating: data.puzzle.Rating,
+        themes: data.puzzle.Themes,
+        url: data.puzzle.GameUrl
       });
 
-      return data;
+      // Transform Supabase puzzle format to match expected format
+      return {
+        puzzle: {
+          id: data.puzzle.PuzzleId,
+          rating: data.puzzle.Rating,
+          themes: data.puzzle.Themes,
+          url: data.puzzle.GameUrl
+        }
+      };
 
     } catch (err) {
       console.log(`💥 [${puzzleRequestId}] EXCEPTION caught in createNewPuzzle:`, err);

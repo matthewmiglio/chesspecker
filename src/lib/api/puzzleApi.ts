@@ -89,7 +89,7 @@ export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
 };
 
 export const getPuzzleData = async (puzzleId: string) => {
-  const response = await fetch(`/api/lichess/getPuzzleById?id=${puzzleId}`);
+  const response = await fetch(`/api/puzzles/${puzzleId}`);
   if (!response.ok) return null;
   return await response.json();
 };

@@ -22,6 +22,7 @@ export default function Navbar() {
     { name: "Performance", href: "/dashboard" },
     { name: "About", href: "/about" },
     { name: "Feedback", href: "/feedback" },
+    { name: "Donate", href: "/donate" },
   ];
 
 
