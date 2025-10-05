@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
     const totalRequestTime = Date.now() - requestStartTime;
 
     if (puzzles.length > 0) {
-      const avgRating = puzzles.reduce((sum, p) => sum + p.Rating, 0) / puzzles.length;
+      const avgRating = puzzles.reduce((sum: number, p) => sum + p.Rating, 0) / puzzles.length;
       console.log(`✅ [API:create-set:${requestId}] Puzzle set created successfully!`);
       console.log(`🎯 [API:create-set:${requestId}] Set details:`, {
         requested: size,

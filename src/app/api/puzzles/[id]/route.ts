@@ -3,7 +3,7 @@ import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const requestId = Math.random().toString(36).substr(2, 8);
   const requestStartTime = Date.now();
@@ -12,7 +12,7 @@ export async function GET(
   console.log(`📅 [API:puzzle-by-id:${requestId}] Timestamp: ${new Date().toISOString()}`);
   console.log(`🌐 [API:puzzle-by-id:${requestId}] Request URL: ${req.url}`);
 
-  const puzzleId = params.id;
+  const { id: puzzleId } = await params;
   console.log(`🎯 [API:puzzle-by-id:${requestId}] Requested puzzle ID: ${puzzleId}`);
 
   if (!puzzleId) {
