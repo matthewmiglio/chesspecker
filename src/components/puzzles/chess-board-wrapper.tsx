@@ -158,24 +158,15 @@ export default function ChessBoardWrapper({
     <div className="mx-auto ">
       <Card className={`py-10 m-0 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
         <CardContent className="p-0 m-00 mx-auto">
-          <div
-            className=" transition-all duration-300"
-            style={{
-              boxShadow: glow
-                ? `0 0 18px 2px ${themeColor}`
-                : `0 0 12px 1px ${themeColor}`,
-            }}
-          >
-            <AnimatedBoard
-              fen={fen}
-              solution={solution}
-              solvedIndex={solvedIndex}
-              onMove={puzzleSession.handleMove}
-              highlight={highlight}
-              isSessionActive={puzzleSession.isSessionActive}
-              sideOnBottom={playerSide}
-            />
-          </div>
+          <AnimatedBoard
+            fen={fen}
+            solution={solution}
+            solvedIndex={solvedIndex}
+            onMove={puzzleSession.handleMove}
+            highlight={highlight}
+            isSessionActive={puzzleSession.isSessionActive}
+            sideOnBottom={playerSide}
+          />
         </CardContent>
 
         <CardFooter className="px-3 py-2 flex justify-center">

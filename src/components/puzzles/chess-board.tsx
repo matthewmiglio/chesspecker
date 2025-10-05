@@ -259,13 +259,13 @@ export default function AnimatedBoard({
 
   return (
     <div
-      className="w-full"
+      className="w-full overflow-x-hidden"
       style={{ opacity: isSessionActive ? 1 : 0.5 }}
       onContextMenu={(e) => e.preventDefault()}
       onMouseDown={handleRightMouseDown}
       onMouseUp={handleRightMouseUp}
     >
-      {/* Board with gothic border - border image is larger to frame from outside */}
+      {/* Board container */}
       <div className="relative block mx-auto" style={{ width: boardWidth, height: boardWidth }}>
         <Chessboard
           position={boardPosition}
@@ -276,22 +276,6 @@ export default function AnimatedBoard({
           arePiecesDraggable={!isBoardLocked && isSessionActive}
           boardWidth={boardWidth}
           customSquareStyles={customSquareStyles}
-        />
-
-        {/* Gothic border overlay - expanded to frame the board from outside */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: '-7%',
-            left: '-7%',
-            right: '-7%',
-            bottom: '-7%',
-            backgroundImage: 'url(/board_themes/boarders/gothic.jpg)',
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            mixBlendMode: 'multiply',
-          }}
         />
       </div>
 
