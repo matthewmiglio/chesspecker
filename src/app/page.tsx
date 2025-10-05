@@ -34,6 +34,11 @@ const TESTIMONIALS: Testimonial[] = [
   { name: "Thej", monthYear: "July 2025", quote: "It’s good." },
   { name: "The", monthYear: "July 2025", quote: "Good." },
   { name: "Sam", monthYear: "June 2025", quote: "Awesome website! Thanks for your contribution — you rock!!" },
+  { name: "Roman", monthYear: "October 2025", quote: "I’ve used ChessPecker for about three months—it’s become a crucial part of my training. Really appreciate the touch-to-move update." },
+  { name: "Ahmed", monthYear: "September 2025", quote: "I love this site—it helped me go from about 100 Elo to 500. Thank you!" },
+  { name: "Dmitry", monthYear: "September 2025", quote: "I was looking for a way to do Woodpecker training—this tool is amazing." },
+  { name: "Jordan", monthYear: "September 2025", quote: "Overall, I love the platform—I’ve made immense improvements this month." },
+  { name: "Anton", monthYear: "October 2025", quote: "Good for improving at chess." },
 ];
 
 /* ---------- Airy, Always-Scrolling Carousel ---------- */
