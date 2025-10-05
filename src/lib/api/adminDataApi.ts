@@ -28,28 +28,16 @@ export async function fetchAllLoginStreaks() {
 }
 
 export async function fetchAnalyticsEvents() {
-  console.log('[adminDataApi] fetchAnalyticsEvents: Making request to /api/analytics/get_events');
-
   try {
     const res = await fetch("/api/analytics/get_events");
 
-    console.log('[adminDataApi] fetchAnalyticsEvents: Response status:', res.status);
-    console.log('[adminDataApi] fetchAnalyticsEvents: Response headers:', Object.fromEntries(res.headers.entries()));
-
     if (!res.ok) {
-      console.error('[adminDataApi] fetchAnalyticsEvents: Request failed with status:', res.status);
       const errorText = await res.text();
-      console.error('[adminDataApi] fetchAnalyticsEvents: Error response:', errorText);
+      console.error('[adminDataApi] fetchAnalyticsEvents: Request failed:', res.status, errorText);
       throw new Error(`HTTP ${res.status}: ${errorText}`);
     }
 
     const data = await res.json();
-    console.log('[adminDataApi] fetchAnalyticsEvents: Success! Received data:', {
-      eventsCount: data.events?.length || 0,
-      sampleEvent: data.events?.[0] || null,
-      fullResponse: data
-    });
-
     return data;
   } catch (error) {
     console.error('[adminDataApi] fetchAnalyticsEvents: Error occurred:', error);

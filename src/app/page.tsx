@@ -18,7 +18,7 @@ type Testimonial = {
 };
 
 const TESTIMONIALS: Testimonial[] = [
-  // 🔝 Strong / Marketable
+  // Strong / Marketable
   { name: "Ahmed", monthYear: "September 2025", quote: "I love this site—it helped me go from about 100 Elo to 500. Thank you!" },
   { name: "Emilio", monthYear: "September 2025", quote: "I started playing chess July 1 this year and I've been looking for ways to improve. I'm loving this method so much… I hope it can become an Android app — I'd even pay for it. Greetings from Mexico!" },
   { name: "Roman", monthYear: "October 2025", quote: "I've used ChessPecker for about three months—it's become a crucial part of my training. Really appreciate the touch-to-move update." },
@@ -29,7 +29,7 @@ const TESTIMONIALS: Testimonial[] = [
   { name: "Gustavo", monthYear: "September 2025", quote: "The site really helped me grow. Thanks to anyone who had this idea." },
   { name: "Sunaksh", monthYear: "July 2025", quote: "It's the best way to train the Woodpecker Method." },
 
-  // 👍 Solid
+  // Solid
   { name: "FlickeryGems", monthYear: "August 2025", quote: "Great website to practice the Woodpecker Method." },
   { name: "JR", monthYear: "August 2025", quote: "Thank you for sharing this great work you've done!" },
   { name: "Adam", monthYear: "July 2025", quote: "Great work — it has a good feel to it." },
@@ -37,7 +37,7 @@ const TESTIMONIALS: Testimonial[] = [
   { name: "Frogi", monthYear: "August 2025", quote: "I really like the site." },
   { name: "Viesturs", monthYear: "August 2025", quote: "Just starting, but the website looks great!" },
 
-  // 👌 Weak / Minimal
+  // Weak / Minimal
   { name: "Roman", monthYear: "August 2025", quote: "I appreciate your work — love you, bro." },
   { name: "Anton", monthYear: "October 2025", quote: "Good for improving at chess." },
 ];

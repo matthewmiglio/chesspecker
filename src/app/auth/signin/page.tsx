@@ -10,20 +10,14 @@ function SignInContent() {
 
   useEffect(() => {
     async function handleSignIn() {
-      console.log('[SignInPage] Starting sign in process, force:', force);
-
       if (force === "true") {
-        console.log('[SignInPage] Force flag detected - ensuring fresh OAuth flow');
-
         // Check if there's any existing session
         const existingSession = await getSession();
-        console.log('[SignInPage] Existing session check:', !!existingSession);
 
         // Immediately trigger Google OAuth with force refresh
         await signIn("google", {
           callbackUrl: "/admin",
           redirect: true,
-          // Add prompt parameter to force account selection
         });
       } else {
         // Normal sign in

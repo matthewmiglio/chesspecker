@@ -19,7 +19,7 @@ import { useSession } from "next-auth/react";
 import FeedbackTable from "@/components/admin-page/tables/FeedbackTable";
 
 import { AccuracyData, DailyStats, SetData, UserTableUser } from "@/lib/types";
-import { fetchAllFeedback } from "@/lib/api/feedbackApi"; // ✅ add this impo
+import { fetchAllFeedback } from "@/lib/api/feedbackApi";
 
 type AnalyticsEvent = {
   id: string;
@@ -57,48 +57,18 @@ export default function AdminPage() {
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   useEffect(() => {
-    console.log('[AdminPage] useEffect triggered:', {
-      hasSession: !!session,
-      sessionStatus: status,
-      sessionUser: session?.user,
-      adminEmail: adminEmail,
-      userEmail: session?.user?.email,
-      isAdminMatch: session?.user?.email === adminEmail
-    });
-
-    if (!session) {
-      console.log('[AdminPage] No session, returning early');
-      return;
-    }
-    if (!adminEmail) {
-      console.log('[AdminPage] No admin email configured, returning early');
-      return;
-    }
-    if (!session.user) {
-      console.log('[AdminPage] No session.user, returning early');
-      return;
-    }
-    if (!session?.user?.email) {
-      console.log('[AdminPage] No session.user.email, returning early');
-      return;
-    }
-    if (session?.user?.email !== adminEmail) {
-      console.log('[AdminPage] User email does not match admin email, returning early');
-      return;
-    }
-
-    console.log('[AdminPage] All checks passed, proceeding to load data');
+    if (!session) return;
+    if (!adminEmail) return;
+    if (!session.user) return;
+    if (!session?.user?.email) return;
+    if (session?.user?.email !== adminEmail) return;
 
     async function loadData() {
-      console.log('[AdminPage] loadData: Starting data fetch');
       setLoading(true);
 
       try {
-        console.log('[AdminPage] loadData: Fetching analytics events...');
         const analyticsData = await fetchAnalyticsEvents();
-        console.log('[AdminPage] loadData: Analytics events result:', analyticsData);
 
-        console.log('[AdminPage] loadData: Fetching all other data...');
         const [
           accuracyData,
           userData,
@@ -115,7 +85,6 @@ export default function AdminPage() {
           fetchAllFeedback(),
         ]);
 
-        console.log('[AdminPage] loadData: All data fetched, setting state...');
         setAccuracy(accuracyData.sets || []);
         setUsers(userData.users || []);
         setDaily(dailyData.days || []);
@@ -124,7 +93,6 @@ export default function AdminPage() {
         setFeedback(feedbackData || []);
         setAnalytics(analyticsData.events || []);
 
-        console.log('[AdminPage] loadData: Analytics events set in state:', analyticsData.events?.length || 0);
         setLoading(false);
       } catch (error) {
         console.error('[AdminPage] loadData: Error occurred:', error);
@@ -196,7 +164,7 @@ export default function AdminPage() {
             analyticsData={analytics}
           />
         ) : (
-          <FeedbackTable feedback={feedback} /> // ✅ new tab
+          <FeedbackTable feedback={feedback} />
         )}
       </div>
     </div>

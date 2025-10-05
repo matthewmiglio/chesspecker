@@ -214,12 +214,12 @@ export default function AnimatedBoard({
   const customSquareStyles = useMemo(() => {
     const styles: { [square: string]: React.CSSProperties } = {};
 
-    // Add highlight square (existing logic)
+    // Highlight square logic
     if (highlight) {
       styles[highlight] = { backgroundColor: "rgba(255, 0, 0, 0.4)" };
     }
 
-    // Add selected square highlighting with theme color
+    // Highlight selected square with theme color
     if (selectedSquare) {
       styles[selectedSquare] = {
         backgroundColor: themeColor,
@@ -227,7 +227,7 @@ export default function AnimatedBoard({
       };
     }
 
-    // Add valid move indicators (smooth dots for regular moves, rings for captures)
+    // Show valid move indicators (dots for moves, rings for captures)
     validMoves.forEach((move) => {
       if (move.to !== selectedSquare) { // Don't overlap selected square
         const isCapture = move.captured !== undefined || move.flags.includes('c') || move.flags.includes('e');

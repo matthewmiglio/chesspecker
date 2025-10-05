@@ -16,16 +16,7 @@ export const puzzleIsFinished = (
   solutionLength: number,
   solvedIndex: number
 ) => {
-  const isFinished = solutionLength + 1 === solvedIndex;
-  console.log(
-    "[puzzleIsFinished] called. solutionLength:",
-    solutionLength,
-    "solvedIndex:",
-    solvedIndex,
-    "returning",
-    isFinished
-  );
-  return isFinished;
+  return solutionLength + 1 === solvedIndex;
 };
 
 /**

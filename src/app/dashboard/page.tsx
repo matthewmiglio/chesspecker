@@ -56,10 +56,6 @@ export default function AccuracyStatsPage() {
     }
   }, [selectedSetId]);
 
-  useEffect(() => {
-    console.log('User Sets:', userSets);
-    console.log('Accuracy Data:', accuracyData);
-  }, [userSets, accuracyData]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

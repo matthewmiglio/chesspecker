@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-site-verification-code', // You'll need to add this later
+    google: 'your-google-site-verification-code', // Google site verification (not yet configured)
   }
 };
 

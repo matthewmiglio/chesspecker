@@ -39,8 +39,8 @@ export function usePuzzleSession({
   userSets,
   currentPuzzleIndex,
   setPlayerSide,
-  email, // ← ✅ add email
-  autoShowSolution = true, // ← ✅ add autoShowSolution with default true
+  email,
+  autoShowSolution = true,
 }: {
   getSelectedSetId: () => number | null;
   currentRepeatIndex: number;
