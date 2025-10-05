@@ -271,119 +271,6 @@ export default function CreatePuzzleSetPage() {
     }
   };
 
-  const createNewPuzzle = async (difficulty: string, retryCount = 0) => {
-    const maxRetries = 3;
-    const puzzleRequestId = Math.random().toString(36).substr(2, 6);
-
-    console.log(`🎲 [${puzzleRequestId}] Requesting puzzle - Difficulty: ${difficulty}, Retry: ${retryCount}/${maxRetries}`);
-
-    const difficultyEloMap: Record<string, number> = {
-      easiest: 1,
-      easier: 999,
-      normal: 1499,
-      harder: 2249,
-      hardest: 3001,
-    };
-
-    const rating = difficultyEloMap[difficulty];
-
-    try {
-      const apiCallStartTime = performance.now();
-      console.log(`📦 [${puzzleRequestId}] Requesting puzzle with rating < ${rating}`);
-
-      const response = await fetch(`/api/puzzles/random-under?rating=${rating}`);
-
-      const apiCallEndTime = performance.now();
-      const apiCallDuration = apiCallEndTime - apiCallStartTime;
-      console.log(`📡 [${puzzleRequestId}] Supabase API response received in ${apiCallDuration.toFixed(2)}ms`);
-      console.log(`📊 [${puzzleRequestId}] Response status: ${response.status} ${response.statusText}`);
-
-      if (!response.ok) {
-        console.log(`❌ [${puzzleRequestId}] Supabase API request FAILED!`);
-        const errorText = await response.text().catch(() => 'No response body');
-        console.log(`💥 [${puzzleRequestId}] Error details:`, {
-          status: response.status,
-          statusText: response.statusText,
-          errorText: errorText,
-          retryCount: retryCount
-        });
-
-        // Retry logic for certain errors
-        const retryableStatuses = [429, 500, 502, 503, 504];
-        if (retryableStatuses.includes(response.status) && retryCount < maxRetries) {
-          const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 8000); // Exponential backoff, max 8s
-          console.log(`🔄 [${puzzleRequestId}] Retrying in ${backoffDelay}ms... (${retryCount + 1}/${maxRetries})`);
-
-          await new Promise(resolve => setTimeout(resolve, backoffDelay));
-          return await createNewPuzzle(difficulty, retryCount + 1);
-        }
-
-        console.log(`🚨 [${puzzleRequestId}] Max retries exceeded or non-retryable error!`);
-        throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log(`📝 [${puzzleRequestId}] Parsing response data...`);
-
-      if (!data || !data.puzzle || !data.puzzle.PuzzleId) {
-        console.log(`❌ [${puzzleRequestId}] Invalid puzzle data received:`, data);
-        throw new Error(`Invalid puzzle data received: ${JSON.stringify(data)}`);
-      }
-
-      console.log(`✅ [${puzzleRequestId}] Puzzle received successfully!`);
-      console.log(`🎯 [${puzzleRequestId}] Puzzle details:`, {
-        id: data.puzzle.PuzzleId,
-        rating: data.puzzle.Rating,
-        themes: data.puzzle.Themes,
-        url: data.puzzle.GameUrl
-      });
-
-      // Transform Supabase puzzle format to match expected format
-      return {
-        puzzle: {
-          id: data.puzzle.PuzzleId,
-          rating: data.puzzle.Rating,
-          themes: data.puzzle.Themes,
-          url: data.puzzle.GameUrl
-        }
-      };
-
-    } catch (err) {
-      console.log(`💥 [${puzzleRequestId}] EXCEPTION caught in createNewPuzzle:`, err);
-      console.log(`🔍 [${puzzleRequestId}] Error analysis:`, {
-        type: err instanceof Error ? err.constructor.name : 'Unknown',
-        message: err instanceof Error ? err.message : String(err),
-        isNetworkError: err instanceof TypeError && err.message.includes('fetch'),
-        isNetworkErrorByName: err instanceof Error && err.name === 'NetworkError',
-        isNetworkErrorByMessage: err instanceof Error && err.message && err.message.includes('network')
-      });
-
-      // Retry on network errors
-      if (retryCount < maxRetries && (
-        err instanceof TypeError && err.message.includes('fetch') ||
-        (err instanceof Error && err.name === 'NetworkError') ||
-        (err instanceof Error && err.message.includes('network'))
-      )) {
-        const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 8000);
-        console.log(`🔄 [${puzzleRequestId}] Network error detected, retrying in ${backoffDelay}ms... (${retryCount + 1}/${maxRetries})`);
-
-        await new Promise(resolve => setTimeout(resolve, backoffDelay));
-        return await createNewPuzzle(difficulty, retryCount + 1);
-      }
-
-      console.log(`🚨 [${puzzleRequestId}] Cannot retry - throwing error`);
-      throw err;
-    }
-  };
-
-  const shuffleStringList = (list: string[]) => {
-    for (let i = list.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [list[i], list[j]] = [list[j], list[i]];
-    }
-    return list;
-  };
-
   const createNewPuzzleList = async (
     puzzle_count: number,
     targetElo: number,
@@ -392,164 +279,86 @@ export default function CreatePuzzleSetPage() {
     const puzzleListSessionId = Math.random().toString(36).substr(2, 8);
     const startTime = performance.now();
 
-    console.log(`\n🎲 === PUZZLE LIST GENERATION START ===`);
+    console.log(`\n🎲 === PUZZLE SET CREATION START ===`);
     console.log(`🆔 Session: ${puzzleListSessionId}`);
     console.log(`🎯 Target: ${puzzle_count} puzzles at ELO ${targetElo}`);
-
-    const difficultyEloMap: Record<string, number> = {
-      easiest: 1,
-      easier: 999,
-      normal: 1499,
-      harder: 2249,
-      hardest: 3001,
-    };
-    console.log(`📊 Difficulty mapping:`, difficultyEloMap);
-
-    const difficulties = Object.keys(difficultyEloMap);
-    console.log(`📋 Available difficulties:`, difficulties);
 
     if (puzzle_count > maxSetSize) {
       console.log(`⚠️ Requested ${puzzle_count} puzzles exceeds max ${maxSetSize}, capping at ${maxSetSize}`);
       puzzle_count = maxSetSize;
     }
 
-    const getRandom = (list: string[]) =>
-      list[Math.floor(Math.random() * list.length)];
+    try {
+      const apiCallStartTime = performance.now();
+      console.log(`📦 [${puzzleListSessionId}] Calling create-set API...`);
 
-    const easierDifficulties = difficulties.filter(
-      (d) => difficultyEloMap[d] < targetElo
-    );
-    const harderDifficulties = difficulties.filter(
-      (d) => difficultyEloMap[d] >= targetElo
-    );
+      const response = await fetch(
+        `/api/puzzles/create-set?target=${targetElo}&size=${puzzle_count}&margin=100&tails_pct=0.10`
+      );
 
-    console.log(`📊 Difficulty pools:`, {
-      easier: easierDifficulties,
-      harder: harderDifficulties,
-      targetElo: targetElo
-    });
+      const apiCallEndTime = performance.now();
+      const apiCallDuration = apiCallEndTime - apiCallStartTime;
+      console.log(`📡 [${puzzleListSessionId}] API response received in ${apiCallDuration.toFixed(2)}ms`);
+      console.log(`📊 [${puzzleListSessionId}] Response status: ${response.status} ${response.statusText}`);
 
-    const puzzleIds: Set<string> = new Set();
-    const difficultyCounts: Record<string, number> = {};
-    let totalElo = 0;
-    let consecutiveFailures = 0;
-    const maxConsecutiveFailures = 10;
-    let iterationCount = 0;
-    let duplicateAttempts = 0;
-    let apiCallCount = 0;
-    let successfulApiCalls = 0;
-
-    console.log(`🔄 Starting puzzle collection loop...`);
-
-    while (puzzleIds.size < puzzle_count) {
-      iterationCount++;
-      const currentAvg = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
-
-      if (iterationCount % 10 === 0) {
-        console.log(`🔄 Loop iteration ${iterationCount} - Progress: ${puzzleIds.size}/${puzzle_count} puzzles (${(puzzleIds.size/puzzle_count*100).toFixed(1)}%)`);
-        console.log(`📊 Current stats:`, {
-          currentAverage: currentAvg.toFixed(0),
-          targetElo: targetElo,
-          consecutiveFailures: consecutiveFailures,
-          apiCalls: apiCallCount,
-          successfulApiCalls: successfulApiCalls,
-          duplicates: duplicateAttempts
+      if (!response.ok) {
+        console.log(`❌ [${puzzleListSessionId}] API request FAILED!`);
+        const errorText = await response.text().catch(() => 'No response body');
+        console.log(`💥 [${puzzleListSessionId}] Error details:`, {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText
         });
+        throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
-      const pool = currentAvg >= targetElo ? easierDifficulties : harderDifficulties;
-      const poolType = currentAvg >= targetElo ? 'easier' : 'harder';
-      console.log(`🎯 Selecting from ${poolType} pool (current avg: ${currentAvg.toFixed(0)}, target: ${targetElo})`);
+      const data = await response.json();
+      console.log(`📝 [${puzzleListSessionId}] Parsing response data...`);
 
-      if (pool.length === 0) {
-        console.log(`❌ No available difficulties in ${poolType} pool - breaking loop`);
-        break;
+      if (!data || !data.puzzles || !Array.isArray(data.puzzles)) {
+        console.log(`❌ [${puzzleListSessionId}] Invalid puzzle data received:`, data);
+        throw new Error(`Invalid puzzle data received: ${JSON.stringify(data)}`);
       }
 
-      const selectedDifficulty = getRandom(pool);
-      console.log(`🎲 Selected difficulty: ${selectedDifficulty} (ELO ${difficultyEloMap[selectedDifficulty]})`);
+      const puzzles = data.puzzles;
+      const puzzleIds = puzzles.map((p: { PuzzleId: string }) => p.PuzzleId);
 
-      try {
-        apiCallCount++;
-        const puzzle = await createNewPuzzle(selectedDifficulty);
+      // Calculate stats
+      const avgRating = puzzles.reduce((sum: number, p: { Rating: number }) => sum + p.Rating, 0) / puzzles.length;
 
-        if (!puzzle?.puzzle?.id) {
-          console.log(`❌ No puzzle ID received from API`);
-          consecutiveFailures++;
-          continue;
-        }
+      const endTime = performance.now();
+      const totalDuration = endTime - startTime;
 
-        const puzzleId = puzzle.puzzle.id;
-        successfulApiCalls++;
+      console.log(`\n🎲 === PUZZLE SET CREATION COMPLETE ===`);
+      console.log(`🆔 Session: ${puzzleListSessionId}`);
+      console.log(`📊 Final Statistics:`, {
+        requested: puzzle_count,
+        received: puzzleIds.length,
+        successRate: `${(puzzleIds.length/puzzle_count*100).toFixed(1)}%`,
+        avgRating: avgRating.toFixed(0),
+        targetElo: targetElo,
+        totalDuration: `${totalDuration.toFixed(2)}ms`,
+        apiCallDuration: `${apiCallDuration.toFixed(2)}ms`
+      });
+      console.log(`🎯 First 5 puzzle IDs:`, puzzleIds.slice(0, 5));
+      console.log(`✅ Puzzle set creation SUCCESS! Returning ${puzzleIds.length} puzzles`);
 
-        if (puzzleIds.has(puzzleId)) {
-          console.log(`🔄 Duplicate puzzle ID detected: ${puzzleId}`);
-          duplicateAttempts++;
-          consecutiveFailures++;
+      onProgress(100);
+      return puzzleIds;
 
-          if (consecutiveFailures >= maxConsecutiveFailures) {
-            console.log(`🚨 Max consecutive failures (${maxConsecutiveFailures}) reached - breaking loop`);
-            break;
-          }
-          continue;
-        }
+    } catch (err) {
+      const endTime = performance.now();
+      const totalDuration = endTime - startTime;
 
-        // Success! Add to collection
-        puzzleIds.add(puzzleId);
-        totalElo += difficultyEloMap[selectedDifficulty];
-        difficultyCounts[selectedDifficulty] = (difficultyCounts[selectedDifficulty] || 0) + 1;
-        consecutiveFailures = 0;
+      console.log(`💥 [${puzzleListSessionId}] EXCEPTION caught:`, err);
+      console.log(`🔍 [${puzzleListSessionId}] Error analysis:`, {
+        type: err instanceof Error ? err.constructor.name : 'Unknown',
+        message: err instanceof Error ? err.message : String(err)
+      });
+      console.log(`⏱️ [${puzzleListSessionId}] Failed after ${totalDuration.toFixed(2)}ms`);
 
-        const progress = Math.floor((puzzleIds.size / puzzle_count) * 100);
-        const newAverage = totalElo / puzzleIds.size;
-
-        console.log(`✅ Puzzle ${puzzleIds.size}/${puzzle_count} added! ID: ${puzzleId}`);
-        console.log(`📊 New average ELO: ${newAverage.toFixed(0)} (target: ${targetElo})`);
-        console.log(`📈 Progress: ${progress}%`);
-
-        onProgress(progress);
-
-      } catch (error) {
-        console.log(`💥 Exception in puzzle generation loop:`, error);
-        consecutiveFailures++;
-        if (consecutiveFailures >= maxConsecutiveFailures) {
-          console.log(`🚨 Max consecutive failures (${maxConsecutiveFailures}) reached due to exception - breaking loop`);
-          break;
-        }
-      }
+      throw err;
     }
-
-    const endTime = performance.now();
-    const totalDuration = endTime - startTime;
-    const finalAverage = puzzleIds.size > 0 ? totalElo / puzzleIds.size : 0;
-
-    console.log(`\n🎲 === PUZZLE LIST GENERATION COMPLETE ===`);
-    console.log(`🆔 Session: ${puzzleListSessionId}`);
-    console.log(`📊 Final Statistics:`, {
-      requested: puzzle_count,
-      generated: puzzleIds.size,
-      successRate: `${(puzzleIds.size/puzzle_count*100).toFixed(1)}%`,
-      finalAverageElo: finalAverage.toFixed(0),
-      targetElo: targetElo,
-      totalIterations: iterationCount,
-      totalApiCalls: apiCallCount,
-      successfulApiCalls: successfulApiCalls,
-      duplicateAttempts: duplicateAttempts,
-      finalConsecutiveFailures: consecutiveFailures,
-      totalDuration: `${totalDuration.toFixed(2)}ms`,
-      avgTimePerPuzzle: `${(totalDuration/puzzleIds.size).toFixed(2)}ms`
-    });
-    console.log(`🎨 Difficulty distribution:`, difficultyCounts);
-
-
-    const allPuzzleIds = Array.from(puzzleIds);
-    console.log(`🎲 Converting Set to Array: ${allPuzzleIds.length} puzzles`);
-    console.log(`🔀 Shuffling puzzle order...`);
-    const shuffledPuzzleIds = shuffleStringList(allPuzzleIds);
-    console.log(`✅ Shuffling complete - first 5 IDs:`, shuffledPuzzleIds.slice(0, 5));
-    console.log(`🎉 Puzzle list generation SUCCESS! Returning ${shuffledPuzzleIds.length} puzzles`);
-
-    return shuffledPuzzleIds;
   };
 
   const handleCreateSetButton = async (e: React.FormEvent) => {

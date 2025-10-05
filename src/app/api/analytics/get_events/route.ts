@@ -84,7 +84,7 @@ export async function GET() {
       .from('chesspecker_analytics_events')
       .select('*')
       .order('ts', { ascending: false })
-      .limit(1000);
+      .limit(100000);
 
     console.log('[get_events] Supabase query result:', {
       hasError: !!error,
