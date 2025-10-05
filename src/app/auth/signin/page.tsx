@@ -11,8 +11,6 @@ function SignInContent() {
   useEffect(() => {
     async function handleSignIn() {
       if (force === "true") {
-        // Check if there's any existing session
-        const existingSession = await getSession();
 
         // Immediately trigger Google OAuth with force refresh
         await signIn("google", {

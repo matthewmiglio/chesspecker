@@ -6,11 +6,11 @@ import { createClient } from "@supabase/supabase-js";
 /**
  * GET /api/user/pseudoname
  *
- * Returns the authenticated user's pseudoname from the chesspecker-pseudonames table.
- * Uses RLS policy to ensure users can only read their own pseudoname.
+ * Returns the authenticated user's pseudoname, creating one if it doesn't exist.
+ * Calls ensure_user_pseudoname() RPC function which handles get-or-create logic.
  *
  * Authentication: Requires valid NextAuth session (OAuth via Google)
- * Authorization: RLS policy enforces email = auth.jwt()->>'email'
+ * Authorization: Session email validated before RPC call
  */
 export async function GET() {
   // Validate session server-side
@@ -31,24 +31,21 @@ export async function GET() {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Query the table directly using the validated email from NextAuth session
-    // Using maybeSingle() to handle 0 or 1 rows gracefully (returns null data if no row)
+    // Call ensure_user_pseudoname() RPC function
+    // This will create a pseudoname if one doesn't exist, or return existing one
     const { data, error } = await supabase
-      .from("chesspecker-pseudonames")
-      .select("pseudoname")
-      .eq("email", session.user.email)
-      .maybeSingle();
+      .rpc('ensure_user_pseudoname', { user_email: session.user.email });
 
     if (error) {
-      console.error("[GET /api/user/pseudoname] Query error:", error);
+      console.error("[GET /api/user/pseudoname] RPC error:", error);
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
       );
     }
 
-    // If no row exists, data will be null
-    return NextResponse.json({ pseudoname: data?.pseudoname ?? null });
+    // data is the pseudoname string directly (not { pseudoname: "..." })
+    return NextResponse.json({ pseudoname: data ?? null });
   } catch (err) {
     console.error("[GET /api/user/pseudoname] Unexpected error:", err);
     return NextResponse.json(

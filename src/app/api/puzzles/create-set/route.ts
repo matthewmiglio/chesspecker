@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
-type Puzzle = {
-  PuzzleId: string;
-  Rating: number;
-};
+
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
