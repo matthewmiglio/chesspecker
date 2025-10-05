@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
+type Puzzle = {
+  PuzzleId: string;
+  Rating: number;
+};
+
 export async function GET(req: NextRequest) {
   const requestId = Math.random().toString(36).substr(2, 8);
   const requestStartTime = Date.now();
@@ -78,14 +83,14 @@ export async function GET(req: NextRequest) {
     const totalRequestTime = Date.now() - requestStartTime;
 
     if (puzzles.length > 0) {
-      const avgRating = puzzles.reduce((sum: number, p) => sum + p.Rating, 0) / puzzles.length;
+      const avgRating = puzzles.reduce((sum: number, p: Puzzle) => sum + p.Rating, 0) / puzzles.length;
       console.log(`✅ [API:create-set:${requestId}] Puzzle set created successfully!`);
       console.log(`🎯 [API:create-set:${requestId}] Set details:`, {
         requested: size,
         received: puzzles.length,
         avgRating: avgRating.toFixed(0),
         target: target,
-        first5Ids: puzzles.slice(0, 5).map(p => p.PuzzleId)
+        first5Ids: puzzles.slice(0, 5).map((p: Puzzle) => p.PuzzleId)
       });
     } else {
       console.log(`⚠️ [API:create-set:${requestId}] No puzzles returned for target=${target}, size=${size}`);

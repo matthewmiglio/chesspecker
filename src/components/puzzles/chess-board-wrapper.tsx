@@ -59,7 +59,6 @@ export default function ChessBoardWrapper({
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
   const { resolvedTheme } = useTheme();
-  const [glow, setGlow] = useState(false);
   const [showHintHighlight, setShowHintHighlight] = useState(false);
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
