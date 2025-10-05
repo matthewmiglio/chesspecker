@@ -53,8 +53,6 @@ export default function CreatePuzzleSetPage() {
     repeats: number,
     name: string
   ) => {
-    const startTime = performance.now();
-    const sessionId = Math.random().toString(36).substr(2, 9);
 
     try {
       setIsCreatingSet(true);
@@ -114,7 +112,7 @@ export default function CreatePuzzleSetPage() {
             typeof accuracyErr === "object" && accuracyErr !== null && "message" in accuracyErr
               ? String((accuracyErr as { message?: unknown }).message)
               : String(accuracyErr);
-          error(`Exception creating accuracy tracking for repeat ${i + 1}`, "Accuracy Setup Error");
+          error(`Exception creating accuracy tracking for repeat ${i + 1}: ${errorMessage}`, "Accuracy Setup Error");
         }
 
         // Update progress UI
