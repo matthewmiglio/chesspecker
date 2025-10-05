@@ -157,6 +157,15 @@ export const handleSetSelect = async (
 
     const { Chess } = await import("chess.js");
     const chess = new Chess(puzzleData.puzzle.FEN);
+    // Determine player side after opponent's setup move
+    if (puzzleData.puzzle.Moves.length > 0) {
+      const opponentSetupMove = puzzleData.puzzle.Moves[0];
+      chess.move({
+        from: opponentSetupMove.slice(0, 2),
+        to: opponentSetupMove.slice(2, 4),
+        promotion: opponentSetupMove.length > 4 ? opponentSetupMove.slice(4) : undefined,
+      });
+    }
     const turn = chess.turn();
     setPlayerSide(turn);
   } else {

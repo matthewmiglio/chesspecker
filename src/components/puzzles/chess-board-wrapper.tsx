@@ -22,6 +22,7 @@ type ChessBoardWrapperProps = {
     handleShowReplay: () => Promise<void>;
     handleManualShowSolution: () => Promise<void>;
     currentPuzzleData: { puzzle: ChessPeckerPuzzle } | null;
+    setAutoNextPuzzle: (value: boolean) => void;
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -64,18 +65,8 @@ export default function ChessBoardWrapper({
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
 
   useEffect(() => {
-    console.log('🏁 [RETRY DEBUG] ChessBoardWrapper useEffect - Session startup check');
-    console.log('🏁 [RETRY DEBUG] selectedSetId:', selectedSetId);
-    console.log('🏁 [RETRY DEBUG] puzzleSession exists:', !!puzzleSession);
-    console.log('🏁 [RETRY DEBUG] isSessionActive:', puzzleSession?.isSessionActive);
-
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
-      console.log(
-        "🏁 [RETRY DEBUG] [ChessBoardWrapper] selectedSetId ready. Starting session..."
-      );
       puzzleSession.handleStartSession();
-    } else {
-      console.log('🏁 [RETRY DEBUG] Not starting session - conditions not met');
     }
   }, [selectedSetId, puzzleSession]);
 
@@ -93,16 +84,6 @@ export default function ChessBoardWrapper({
     }
   }, [puzzleSession.showFeedbackButtons]);
 
-  // Auto-advance to next puzzle when auto mode is enabled
-  useEffect(() => {
-    if (autoNextPuzzle && puzzleSession.showFeedbackButtons) {
-      const timer = setTimeout(() => {
-        puzzleSession.handleContinueToNext();
-      }, 1000); // 1 second delay before auto-advancing
-
-      return () => clearTimeout(timer);
-    }
-  }, [autoNextPuzzle, puzzleSession, puzzleSession.showFeedbackButtons, puzzleSession.handleContinueToNext]);
 
   // Timer for hint button highlighting
   useEffect(() => {
@@ -238,7 +219,10 @@ export default function ChessBoardWrapper({
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground whitespace-nowrap">Auto Next</span>
               <button
-                onClick={() => setAutoNextPuzzle(!autoNextPuzzle)}
+                onClick={() => {
+                  setAutoNextPuzzle(!autoNextPuzzle);
+                  puzzleSession.setAutoNextPuzzle(!autoNextPuzzle);
+                }}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   autoNextPuzzle
                     ? 'bg-primary focus:ring-primary'
@@ -304,20 +288,8 @@ export default function ChessBoardWrapper({
         </CardFooter>
       </Card>
 
-      {/* Auto Next Indicator */}
-      {puzzleSession.showFeedbackButtons && autoNextPuzzle && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-card/90 backdrop-blur-md border border-border rounded-xl p-4 max-w-sm mx-4 text-center">
-            <div className="flex items-center justify-center gap-2 text-primary">
-              <ArrowRight className="h-5 w-5 animate-pulse" />
-              <span className="font-medium">Auto advancing...</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Feedback Buttons Overlay */}
-      {puzzleSession.showFeedbackButtons && !autoNextPuzzle && (
+      {puzzleSession.showFeedbackButtons && (
         <div className={`fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 ease-out ${puzzleSession.showFeedbackButtons ? 'opacity-100' : 'opacity-0'}`}>
           <div className={`bg-card/70 backdrop-blur-md border border-border rounded-xl p-6 max-w-md mx-4 transform transition-all duration-300 ease-out ${isAnimatingIn ? 'scale-100 translate-y-0 opacity-100' : 'scale-90 translate-y-8 opacity-0'}`}>
             <div className="space-y-3">
@@ -332,11 +304,7 @@ export default function ChessBoardWrapper({
 
               {/* Retry Puzzle */}
               <Button
-                onClick={() => {
-                  console.log('🔄 [RETRY DEBUG] RETRY BUTTON CLICKED!');
-                  console.log('🔄 [RETRY DEBUG] About to call handleRetryPuzzle');
-                  puzzleSession.handleRetryPuzzle();
-                }}
+                onClick={puzzleSession.handleRetryPuzzle}
                 variant="outline"
                 className="w-full flex items-center justify-center gap-3 py-3"
               >

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Chess } from "chess.js";
 import { showConfetti, showGreenCheck, showRedX, showYellowWarning } from "@/lib/visuals";
 import {
-  parseUCIMove,
   puzzleIsFinished,
   setIsDone,
 } from "@/lib/utils/puzzleUtils";
@@ -68,6 +67,7 @@ export function usePuzzleSession({
   const [hintUsed, setHintUsed] = useState(false);
   const [showFeedbackButtons, setShowFeedbackButtons] = useState(false);
   const [currentPuzzleData, setCurrentPuzzleData] = useState<{ puzzle: ChessPeckerPuzzle } | null>(null);
+  const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
 
   // Timing state for puzzle duration tracking
   const [puzzleStartTime, setPuzzleStartTime] = useState<number | null>(null);
@@ -105,15 +105,36 @@ export function usePuzzleSession({
     if (!email) email = "unauthenticated@email.com";
     incrementUserIncorrect(email);
 
-    if (autoShowSolution) {
+    // if auto show solution on and + auto next on -> shows solution, waits a sec, then moves to next puzzle without input
+    if (autoShowSolution && autoNextPuzzle) {
       await showSolution();
       await new Promise((resolve) => setTimeout(resolve, 3000));
+      await handleNextPuzzle(true);
+      return;
     }
 
-    setShowFeedbackButtons(true);
+    // if auto show solution off and + auto next on -> skips showing solution, just moves to next puzzle immediately no input
+    if (!autoShowSolution && autoNextPuzzle) {
+      await handleNextPuzzle(true);
+      return;
+    }
+
+    // if auto show solution on and + auto next off ->  shows solution, waits a sec, then shows continue replay export popup
+    if (autoShowSolution && !autoNextPuzzle) {
+      await showSolution();
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      setShowFeedbackButtons(true);
+      return;
+    }
+
+    // if auto show solution off and + auto next off -> skips showing solution, then goes right to the popup for showing continue replay and export
+    if (!autoShowSolution && !autoNextPuzzle) {
+      setShowFeedbackButtons(true);
+      return;
+    }
   };
 
-  const handleSuccessfulPuzzle = async (forceFinish = false) => {
+  const handleSuccessfulPuzzle = async () => {
     if (puzzleAttempted && puzzleOutcome === 'correct' && retryCounter === 0) {
       return;
     }
@@ -132,7 +153,20 @@ export function usePuzzleSession({
     if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email);
 
-    await handleNextPuzzle(true);
+    // if they get it right
+    // -if auto show solution on and + auto next on -> auto move to next puzzle immediately, no popup no solution.
+    // -if auto show solution off and + auto next on -> auto move to next puzzle immediately, no popup no solution.
+    if (autoNextPuzzle) {
+      await handleNextPuzzle(true);
+      return;
+    }
+
+    // -if auto show solution on and + auto next off -> popup for replay and export and continue shows
+    // -if auto show solution off and + auto next off -> popup for replay and export and continue shows
+    if (!autoNextPuzzle) {
+      setShowFeedbackButtons(true);
+      return;
+    }
   };
 
   const handleHintAssistedSolve = async () => {
@@ -159,13 +193,18 @@ export function usePuzzleSession({
     if (!email) email = "unauthenticated@email.com";
     incrementUserCorrect(email); //user stats
 
-    // Show solution like incorrect moves do
-    await showSolution();
+    // Hint-assisted counts as correct, so follow the correct answer logic
+    // -if auto next on -> auto move to next puzzle immediately
+    if (autoNextPuzzle) {
+      await handleNextPuzzle(true);
+      return;
+    }
 
-    // Wait 3 seconds after solution replay before showing feedback buttons
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    setShowFeedbackButtons(true);
+    // -if auto next off -> popup for replay and export and continue shows
+    if (!autoNextPuzzle) {
+      setShowFeedbackButtons(true);
+      return;
+    }
   };
 
   const handleMove = async (move: string, isCorrect: boolean) => {
@@ -192,7 +231,7 @@ export function usePuzzleSession({
         }
       } else {
         try {
-          await handleSuccessfulPuzzle(true);
+          await handleSuccessfulPuzzle();
         } catch (error) {
           console.error('Error in handleSuccessfulPuzzle:', error);
           await handleNextPuzzle(true);
@@ -219,14 +258,14 @@ export function usePuzzleSession({
     }
   };
 
-  const showFullSolution = async (startingFen: string) => {
+  const showFullSolution = async (startingFen: string, allMoves: string[]) => {
     const chess = new Chess(startingFen);
 
     const moveSpeed = 1200; // milliseconds per move
-    
-    // Play all solution moves from the beginning
-    for (let i = 0; i < solution.length; i++) {
-      const moveUci = solution[i];
+
+    // Play ALL puzzle moves from the beginning (including opponent's setup)
+    for (let i = 0; i < allMoves.length; i++) {
+      const moveUci = allMoves[i];
       await new Promise((resolve) => setTimeout(resolve, moveSpeed));
 
       chess.move({
@@ -283,7 +322,16 @@ export function usePuzzleSession({
     // Reset hint state for new puzzle
     setHintUsed(false);
 
+    // Determine player side after opponent's setup move
     const chess = new Chess(puzzleData.puzzle.FEN);
+    if (puzzleData.puzzle.Moves.length > 0) {
+      const opponentSetupMove = puzzleData.puzzle.Moves[0];
+      chess.move({
+        from: opponentSetupMove.slice(0, 2),
+        to: opponentSetupMove.slice(2, 4),
+        promotion: opponentSetupMove.length > 4 ? opponentSetupMove.slice(4) : undefined,
+      });
+    }
     setPlayerSide(chess.turn());
 
     await updateThisSetAccuracy(setId, setAccuracies);
@@ -337,6 +385,18 @@ export function usePuzzleSession({
       setHighlight
     );
 
+    // Update player side for correct orientation
+    const chess = new Chess(puzzleData.puzzle.FEN);
+    if (puzzleData.puzzle.Moves.length > 0) {
+      const opponentSetupMove = puzzleData.puzzle.Moves[0];
+      chess.move({
+        from: opponentSetupMove.slice(0, 2),
+        to: opponentSetupMove.slice(2, 4),
+        promotion: opponentSetupMove.length > 4 ? opponentSetupMove.slice(4) : undefined,
+      });
+    }
+    setPlayerSide(chess.turn());
+
     setHintUsed(false);
     setPuzzleStartTime(Date.now());
   };
@@ -372,6 +432,18 @@ export function usePuzzleSession({
       setHighlight
     );
 
+    // Update player side for correct orientation
+    const chess = new Chess(puzzleData.puzzle.FEN);
+    if (puzzleData.puzzle.Moves.length > 0) {
+      const opponentSetupMove = puzzleData.puzzle.Moves[0];
+      chess.move({
+        from: opponentSetupMove.slice(0, 2),
+        to: opponentSetupMove.slice(2, 4),
+        promotion: opponentSetupMove.length > 4 ? opponentSetupMove.slice(4) : undefined,
+      });
+    }
+    setPlayerSide(chess.turn());
+
     // Get the starting FEN for the full replay
     const startingFen = puzzleData.puzzle.FEN;
 
@@ -379,7 +451,7 @@ export function usePuzzleSession({
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Show the full solution from the beginning
-    await showFullSolution(startingFen);
+    await showFullSolution(startingFen, puzzleData.puzzle.Moves);
 
     //wait for 1 second
     const postReplayDelay = 1000; // milliseconds
@@ -403,5 +475,6 @@ export function usePuzzleSession({
     handleShowReplay,
     handleManualShowSolution,
     currentPuzzleData,
+    setAutoNextPuzzle,
   };
 }
