@@ -5,7 +5,6 @@ import { Chess, Square, Move } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 
-import MoveIndicator from "@/components/puzzles/MoveIndicator";
 import ArrowOverlay from "@/components/puzzles/ArrowOverlay";
 import {
   handlePieceDropHelper,
@@ -266,17 +265,36 @@ export default function AnimatedBoard({
       onMouseDown={handleRightMouseDown}
       onMouseUp={handleRightMouseUp}
     >
-      <div className = 'py-2 '><MoveIndicator turn={game.turn()} /></div>
-      <Chessboard
-        position={boardPosition}
-        onPieceDrop={handlePieceDrop}
-        onSquareClick={handleSquareClick}
-        animationDuration={300}
-        boardOrientation={sideOnBottom === "w" ? "white" : "black"}
-        arePiecesDraggable={!isBoardLocked && isSessionActive}
-        boardWidth={boardWidth}
-        customSquareStyles={customSquareStyles}
-      />
+      {/* Board with gothic border - border image is larger to frame from outside */}
+      <div className="relative block mx-auto" style={{ width: boardWidth, height: boardWidth }}>
+        <Chessboard
+          position={boardPosition}
+          onPieceDrop={handlePieceDrop}
+          onSquareClick={handleSquareClick}
+          animationDuration={300}
+          boardOrientation={sideOnBottom === "w" ? "white" : "black"}
+          arePiecesDraggable={!isBoardLocked && isSessionActive}
+          boardWidth={boardWidth}
+          customSquareStyles={customSquareStyles}
+        />
+
+        {/* Gothic border overlay - expanded to frame the board from outside */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            top: '-7%',
+            left: '-7%',
+            right: '-7%',
+            bottom: '-7%',
+            backgroundImage: 'url(/board_themes/boarders/gothic.jpg)',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            mixBlendMode: 'multiply',
+          }}
+        />
+      </div>
+
       <ArrowOverlay arrows={arrows} sideOnBottom={sideOnBottom} />
     </div>
   );

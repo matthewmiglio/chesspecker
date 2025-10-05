@@ -156,18 +156,14 @@ export default function ChessBoardWrapper({
 
   return (
     <div className="mx-auto ">
-
-      <Card className={`transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
-        <CardContent className="px-0 mx-auto ">
+      <Card className={`py-10 m-0 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
+        <CardContent className="p-0 m-00 mx-auto">
           <div
             className=" transition-all duration-300"
-            onMouseEnter={() => setGlow(true)}
-            onMouseLeave={() => setGlow(false)}
             style={{
               boxShadow: glow
                 ? `0 0 18px 2px ${themeColor}`
                 : `0 0 12px 1px ${themeColor}`,
-              padding: "0.0rem",
             }}
           >
             <AnimatedBoard
