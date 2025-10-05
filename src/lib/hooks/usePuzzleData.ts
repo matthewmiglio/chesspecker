@@ -81,28 +81,25 @@ export const loadPuzzleAndInitialize = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
-  console.log('🎨 [RETRY DEBUG] loadPuzzleAndInitialize - START');
-  console.log('🎨 [RETRY DEBUG] puzzle received:', {
-    puzzleId: puzzle.PuzzleId,
-    solutionLength: puzzle.Moves.length,
-    solution: puzzle.Moves,
-    fen: puzzle.FEN,
-  });
+  const { Chess } = await import("chess.js");
+  const chess = new Chess(puzzle.FEN);
 
-  console.log('🎨 [RETRY DEBUG] Setting puzzle state:');
-  console.log('🎨 [RETRY DEBUG] - Setting FEN to:', puzzle.FEN);
-  setFen(puzzle.FEN);
+  if (puzzle.Moves.length > 0) {
+    const opponentSetupMove = puzzle.Moves[0];
+    chess.move({
+      from: opponentSetupMove.slice(0, 2),
+      to: opponentSetupMove.slice(2, 4),
+      promotion: opponentSetupMove.length > 4 ? opponentSetupMove.slice(4) : undefined,
+    });
+  }
 
-  console.log('🎨 [RETRY DEBUG] - Setting solution to:', puzzle.Moves);
-  setSolution(puzzle.Moves);
+  const startingFen = chess.fen();
+  setFen(startingFen);
 
-  console.log('🎨 [RETRY DEBUG] - Setting solvedIndex to: 0');
+  const playerSolution = puzzle.Moves.slice(1);
+  setSolution(playerSolution);
   setSolvedIndex(0);
-
-  console.log('🎨 [RETRY DEBUG] - Setting highlight to: null');
   setHighlight(null);
-
-  console.log('🎨 [RETRY DEBUG] loadPuzzleAndInitialize - END');
 };
 
 export const handleSetSelect = async (

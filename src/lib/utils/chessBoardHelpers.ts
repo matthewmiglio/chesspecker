@@ -70,6 +70,9 @@ export function handlePieceDropHelper({
   if (!isSessionActive || isBoardLocked)
     return { valid: false, moveWasCorrect: false };
 
+  if (solvedIndex >= solution.length)
+    return { valid: false, moveWasCorrect: false };
+
   const tempGame = new Chess(game.fen());
   try {
     tempGame.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
@@ -85,11 +88,8 @@ export function handlePieceDropHelper({
   const moveStr = sourceSquare + targetSquare;
   const expectedMoveStr = solution[solvedIndex].slice(0, 4);
 
-  // Check if move results in checkmate - any checkmate is correct for mate-in-1 puzzles
   const isCheckmate = tempGame.isCheckmate();
-  // Keep original string comparison for non-mate puzzles
   const matchesOriginalSolution = moveStr === expectedMoveStr;
-  // Accept either checkmate OR original solution match
   const isCorrect = isCheckmate || matchesOriginalSolution;
 
   const nextGame = new Chess(game.fen());
