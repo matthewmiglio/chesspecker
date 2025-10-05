@@ -18,28 +18,30 @@ type Testimonial = {
 };
 
 const TESTIMONIALS: Testimonial[] = [
-  { name: "Gustavo", monthYear: "September 2025", quote: "The site really helped me grow. Thanks to anyone who had this idea." },
-  { name: "Josh", monthYear: "September 2025", quote: "Site is great." },
-  { name: "Emilio", monthYear: "September 2025", quote: "I started playing chess July 1 this year and I’ve been looking for ways to improve. I’m loving this method so much… I hope it can become an Android app — I’d even pay for it. Greetings from Mexico!" },
-  { name: "Emilio", monthYear: "September 2025", quote: "Finished my first 8-lap set of 100. First try took around 4 hours with ~40% accuracy. My 8th round was 99% in around 14 minutes :D" },
-  { name: "JR", monthYear: "August 2025", quote: "Thank you for sharing this great work you’ve done!" },
-  { name: "Viesturs", monthYear: "August 2025", quote: "Just starting, but the website looks great!" },
-  { name: "Karabi", monthYear: "August 2025", quote: "Nice." },
-  { name: "Roman", monthYear: "August 2025", quote: "I appreciate your work — love you, bro." },
-  { name: "FlickeryGems", monthYear: "August 2025", quote: "Great website to practice the Woodpecker Method." },
-  { name: "Vaishnav", monthYear: "August 2025", quote: "ChessPecker is great — it offers free training and is excellent for tactics using the Woodpecker Method." },
-  { name: "Frogi", monthYear: "August 2025", quote: "I really like the site." },
-  { name: "Sunaksh", monthYear: "July 2025", quote: "It’s the best way to train the Woodpecker Method." },
-  { name: "Adam", monthYear: "July 2025", quote: "Great work — it has a good feel to it." },
-  { name: "Thej", monthYear: "July 2025", quote: "It’s good." },
-  { name: "The", monthYear: "July 2025", quote: "Good." },
-  { name: "Sam", monthYear: "June 2025", quote: "Awesome website! Thanks for your contribution — you rock!!" },
-  { name: "Roman", monthYear: "October 2025", quote: "I’ve used ChessPecker for about three months—it’s become a crucial part of my training. Really appreciate the touch-to-move update." },
+  // 🔝 Strong / Marketable
   { name: "Ahmed", monthYear: "September 2025", quote: "I love this site—it helped me go from about 100 Elo to 500. Thank you!" },
+  { name: "Emilio", monthYear: "September 2025", quote: "I started playing chess July 1 this year and I've been looking for ways to improve. I'm loving this method so much… I hope it can become an Android app — I'd even pay for it. Greetings from Mexico!" },
+  { name: "Roman", monthYear: "October 2025", quote: "I've used ChessPecker for about three months—it's become a crucial part of my training. Really appreciate the touch-to-move update." },
+  { name: "Jordan", monthYear: "September 2025", quote: "Overall, I love the platform—I've made immense improvements this month." },
+  { name: "Emilio", monthYear: "September 2025", quote: "Finished my first 8-lap set of 100. First try took around 4 hours with ~40% accuracy. My 8th round was 99% in around 14 minutes :D" },
   { name: "Dmitry", monthYear: "September 2025", quote: "I was looking for a way to do Woodpecker training—this tool is amazing." },
-  { name: "Jordan", monthYear: "September 2025", quote: "Overall, I love the platform—I’ve made immense improvements this month." },
+  { name: "Vaishnav", monthYear: "August 2025", quote: "ChessPecker is great — it offers free training and is excellent for tactics using the Woodpecker Method." },
+  { name: "Gustavo", monthYear: "September 2025", quote: "The site really helped me grow. Thanks to anyone who had this idea." },
+  { name: "Sunaksh", monthYear: "July 2025", quote: "It's the best way to train the Woodpecker Method." },
+
+  // 👍 Solid
+  { name: "FlickeryGems", monthYear: "August 2025", quote: "Great website to practice the Woodpecker Method." },
+  { name: "JR", monthYear: "August 2025", quote: "Thank you for sharing this great work you've done!" },
+  { name: "Adam", monthYear: "July 2025", quote: "Great work — it has a good feel to it." },
+  { name: "Sam", monthYear: "June 2025", quote: "Awesome website! Thanks for your contribution — you rock!!" },
+  { name: "Frogi", monthYear: "August 2025", quote: "I really like the site." },
+  { name: "Viesturs", monthYear: "August 2025", quote: "Just starting, but the website looks great!" },
+
+  // 👌 Weak / Minimal
+  { name: "Roman", monthYear: "August 2025", quote: "I appreciate your work — love you, bro." },
   { name: "Anton", monthYear: "October 2025", quote: "Good for improving at chess." },
 ];
+
 
 /* ---------- Airy, Always-Scrolling Carousel ---------- */
 function TestimonialsCarousel({
