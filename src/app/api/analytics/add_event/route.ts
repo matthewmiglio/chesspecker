@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     // Validate input with Zod
     const validation = analyticsEventSchema.safeParse(body);
     if (!validation.success) {
-      const firstError = validation.error.errors[0];
+      const firstError = validation.error.issues[0];
       return NextResponse.json({ error: firstError.message }, { status: 400 });
     }
 

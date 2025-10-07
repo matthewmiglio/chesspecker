@@ -3,7 +3,7 @@ import { Redis } from "@upstash/redis";
 
 // Create Redis client
 // Falls back to in-memory Map if Upstash credentials not configured
-let redis: Redis | Map<string, number>;
+let redis: Redis;
 
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
   redis = new Redis({
@@ -12,7 +12,8 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   });
 } else {
   console.warn('[rateLimit] Upstash Redis not configured - using in-memory fallback (not production-safe!)');
-  redis = new Map<string, number>();
+  // Use Map adapter for in-memory storage when Redis is not configured
+  redis = new Map() as unknown as Redis;
 }
 
 /**
