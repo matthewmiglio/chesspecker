@@ -121,8 +121,7 @@ export default function PuzzlesPage() {
 
 
       try {
-        const email = session.user.email;
-        const sets = await getAllSetData(email);
+        const sets = await getAllSetData();
 
         if (!sets) {
           setIsSetDataLoaded(true);

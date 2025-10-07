@@ -2,11 +2,11 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import type { PuzzleSet } from "@/lib/types";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 
 interface SetTabsProps {
-  userSets: PuzzleSet[];
+  userSets: ChessPeckerSet[];
   selectedSetId: number | null;
   setSelectedSetId: (id: number) => void;
 }

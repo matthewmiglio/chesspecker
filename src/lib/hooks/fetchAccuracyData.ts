@@ -1,4 +1,5 @@
 import type { RepeatAccuracy } from "@/lib/types";
+import { getAccuracies } from "@/lib/api/accuraciesApi";
 
 type PercentifiedAccuracy = RepeatAccuracy & {
   correctPercent: number;
@@ -10,53 +11,52 @@ export const fetchAccuracyData = async (
   setAccuracyData: React.Dispatch<React.SetStateAction<PercentifiedAccuracy[]>>,
   setIsAccuracyChecked: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const getSetSize = async () => {
-    const response = await fetch("/api/sets/getSetProgressStats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id }),
-    });
+  console.log('[fetchAccuracyData] Starting fetch for set_id:', set_id);
 
-    if (!response.ok) return null;
-    const result = await response.json();
-    return result.progress.size;
-  };
+  try {
+    // Fetch all accuracies for this set using the new RPC-based API
+    console.log('[fetchAccuracyData] Calling getAccuracies API');
+    const accuracies = await getAccuracies(set_id);
+    console.log('[fetchAccuracyData] Accuracies received:', accuracies, 'Count:', accuracies.length);
 
-  const size = await getSetSize();
-  if (!size) {
-    setIsAccuracyChecked(true);
-    return;
-  }
+    if (!accuracies || accuracies.length === 0) {
+      console.warn('[fetchAccuracyData] No accuracies found');
+      setAccuracyData([]);
+      setIsAccuracyChecked(true);
+      return;
+    }
 
-  const responses = await Promise.all(
-    Array.from({ length: 10 }, (_, i) =>
-      fetch("/api/accuracy/getSetAccuracy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ set_id, repeat_index: i }),
+    // Transform accuracies into the format expected by the chart
+    const processed = accuracies
+      .map((acc) => {
+        const correct = acc.correct || 0;
+        const incorrect = acc.incorrect || 0;
+        const total = correct + incorrect;
+
+        const entry = {
+          repeat: acc.repeat_index,
+          correct,
+          incorrect,
+          time_taken: acc.time_taken ?? undefined,
+          correctPercent: total > 0 ? (correct / total) * 100 : 0,
+          incorrectPercent: total > 0 ? (incorrect / total) * 100 : 0,
+        };
+
+        console.log(`[fetchAccuracyData] Repeat ${acc.repeat_index} processed:`, entry);
+        return entry;
       })
-        .then((res) => (res.ok ? res.json() : { correct: 0, incorrect: 0, time_taken: null }))
-        .catch(() => ({ correct: 0, incorrect: 0, time_taken: null }))
-    )
-  );
+      .filter((d) => {
+        const hasData = d.correct > 0 || d.incorrect > 0;
+        console.log(`[fetchAccuracyData] Repeat ${d.repeat} has data:`, hasData);
+        return hasData;
+      });
 
-  const filtered = responses
-    .map((data, i) => {
-      const correct = data.correct || 0;
-      const incorrect = data.incorrect || 0;
-      const total = correct + incorrect;
-
-      return {
-        repeat: i,
-        correct,
-        incorrect,
-        time_taken: data.time_taken || null,
-        correctPercent: total > 0 ? (correct / total) * 100 : 0,
-        incorrectPercent: total > 0 ? (incorrect / total) * 100 : 0,
-      };
-    })
-    .filter((d) => d.correct > 0 || d.incorrect > 0);
-
-  setAccuracyData(filtered);
-  setIsAccuracyChecked(true);
+    console.log('[fetchAccuracyData] Filtered accuracy data:', processed, 'Count:', processed.length);
+    setAccuracyData(processed);
+  } catch (err) {
+    console.error('[fetchAccuracyData] Error fetching accuracies:', err);
+    setAccuracyData([]);
+  } finally {
+    setIsAccuracyChecked(true);
+  }
 };

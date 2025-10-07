@@ -16,6 +16,9 @@ import {
   incrementPuzzleRequest,
 } from "@/lib/api/dailyStatsApi";
 
+import { createUserSet } from "@/lib/api/setsApi";
+import { upsertAccuracy } from "@/lib/api/accuraciesApi";
+
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 500;
   const { data: session } = useSession();
@@ -47,7 +50,6 @@ export default function CreatePuzzleSetPage() {
 
 
   const addNewSetToDatabase = async (
-    email: string,
     elo: number,
     size: number,
     repeats: number,
@@ -68,44 +70,36 @@ export default function CreatePuzzleSetPage() {
         throw new Error('No puzzles were generated');
       }
 
-      // Phase 2: Database Insertion
-      const requestPayload = { email, elo, size, repeats, name, puzzleIds };
-      const res = await fetch("/api/sets/addSet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestPayload),
+      // Phase 2: Database Insertion using new secure API
+      const setId = await createUserSet({
+        name,
+        elo,
+        size,
+        repeats,
+        puzzleIds
       });
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        const errorMessage = errorData.error || `Server error (${res.status})`;
-
-        error(`Failed to create puzzle set: ${errorMessage}`, "Creation Failed");
+      if (!setId) {
+        error("Failed to create puzzle set", "Creation Failed");
         setIsCreatingSet(false);
         return null;
       }
 
-      const response = await res.json();
-      const set = response.set;
-
       // Phase 3: Accuracy Tracking Setup
       info("Setting up accuracy tracking...", undefined, 4000);
 
-      // Create accuracy rows for each repeat index
+      // Create accuracy rows for each repeat index using the new RPC-based API
       for (let i = 0; i < repeats; i++) {
         try {
-          const accuracyPayload = { set_id: set.set_id, repeat_index: i };
-
-          const accuracyRes = await fetch("/api/accuracy/createSetAccuracy", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(accuracyPayload),
+          const result = await upsertAccuracy({
+            setId,
+            repeatIndex: i,
+            deltaCorrect: 0,
+            deltaIncorrect: 0
           });
 
-          if (!accuracyRes.ok) {
-            const errorData = await accuracyRes.json().catch(() => ({}));
-            const errorDetail = errorData.error || 'Unknown error';
-            error(`Failed to create accuracy tracking for repeat ${i + 1}: ${errorDetail}`, "Accuracy Setup Failed");
+          if (!result) {
+            error(`Failed to create accuracy tracking for repeat ${i + 1}`, "Accuracy Setup Failed");
           }
         } catch (accuracyErr) {
           const errorMessage =
@@ -123,7 +117,7 @@ export default function CreatePuzzleSetPage() {
 
       setIsCreatingSet(false);
       success(`"${name}" created successfully!`, "Puzzle Set Ready");
-      return set;
+      return { set_id: setId };
 
     } catch (err) {
       setIsCreatingSet(false);
@@ -197,7 +191,6 @@ export default function CreatePuzzleSetPage() {
 
     // Create the set
     const result = await addNewSetToDatabase(
-      email,
       difficultySliderValue,
       setSize,
       repeatCount,

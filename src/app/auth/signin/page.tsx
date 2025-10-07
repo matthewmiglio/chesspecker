@@ -33,7 +33,7 @@ function SignInContent() {
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-4">Signing you in...</h1>
-        <p className="text-muted-foreground">
+      <p className="text-muted-foreground">
           {force === "true"
             ? "Performing fresh authentication to enable all features..."
             : "Redirecting to Google sign in..."

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import type { PuzzleSet, RepeatAccuracy } from "@/lib/types";
+import type { RepeatAccuracy } from "@/lib/types";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import AccuracyChartCard from "@/components/dashboard-page/AccuracyChartCard";
 import SetTabs from "@/components/dashboard-page/SetTabs";
 import NoDataCard from "@/components/dashboard-page/NoDataCard";
-import { fetchUserSets } from "@/lib/hooks/fetchUserSets";
+import { getUserSets } from "@/lib/api/setsApi";
 import { fetchAccuracyData } from "@/lib/hooks/fetchAccuracyData";
 
 // Extend RepeatAccuracy to include percent fields
@@ -18,7 +19,7 @@ type PercentifiedAccuracy = RepeatAccuracy & {
 export default function AccuracyStatsPage() {
   const { data: session, status } = useSession();
 
-  const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
+  const [userSets, setUserSets] = useState<ChessPeckerSet[]>([]);
   const [accuracyData, setAccuracyData] = useState<PercentifiedAccuracy[]>([]);
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
@@ -29,21 +30,36 @@ export default function AccuracyStatsPage() {
   // Step 1: Auth & Fetch Sets
   useEffect(() => {
     const run = async () => {
+      console.log('[Dashboard] Auth status:', status);
+
       if (status !== "authenticated") {
+        console.log('[Dashboard] Not authenticated, skipping fetch');
         setIsAuthChecked(true);
+        setIsSetsChecked(true);
         return;
       }
 
-      if (!session?.user?.email) return;
+      if (!session?.user?.email) {
+        console.log('[Dashboard] No user email in session');
+        return;
+      }
 
+      console.log('[Dashboard] Authenticated user:', session.user.email);
       setIsAuthChecked(true);
 
-      await fetchUserSets(
-        session.user.email,
-        setUserSets,
-        setSelectedSetId,
-        setIsSetsChecked
-      );
+      console.log('[Dashboard] Fetching user sets');
+      const sets = await getUserSets();
+      console.log('[Dashboard] User sets retrieved:', sets, 'Count:', sets.length);
+
+      setUserSets(sets);
+      if (sets.length > 0) {
+        console.log('[Dashboard] Setting selected set to:', sets[0].set_id);
+        setSelectedSetId(sets[0].set_id);
+      } else {
+        console.log('[Dashboard] No sets found for user');
+      }
+
+      setIsSetsChecked(true);
     };
 
     run();
@@ -51,8 +67,12 @@ export default function AccuracyStatsPage() {
 
   // Step 2: Fetch Accuracy
   useEffect(() => {
+    console.log('[Dashboard] Selected set ID changed:', selectedSetId);
     if (selectedSetId !== null) {
+      console.log('[Dashboard] Fetching accuracy data for set:', selectedSetId);
       fetchAccuracyData(selectedSetId, setAccuracyData, setIsAccuracyChecked);
+    } else {
+      console.log('[Dashboard] No set selected yet');
     }
   }, [selectedSetId]);
 

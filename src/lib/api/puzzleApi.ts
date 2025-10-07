@@ -4,6 +4,7 @@
 
 import { PuzzleSet } from "@/lib/types";
 import { showConfirmDeletePopup } from "@/lib/utils/uiHelpers";
+import { upsertAccuracy, getAccuracies } from "@/lib/api/accuraciesApi";
 
 export const addIncorrectAttempt = async (
   setId: number,
@@ -11,18 +12,14 @@ export const addIncorrectAttempt = async (
   timeTaken: number = 0
 ) => {
   try {
-    const res = await fetch("/api/accuracy/addIncorrect", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex, time_taken: timeTaken }),
+    const result = await upsertAccuracy({
+      setId,
+      repeatIndex,
+      deltaIncorrect: 1,
+      deltaTime: timeTaken
     });
 
-    const data = await res.json();
-
-    if (!res.ok)
-      throw new Error(data.error || "Failed to add incorrect attempt");
-
-    return true;
+    return result !== null;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("Error in addIncorrectAttempt:", message);
@@ -32,18 +29,14 @@ export const addIncorrectAttempt = async (
 
 export const addCorrectAttempt = async (setId: number, repeatIndex: number, timeTaken: number = 0) => {
   try {
-
-    const res = await fetch("/api/accuracy/addCorrect", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex, time_taken: timeTaken }),
+    const result = await upsertAccuracy({
+      setId,
+      repeatIndex,
+      deltaCorrect: 1,
+      deltaTime: timeTaken
     });
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || "Failed to add correct attempt");
-
-    return true;
+    return result !== null;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("Error in addCorrectAttempt:", message);
@@ -51,11 +44,17 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number, time
   }
 };
 
-export const getAllSetData = async (email: string) => {
-  const response = await fetch("/api/sets/getSet", {
-    method: "POST",
+/**
+ * Fetches all sets for the current user.
+ * Uses the new secure API that validates session server-side.
+ *
+ * @deprecated The email parameter is no longer used - auth is handled server-side
+ */
+export const getAllSetData = async () => {
+  const response = await fetch("/api/user/sets", {
+    method: "GET",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
+    credentials: "include", // Include session cookies
   });
 
   if (!response.ok) {
@@ -69,17 +68,12 @@ export const getAllSetData = async (email: string) => {
 
 export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
   try {
-    const res = await fetch("/api/accuracy/getSetAccuracy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId, repeat_index: repeatIndex }),
-    });
+    const accuracies = await getAccuracies(setId);
+    const accuracy = accuracies.find(acc => acc.repeat_index === repeatIndex);
 
-    const data = await res.json();
+    if (!accuracy) return { correct: 0, incorrect: 0 };
 
-    if (!res.ok) return { correct: 0, incorrect: 0 };
-
-    return { correct: data.correct, incorrect: data.incorrect };
+    return { correct: accuracy.correct, incorrect: accuracy.incorrect };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("Error in getSetAccuracy:", message);
@@ -95,14 +89,21 @@ export const getPuzzleData = async (puzzleId: string): Promise<{ puzzle: import(
 };
 
 export const getSetProgress = async (set_id: number) => {
-  const response = await fetch("/api/sets/getSetProgressStats", {
-    method: "POST",
+  console.log('[puzzleApi] Getting set progress for:', set_id);
+
+  const response = await fetch(`/api/user/sets/${set_id}/progress`, {
+    method: "GET",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ set_id }),
+    credentials: "include",
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) {
+    console.error('[puzzleApi] Failed to get progress:', response.status);
+    return null;
+  }
+
   const result = await response.json();
+  console.log('[puzzleApi] Progress result:', result);
   return result.progress;
 };
 
@@ -111,12 +112,18 @@ export const setSetProgress = async (
   repeat_index: number,
   puzzle_index: number
 ) => {
+  console.log('[puzzleApi] Setting progress:', { set_id, repeat_index, puzzle_index });
 
-  const response = await fetch("/api/sets/updateSetProgressStats", {
-    method: "POST",
+  const response = await fetch(`/api/user/sets/${set_id}/progress`, {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ set_id, repeat_index, puzzle_index }),
+    credentials: "include",
+    body: JSON.stringify({ repeat_index, puzzle_index }),
   });
+
+  if (!response.ok) {
+    console.error('[puzzleApi] Failed to update progress:', response.status);
+  }
 
   return response.ok;
 };
@@ -128,19 +135,24 @@ export const handleSetDelete = async (
 ) => {
   const confirmed = await showConfirmDeletePopup();
   if (!confirmed) {
+    console.log('[puzzleApi] Delete cancelled by user');
     return;
   }
 
-  const res = await fetch("/api/sets/removeSet", {
-    method: "POST",
+  console.log('[puzzleApi] Deleting set:', setId);
+
+  const res = await fetch(`/api/user/sets/${setId}`, {
+    method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ set_id: setId }),
+    credentials: "include",
   });
 
   if (!res.ok) {
+    console.error('[puzzleApi] Failed to delete set:', res.status);
     return;
   }
 
+  console.log('[puzzleApi] Set deleted successfully');
   setUserSets((prevSets) => prevSets.filter((set) => set.set_id !== setId));
   setSelectedSetId((prevId) => (prevId === setId ? null : prevId));
   sessionStorage.removeItem("selected_set_id");
