@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/authOptions";
 import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+
+// Validation schema for incrementing stats
+const incrementStatsSchema = z.object({
+  puzzle_starts: z.number().int().nonnegative("Puzzle starts must be 0 or greater").max(1000, "Increment too large").optional().default(0),
+  correct_puzzles: z.number().int().nonnegative("Correct puzzles must be 0 or greater").max(1000, "Increment too large").optional().default(0),
+  incorrect_puzzles: z.number().int().nonnegative("Incorrect puzzles must be 0 or greater").max(1000, "Increment too large").optional().default(0),
+  set_creates: z.number().int().nonnegative("Set creates must be 0 or greater").max(100, "Increment too large").optional().default(0),
+  hints: z.number().int().nonnegative("Hints must be 0 or greater").max(1000, "Increment too large").optional().default(0),
+  puzzle_requests: z.number().int().nonnegative("Puzzle requests must be 0 or greater").max(1000, "Increment too large").optional().default(0),
+});
 
 /**
  * GET /api/user/stats
@@ -109,22 +120,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('[API POST /user/stats] Request body:', body);
 
-    // Coerce to integers, default to 0, handle NaN
-    const toInt = (val: unknown): number => {
-      const num = Number(val);
-      return isNaN(num) ? 0 : Math.floor(num);
-    };
+    // Validate input with Zod
+    const validation = incrementStatsSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      return NextResponse.json(
+        { error: firstError.message },
+        { status: 400 }
+      );
+    }
 
-    const deltas = {
-      puzzle_starts: toInt(body.puzzle_starts),
-      correct_puzzles: toInt(body.correct_puzzles),
-      incorrect_puzzles: toInt(body.incorrect_puzzles),
-      set_creates: toInt(body.set_creates),
-      hints: toInt(body.hints),
-      puzzle_requests: toInt(body.puzzle_requests),
-    };
-
-    console.log('[API POST /user/stats] Parsed deltas:', deltas);
+    const deltas = validation.data;
+    console.log('[API POST /user/stats] Validated deltas:', deltas);
 
     // Create Supabase client with SERVICE ROLE key to bypass RLS
     // This is secure because we've already validated the NextAuth session above

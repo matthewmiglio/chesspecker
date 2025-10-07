@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/authOptions";
 import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+
+// Validation schema for upserting accuracy
+const upsertAccuracySchema = z.object({
+  setId: z.number().int().positive("Set ID must be a positive integer"),
+  repeatIndex: z.number().int().nonnegative("Repeat index must be 0 or greater"),
+  deltaCorrect: z.number().int().nonnegative("Delta correct must be 0 or greater").max(1000, "Delta too large").optional().default(0),
+  deltaIncorrect: z.number().int().nonnegative("Delta incorrect must be 0 or greater").max(1000, "Delta too large").optional().default(0),
+  deltaTime: z.number().nonnegative("Delta time must be positive").max(86400, "Time delta too large (max 24 hours)").nullable().optional(),
+});
 
 /**
  * GET /api/user/accuracies?setId=<number>
@@ -121,20 +131,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('[POST /api/user/accuracies] Request body:', body);
 
-    // Validate required fields
-    if (typeof body.setId !== 'number' || body.setId <= 0) {
+    // Validate input with Zod
+    const validation = upsertAccuracySchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
       return NextResponse.json(
-        { error: "Missing or invalid 'setId' field" },
+        { error: firstError.message },
         { status: 400 }
       );
     }
 
-    if (typeof body.repeatIndex !== 'number' || body.repeatIndex < 0) {
-      return NextResponse.json(
-        { error: "Missing or invalid 'repeatIndex' field" },
-        { status: 400 }
-      );
-    }
+    const { setId, repeatIndex, deltaCorrect, deltaIncorrect, deltaTime } = validation.data;
 
     // Create Supabase client with SERVICE ROLE key to bypass RLS
     // This is secure because we've already validated the NextAuth session above
@@ -146,20 +153,20 @@ export async function POST(request: NextRequest) {
     // Call upsert_set_accuracy RPC
     console.log('[POST /api/user/accuracies] Calling RPC with params:', {
       user_email: session.user.email,
-      p_set_id: body.setId,
-      p_repeat_index: body.repeatIndex,
-      delta_correct: body.deltaCorrect ?? 0,
-      delta_incorrect: body.deltaIncorrect ?? 0,
-      delta_time: body.deltaTime ?? null
+      p_set_id: setId,
+      p_repeat_index: repeatIndex,
+      delta_correct: deltaCorrect,
+      delta_incorrect: deltaIncorrect,
+      delta_time: deltaTime ?? null
     });
 
     const { data, error } = await supabase.rpc('upsert_set_accuracy', {
       user_email: session.user.email,
-      p_set_id: body.setId,
-      p_repeat_index: body.repeatIndex,
-      delta_correct: body.deltaCorrect ?? 0,
-      delta_incorrect: body.deltaIncorrect ?? 0,
-      delta_time: body.deltaTime ?? null
+      p_set_id: setId,
+      p_repeat_index: repeatIndex,
+      delta_correct: deltaCorrect,
+      delta_incorrect: deltaIncorrect,
+      delta_time: deltaTime ?? null
     });
 
     if (error) {

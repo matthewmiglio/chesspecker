@@ -1,6 +1,15 @@
 // src/app/api/feedback/addFormSubmission/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+
+// Validation schema for feedback submission
+const feedbackSchema = z.object({
+  email: z.string().email("Invalid email address").max(200, "Email too long"),
+  text: z.string().min(1, "Feedback text is required").max(1000, "Feedback must be 1000 characters or less").trim(),
+  stars: z.number().int().min(0, "Stars must be 0 or greater").max(5, "Stars must be 5 or less").optional().default(0),
+  category: z.string().max(50, "Category too long").optional().default("other"),
+});
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,11 +17,16 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { email, text, stars, category } = await req.json();
+  const body = await req.json();
 
-  if (!email || !text) {
-    return NextResponse.json({ error: "Missing email or text" }, { status: 400 });
+  // Validate input with Zod
+  const validation = feedbackSchema.safeParse(body);
+  if (!validation.success) {
+    const firstError = validation.error.errors[0];
+    return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
+
+  const { email, text, stars, category } = validation.data;
 
   const { error } = await supabase.from("ChessPeckerFeedback").insert({
     email,

@@ -3,6 +3,16 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/authOptions";
 import { createClient } from "@supabase/supabase-js";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
+import { z } from "zod";
+
+// Validation schema for creating a set
+const createSetSchema = z.object({
+  name: z.string().min(1, "Set name is required").max(200, "Set name must be 200 characters or less").trim(),
+  elo: z.number().int().min(0, "ELO must be positive").max(4000, "ELO must be 4000 or less"),
+  size: z.number().int().min(1, "Size must be at least 1").max(500, "Size must be 500 or less"),
+  repeats: z.number().int().min(1, "Repeats must be at least 1").max(50, "Repeats must be 50 or less"),
+  puzzleIds: z.array(z.string().max(50)).max(500, "Cannot specify more than 500 puzzle IDs").optional(),
+});
 
 /**
  * GET /api/user/sets
@@ -88,37 +98,17 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Validate required fields
-    if (!body.name || typeof body.name !== 'string') {
+    // Validate input with Zod
+    const validation = createSetSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
       return NextResponse.json(
-        { error: "Missing or invalid 'name' field" },
+        { error: firstError.message },
         { status: 400 }
       );
     }
 
-    if (typeof body.elo !== 'number') {
-      return NextResponse.json(
-        { error: "Missing or invalid 'elo' field" },
-        { status: 400 }
-      );
-    }
-
-    if (typeof body.size !== 'number' || body.size <= 0) {
-      return NextResponse.json(
-        { error: "'size' must be a positive number" },
-        { status: 400 }
-      );
-    }
-
-    if (typeof body.repeats !== 'number' || body.repeats < 1) {
-      return NextResponse.json(
-        { error: "'repeats' must be at least 1" },
-        { status: 400 }
-      );
-    }
-
-    // puzzleIds is optional
-    const puzzleIds = body.puzzleIds && Array.isArray(body.puzzleIds) ? body.puzzleIds : null;
+    const { name, elo, size, repeats, puzzleIds } = validation.data;
 
     // Create Supabase client with SERVICE ROLE key to bypass RLS
     // This is secure because we've already validated the NextAuth session above
@@ -131,11 +121,11 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .rpc('create_user_set', {
         user_email: session.user.email,
-        set_name: body.name,
-        target_elo: body.elo,
-        set_size: body.size,
-        num_repeats: body.repeats,
-        puzzle_ids_in: puzzleIds
+        set_name: name,
+        target_elo: elo,
+        set_size: size,
+        num_repeats: repeats,
+        puzzle_ids_in: puzzleIds ?? null
       });
 
     if (error) {

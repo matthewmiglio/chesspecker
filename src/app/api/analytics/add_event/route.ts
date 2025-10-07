@@ -1,5 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { z } from 'zod';
+
+// Validation schema for analytics event
+const analyticsEventSchema = z.object({
+  path: z.string().max(500, "Path too long").optional().default("/"),
+  referrer: z.string().max(500, "Referrer too long").nullable().optional(),
+  visitor_id: z.string().max(100, "Visitor ID too long").nullable().optional(),
+  session_id: z.string().max(100, "Session ID too long").nullable().optional(),
+  ua: z.string().max(500, "User agent too long").nullable().optional(),
+});
 
 export const runtime = 'edge';
 
@@ -8,7 +18,14 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { path, referrer, visitor_id, session_id, ua } = body;
+    // Validate input with Zod
+    const validation = analyticsEventSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      return NextResponse.json({ error: firstError.message }, { status: 400 });
+    }
+
+    const { path, referrer, visitor_id, session_id, ua } = validation.data;
 
     const clientIP = getClientIP(req);
 
