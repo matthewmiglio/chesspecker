@@ -197,12 +197,16 @@ export default function Home() {
         </div>
 
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          Train Smarter. <span style={{ color: themeColor }}>Play Better.</span>
+          Chess Tactics Training with the <span style={{ color: themeColor }}>Woodpecker Method</span>
         </h1>
 
-        <p className="text-muted-foreground text-lg md:text-xl px-4">
-          Build your own tactical puzzles, master key positions, and track your
-          progress across every session.
+        <p className="text-muted-foreground text-lg md:text-xl px-4 font-semibold">
+          Train Smarter. Play Better.
+        </p>
+
+        <p className="text-muted-foreground text-base md:text-lg px-4">
+          Build custom puzzle sets, master tactical patterns, and track your
+          progress across every training session.
         </p>
 
         {/* Buttons */}

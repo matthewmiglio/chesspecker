@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'Matthew Miglio', url: 'https://matthewmiglio.dev' }],
   creator: 'Matthew Miglio',
   publisher: 'ChessPecker',
+  alternates: {
+    canonical: 'https://chesspecker.org',
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -65,7 +68,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-site-verification-code', // Google site verification (not yet configured)
+    google: 'TODO-ADD-GOOGLE-SEARCH-CONSOLE-VERIFICATION-CODE', // Get from Google Search Console
   }
 };
 
@@ -76,6 +79,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+      </head>
       <body className={inter.className}>
         <Providers>
           <AnalyticsProvider>

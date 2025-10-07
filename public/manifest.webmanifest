@@ -1,0 +1,22 @@
+{
+  "name": "ChessPecker - Chess Tactics Training",
+  "short_name": "ChessPecker",
+  "description": "Master chess tactics with the Woodpecker Method. Create, practice, and track progress with personalized puzzle sets.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["education", "games"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": []
+}

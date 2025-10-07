@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: 'Chess Training Progress | Performance Analytics',
   description: 'Track your chess tactics improvement with detailed performance analytics and progress visualization.',
   keywords: ['chess training progress', 'chess improvement tracking', 'chess performance analytics', 'tactical progress', 'chess statistics'],
+  alternates: {
+    canonical: 'https://chesspecker.org/dashboard',
+  },
   openGraph: {
     title: 'Chess Training Progress | Performance Analytics',
     description: 'Track your chess tactics improvement with detailed performance analytics and progress visualization.',
