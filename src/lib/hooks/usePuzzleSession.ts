@@ -85,16 +85,27 @@ export function usePuzzleSession({
   }, [currentPuzzleIndex, currentRepeatIndex]);
 
   const handleIncorrectMove = async () => {
-    if (puzzleAttempted) return;
+    console.log('[handleIncorrectMove] Called');
+    if (puzzleAttempted) {
+      console.log('[handleIncorrectMove] Puzzle already attempted, skipping');
+      return;
+    }
+
+    console.log('[handleIncorrectMove] Auto show solution:', autoShowSolution);
+    console.log('[handleIncorrectMove] Auto next puzzle:', autoNextPuzzle);
 
     const setId = getSelectedSetId();
-    if (!setId) return;
+    if (!setId) {
+      console.warn('[handleIncorrectMove] No set ID, aborting');
+      return;
+    }
 
     setPuzzleAttempted(true);
     setPuzzleOutcome('incorrect');
     showRedX();
 
     const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0;
+    console.log('[handleIncorrectMove] Time taken:', timeTaken, 'seconds');
 
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addIncorrectAttempt(setId, currentRepeatIndex, timeTaken);
@@ -104,7 +115,9 @@ export function usePuzzleSession({
 
     // if auto show solution on and + auto next on -> shows solution, waits a sec, then moves to next puzzle without input
     if (autoShowSolution && autoNextPuzzle) {
+      console.log('[handleIncorrectMove] Path: Show solution + auto next');
       await showSolution();
+      console.log('[handleIncorrectMove] Solution shown, waiting 3s before next puzzle');
       await new Promise((resolve) => setTimeout(resolve, 3000));
       await handleNextPuzzle(true);
       return;
@@ -112,13 +125,16 @@ export function usePuzzleSession({
 
     // if auto show solution off and + auto next on -> skips showing solution, just moves to next puzzle immediately no input
     if (!autoShowSolution && autoNextPuzzle) {
+      console.log('[handleIncorrectMove] Path: Skip solution + auto next');
       await handleNextPuzzle(true);
       return;
     }
 
     // if auto show solution on and + auto next off ->  shows solution, waits a sec, then shows continue replay export popup
     if (autoShowSolution && !autoNextPuzzle) {
+      console.log('[handleIncorrectMove] Path: Show solution + show feedback buttons');
       await showSolution();
+      console.log('[handleIncorrectMove] Solution shown, waiting 3s before showing buttons');
       await new Promise((resolve) => setTimeout(resolve, 3000));
       setShowFeedbackButtons(true);
       return;
@@ -126,9 +142,12 @@ export function usePuzzleSession({
 
     // if auto show solution off and + auto next off -> skips showing solution, then goes right to the popup for showing continue replay and export
     if (!autoShowSolution && !autoNextPuzzle) {
+      console.log('[handleIncorrectMove] Path: Skip solution + show feedback buttons');
       setShowFeedbackButtons(true);
       return;
     }
+
+    console.warn('[handleIncorrectMove] No path matched - this should not happen');
   };
 
   const handleSuccessfulPuzzle = async () => {
@@ -236,41 +255,86 @@ export function usePuzzleSession({
   };
 
   const showSolution = async () => {
+    console.log('[showSolution] Starting solution replay');
+    console.log('[showSolution] Current FEN:', fen);
+    console.log('[showSolution] Full solution:', solution);
+    console.log('[showSolution] Solved index:', solvedIndex);
+
     const chess = new Chess(fen);
     const remainingSolution = solution.slice(solvedIndex);
 
+    console.log('[showSolution] Remaining moves to play:', remainingSolution);
+    console.log('[showSolution] Total moves to play:', remainingSolution.length);
+
     for (let i = 0; i < remainingSolution.length; i++) {
       const moveUci = remainingSolution[i];
+      console.log(`[showSolution] Move ${i + 1}/${remainingSolution.length}: "${moveUci}"`);
+      console.log(`[showSolution] Current FEN before move: ${chess.fen()}`);
+      console.log(`[showSolution] Parsing move - from: "${moveUci.slice(0, 2)}", to: "${moveUci.slice(2, 4)}", promotion: "${moveUci.length > 4 ? moveUci.slice(4) : 'none'}"`);
+
       await new Promise((resolve) => setTimeout(resolve, 600));
 
-      chess.move({
-        from: moveUci.slice(0, 2),
-        to: moveUci.slice(2, 4),
-        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
-      });
+      try {
+        const moveResult = chess.move({
+          from: moveUci.slice(0, 2),
+          to: moveUci.slice(2, 4),
+          promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+        });
 
-      setFen(chess.fen());
+        console.log(`[showSolution] Move ${i + 1} successful:`, moveResult);
+        console.log(`[showSolution] New FEN after move: ${chess.fen()}`);
+
+        setFen(chess.fen());
+      } catch (error) {
+        console.error(`[showSolution] ERROR on move ${i + 1}:`, error);
+        console.error(`[showSolution] Failed move UCI: "${moveUci}"`);
+        console.error(`[showSolution] FEN at failure: ${chess.fen()}`);
+        console.error(`[showSolution] Legal moves at this position:`, chess.moves({ verbose: true }));
+        throw error; // Re-throw to stop execution
+      }
     }
+
+    console.log('[showSolution] Solution replay completed successfully');
+    console.log('[showSolution] Final FEN:', chess.fen());
   };
 
   const showFullSolution = async (startingFen: string, allMoves: string[]) => {
-    const chess = new Chess(startingFen);
+    console.log('[showFullSolution] Starting full solution replay from beginning');
+    console.log('[showFullSolution] Starting FEN:', startingFen);
+    console.log('[showFullSolution] All moves:', allMoves);
+    console.log('[showFullSolution] Total moves:', allMoves.length);
 
+    const chess = new Chess(startingFen);
     const moveSpeed = 1200; // milliseconds per move
 
     // Play ALL puzzle moves from the beginning (including opponent's setup)
     for (let i = 0; i < allMoves.length; i++) {
       const moveUci = allMoves[i];
+      console.log(`[showFullSolution] Move ${i + 1}/${allMoves.length}: "${moveUci}"`);
+      console.log(`[showFullSolution] Current FEN before move: ${chess.fen()}`);
+
       await new Promise((resolve) => setTimeout(resolve, moveSpeed));
 
-      chess.move({
-        from: moveUci.slice(0, 2),
-        to: moveUci.slice(2, 4),
-        promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
-      });
+      try {
+        const moveResult = chess.move({
+          from: moveUci.slice(0, 2),
+          to: moveUci.slice(2, 4),
+          promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+        });
 
-      setFen(chess.fen());
+        console.log(`[showFullSolution] Move ${i + 1} successful:`, moveResult);
+        setFen(chess.fen());
+      } catch (error) {
+        console.error(`[showFullSolution] ERROR on move ${i + 1}:`, error);
+        console.error(`[showFullSolution] Failed move UCI: "${moveUci}"`);
+        console.error(`[showFullSolution] FEN at failure: ${chess.fen()}`);
+        console.error(`[showFullSolution] Legal moves:`, chess.moves({ verbose: true }));
+        throw error;
+      }
     }
+
+    console.log('[showFullSolution] Full solution replay completed');
+    console.log('[showFullSolution] Final FEN:', chess.fen());
   };
 
   const handleNextPuzzle = async (forceFinish = false) => {
