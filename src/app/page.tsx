@@ -5,8 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
-import FeedbackPopup from "@/components/ui/FeedbackPopup";
-import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import HomeStructuredData from "@/components/structured-data/HomeStructuredData";
 
@@ -163,54 +161,6 @@ export default function Home() {
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
-  const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
-  const { data: session, status } = useSession();
-
-  // Keep your feedback popup logic intact
-  useEffect(() => {
-    const run = async () => {
-      if (session?.user?.email) {
-        const email = session.user.email;
-
-        // Step 1: Get login streak
-        let streak = 0;
-        try {
-          const res = await fetch("/api/login_streak/get_login_streak", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-          const result = await res.json();
-          if (!res.ok) throw new Error(result.error || "Failed to fetch streak");
-          streak = result.login_count;
-        } catch (err) {
-          console.error("Error fetching login streak:", err);
-        }
-
-        // Step 2: Get popup flag
-        try {
-          const res = await fetch("/api/popup_flags/getFlag", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-          const result = await res.json();
-          if (!res.ok) throw new Error(result.error || "Failed to fetch popup flags");
-
-          const feedbackSeen = result.data?.feedback;
-
-          // Step 3: Decide whether to show popup
-          if (feedbackSeen !== true && streak >= 2) {
-            setShowFeedbackPopup(true);
-          }
-        } catch (err) {
-          console.error("Error checking feedback flag:", err);
-        }
-      }
-    };
-
-    run();
-  }, [status, session]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -276,14 +226,6 @@ export default function Home() {
 
       {/* TESTIMONIALS (airy & always scrolling) */}
       <TestimonialsCarousel themeColor={themeColor} />
-
-      {/* Feedback Popup */}
-      {showFeedbackPopup && (
-        <FeedbackPopup
-          onConfirm={async () => { window.location.href = "/feedback"; }}
-          onDismiss={async () => { setShowFeedbackPopup(false); }}
-        />
-      )}
     </div>
   );
 }

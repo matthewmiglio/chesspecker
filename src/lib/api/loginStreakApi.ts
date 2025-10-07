@@ -1,52 +1,36 @@
 "use client";
 
-const BASE = "/api/login_streak";
-
 /**
- * Fetches the current login streak count for a user.
- * @param email - The user's email address
- */
-export const getLoginStreak = async (email: string): Promise<number | null> => {
-  try {
-    const res = await fetch(`${BASE}/get_login_streak`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to get login streak");
-
-    return data.login_count;
-  } catch (err) {
-    console.error("[loginStreakApi] getLoginStreak error:", err);
-    return null;
-  }
-};
-
-/**
- * Updates the login streak for a user:
+ * Updates the current user's login streak.
+ * Authentication is handled server-side via NextAuth session cookies.
+ *
  * - Increments if last login was exactly one day ago
  * - Resets if it's been more than one day
- * - Does nothing if user already logged in today
- * @param email - The user's email address
+ * - Idempotent if user already logged in today
+ *
+ * @returns true if successful, false on error or if not authenticated
  */
-export const updateLoginStreak = async (
-  email: string
-): Promise<number | null> => {
+export const bumpLoginStreak = async (): Promise<boolean> => {
   try {
-    const res = await fetch(`${BASE}/update_login_streak`, {
+    const res = await fetch("/api/user/login-streak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      credentials: "include", // Include session cookies
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to update login streak");
+    if (res.status === 401) {
+      // Not logged in - this is expected, not an error
+      return false;
+    }
 
-    return data.login_count;
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to bump login streak: ${text}`);
+    }
+
+    return true;
   } catch (err) {
-    console.error("[loginStreakApi] updateLoginStreak error:", err);
-    return null;
+    console.error("[loginStreakApi] bumpLoginStreak error:", err);
+    return false;
   }
 };

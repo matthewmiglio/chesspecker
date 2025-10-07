@@ -7,7 +7,7 @@ import {
 } from "@/lib/api/puzzleApi";
 import { ChessPeckerPuzzle } from "@/lib/types";
 
-import { incrementPuzzleStart } from "@/lib/api/dailyStatsApi";
+import { bumpDailyUsage } from "@/lib/api/usageApi";
 
 import { incrementUserPuzzleStart } from "@/lib/api/userStatsApi";
 
@@ -124,7 +124,7 @@ export const handleSetSelect = async (
   preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
   //increment total daily stats
-  incrementPuzzleStart();
+  bumpDailyUsage({ puzzle_starts: 1 });
 
   //increment user stats
   incrementUserPuzzleStart();

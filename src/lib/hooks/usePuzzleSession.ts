@@ -15,7 +15,7 @@ import {
   updatePuzzleProgress,
 } from "@/lib/hooks/usePuzzleData";
 
-import { incrementCorrect, incrementIncorrect } from "@/lib/api/dailyStatsApi";
+import { bumpDailyUsage } from "@/lib/api/usageApi";
 
 import {
   incrementUserCorrect,
@@ -99,7 +99,7 @@ export function usePuzzleSession({
     const { addIncorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addIncorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
-    incrementIncorrect();
+    bumpDailyUsage({ incorrect_puzzles: 1 });
     incrementUserIncorrect();
 
     // if auto show solution on and + auto next on -> shows solution, waits a sec, then moves to next puzzle without input
@@ -146,7 +146,7 @@ export function usePuzzleSession({
 
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
-    incrementCorrect();
+    bumpDailyUsage({ correct_puzzles: 1 });
     incrementUserCorrect();
 
     // if they get it right
@@ -185,7 +185,7 @@ export function usePuzzleSession({
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
-    incrementCorrect(); //total daily stats
+    bumpDailyUsage({ correct_puzzles: 1 }); //total daily stats
     incrementUserCorrect(); //user stats
 
     // Hint-assisted counts as correct, so follow the correct answer logic

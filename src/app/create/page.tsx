@@ -11,10 +11,7 @@ import { useToast } from "@/lib/hooks/useToast";
 
 import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
-import {
-  incrementSetCreate,
-  incrementPuzzleRequest,
-} from "@/lib/api/dailyStatsApi";
+import { bumpDailyUsage } from "@/lib/api/usageApi";
 
 import { createUserSet } from "@/lib/api/setsApi";
 import { upsertAccuracy } from "@/lib/api/accuraciesApi";
@@ -184,8 +181,7 @@ export default function CreatePuzzleSetPage() {
     }
 
     // Track usage statistics
-    incrementSetCreate();
-    incrementPuzzleRequest(setSize);
+    bumpDailyUsage({ set_creates: 1, puzzle_requests: setSize });
     incrementUserSetCreate();
     incrementUserPuzzleRequests(setSize);
 
