@@ -24,7 +24,6 @@ import FeedbackCTA from "@/components/puzzles/FeedbackCTA";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
-  const email = session?.user?.email ?? null;
   const { resolvedTheme } = useTheme();
   const userIsLoggedIn = authStatus === "authenticated";
   const isAuthChecked = authStatus !== "loading";
@@ -70,7 +69,6 @@ export default function PuzzlesPage() {
     userSets,
     currentPuzzleIndex,
     setPlayerSide,
-    email,
     autoShowSolution,
   });
 

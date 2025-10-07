@@ -39,7 +39,6 @@ export function usePuzzleSession({
   userSets,
   currentPuzzleIndex,
   setPlayerSide,
-  email,
   autoShowSolution = true,
 }: {
   getSelectedSetId: () => number | null;
@@ -60,7 +59,6 @@ export function usePuzzleSession({
   userSets: { set_id: number; repeats: number }[];
   currentPuzzleIndex: number;
   setPlayerSide: (side: "w" | "b") => void;
-  email: string | null;
   autoShowSolution?: boolean;
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -102,8 +100,7 @@ export function usePuzzleSession({
     await addIncorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
     incrementIncorrect();
-    if (!email) email = "unauthenticated@email.com";
-    incrementUserIncorrect(email);
+    incrementUserIncorrect();
 
     // if auto show solution on and + auto next on -> shows solution, waits a sec, then moves to next puzzle without input
     if (autoShowSolution && autoNextPuzzle) {
@@ -150,8 +147,7 @@ export function usePuzzleSession({
     const { addCorrectAttempt } = await import("@/lib/api/puzzleApi");
     await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
     incrementCorrect();
-    if (!email) email = "unauthenticated@email.com";
-    incrementUserCorrect(email);
+    incrementUserCorrect();
 
     // if they get it right
     // -if auto show solution on and + auto next on -> auto move to next puzzle immediately, no popup no solution.
@@ -190,8 +186,7 @@ export function usePuzzleSession({
     await addCorrectAttempt(setId, currentRepeatIndex, timeTaken);
 
     incrementCorrect(); //total daily stats
-    if (!email) email = "unauthenticated@email.com";
-    incrementUserCorrect(email); //user stats
+    incrementUserCorrect(); //user stats
 
     // Hint-assisted counts as correct, so follow the correct answer logic
     // -if auto next on -> auto move to next puzzle immediately

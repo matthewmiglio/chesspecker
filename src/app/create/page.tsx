@@ -186,8 +186,8 @@ export default function CreatePuzzleSetPage() {
     // Track usage statistics
     incrementSetCreate();
     incrementPuzzleRequest(setSize);
-    incrementUserSetCreate(email);
-    incrementUserPuzzleRequests(email, setSize);
+    incrementUserSetCreate();
+    incrementUserPuzzleRequests(setSize);
 
     // Create the set
     const result = await addNewSetToDatabase(

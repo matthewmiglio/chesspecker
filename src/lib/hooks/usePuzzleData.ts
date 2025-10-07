@@ -127,8 +127,7 @@ export const handleSetSelect = async (
   incrementPuzzleStart();
 
   //increment user stats
-  //grab email from session for user stats
-  incrementUserPuzzleStart(email);
+  incrementUserPuzzleStart();
 
   setSelectedSetId(setId);
   sessionStorage.setItem("selected_set_id", String(setId));
