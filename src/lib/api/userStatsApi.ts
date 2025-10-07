@@ -120,19 +120,3 @@ export const incrementUserPuzzleRequests = async (count: number): Promise<boolea
   const result = await incrementUserStats({ puzzle_requests: count });
   return result !== null;
 };
-
-/**
- * Admin function - fetches all user stats (kept for backwards compatibility)
- * @deprecated Consider creating a separate admin-only endpoint
- */
-export const getAllUserStats = async () => {
-  try {
-    const res = await fetch("/api/userStats/getAll", { method: "GET" });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to fetch user stats");
-    return data.users;
-  } catch (err) {
-    console.error("[userStatsApi] getAllUserStats error:", err);
-    return null;
-  }
-};

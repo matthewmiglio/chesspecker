@@ -14,13 +14,13 @@ function SignInContent() {
 
         // Immediately trigger Google OAuth with force refresh
         await signIn("google", {
-          callbackUrl: "/admin",
+          callbackUrl: "/",
           redirect: true,
         });
       } else {
         // Normal sign in
         await signIn("google", {
-          callbackUrl: "/admin",
+          callbackUrl: "/",
           redirect: true,
         });
       }
