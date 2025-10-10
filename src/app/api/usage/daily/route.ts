@@ -24,9 +24,11 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 100 requests per minute per IP
   const identifier = getClientIdentifier(request);
+  console.log('[API POST /usage/daily] Client identifier:', identifier);
   const { success, limit, remaining, reset } = await dailyStatsLimiter.limit(identifier);
 
   if (!success) {
+    console.warn('[API POST /usage/daily] Rate limit exceeded:', { identifier, limit, remaining, reset });
     return NextResponse.json(
       {
         error: "Rate limit exceeded. Please try again later.",
@@ -72,10 +74,24 @@ export async function POST(request: NextRequest) {
 
     // Create Supabase client with SERVICE ROLE key
     // This allows us to bypass RLS and write to the write-only table
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    console.log('[API POST /usage/daily] Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceRoleKey: !!serviceRoleKey,
+      supabaseUrl
+    });
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[API POST /usage/daily] Missing environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing database credentials' },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     console.log('[API POST /usage/daily] Fetching today\'s row:', today);
 

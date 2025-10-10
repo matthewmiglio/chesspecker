@@ -14,14 +14,17 @@ const analyticsEventSchema = z.object({
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
+  console.log('[API POST /analytics/add_event] Request received');
 
   try {
     // Rate limiting: 100 requests per minute per IP
     const { analyticsLimiter, getClientIdentifier } = await import('@/lib/rateLimit');
     const identifier = getClientIdentifier(req);
+    console.log('[API POST /analytics/add_event] Client identifier:', identifier);
     const { success, limit, remaining, reset } = await analyticsLimiter.limit(identifier);
 
     if (!success) {
+      console.warn('[API POST /analytics/add_event] Rate limit exceeded:', { identifier, limit, remaining, reset });
       return NextResponse.json(
         {
           error: "Rate limit exceeded. Please try again later.",
@@ -41,19 +44,28 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    console.log('[API POST /analytics/add_event] Request body:', body);
 
     // Validate input with Zod
     const validation = analyticsEventSchema.safeParse(body);
     if (!validation.success) {
       const firstError = validation.error.issues[0];
+      console.error('[API POST /analytics/add_event] Validation error:', {
+        error: firstError.message,
+        path: firstError.path,
+        received: body
+      });
       return NextResponse.json({ error: firstError.message }, { status: 400 });
     }
 
     const { path, referrer, visitor_id, session_id, ua } = validation.data;
+    console.log('[API POST /analytics/add_event] Validated data:', { path, visitor_id, session_id });
 
     const clientIP = getClientIP(req);
+    console.log('[API POST /analytics/add_event] Client IP:', clientIP);
 
     const location = getLocationFromHeaders(req);
+    console.log('[API POST /analytics/add_event] Location data:', location);
 
     // Debug logging for development
     if (process.env.NODE_ENV === 'development') {
@@ -66,11 +78,13 @@ export async function POST(req: Request) {
     }
 
     const ipHash = clientIP ? await hashIP(clientIP) : null;
+    console.log('[API POST /analytics/add_event] IP hash generated:', !!ipHash);
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_KEY!
     );
+    console.log('[API POST /analytics/add_event] Supabase client created, URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 
     const eventData = {
       path: path || '/',
@@ -83,18 +97,30 @@ export async function POST(req: Request) {
       state: location.state,
       country: location.country,
     };
+    console.log('[API POST /analytics/add_event] Event data prepared:', eventData);
 
     const { error } = await supabase
       .from('chesspecker_analytics_events')
       .insert([eventData]);
 
     if (error) {
+      console.error('[API POST /analytics/add_event] Supabase insert error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    console.log('[API POST /analytics/add_event] Successfully inserted event');
     return NextResponse.json({ success: true, data: eventData }, { status: 200 });
 
   } catch (err: unknown) {
+    console.error('[API POST /analytics/add_event] Unexpected error:', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined
+    });
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Internal Server Error" },
       { status: 500 }
