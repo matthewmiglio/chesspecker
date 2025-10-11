@@ -1,75 +1,88 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// Create Redis client
-// Falls back to in-memory Map if Upstash credentials not configured
-let redis: Redis;
+// Check if Redis is configured
+const isRedisConfigured = !!(
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+);
 
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+// Create Redis client
+let redis: Redis | undefined;
+
+if (isRedisConfigured) {
   redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
   });
 } else {
-  console.warn('[rateLimit] Upstash Redis not configured - using in-memory fallback (not production-safe!)');
-  // Use Map adapter for in-memory storage when Redis is not configured
-  redis = new Map() as unknown as Redis;
+  console.warn('[rateLimit] Upstash Redis not configured - rate limiting disabled (not production-safe!)');
 }
 
 /**
  * Rate limiter for puzzle creation endpoint
  * Limit: 10 requests per hour per user
  */
-export const puzzleCreationLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, "1 h"),
-  analytics: true,
-  prefix: "ratelimit:puzzle_creation",
-});
+export const puzzleCreationLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(10, "1 h"),
+      analytics: true,
+      prefix: "ratelimit:puzzle_creation",
+    })
+  : null;
 
 /**
  * Rate limiter for daily stats endpoint
  * Limit: 100 requests per minute per IP
  */
-export const dailyStatsLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(100, "1 m"),
-  analytics: true,
-  prefix: "ratelimit:daily_stats",
-});
+export const dailyStatsLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(100, "1 m"),
+      analytics: true,
+      prefix: "ratelimit:daily_stats",
+    })
+  : null;
 
 /**
  * Rate limiter for feedback submission
  * Limit: 5 requests per minute per user
  */
-export const feedbackLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, "1 m"),
-  analytics: true,
-  prefix: "ratelimit:feedback",
-});
+export const feedbackLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, "1 m"),
+      analytics: true,
+      prefix: "ratelimit:feedback",
+    })
+  : null;
 
 /**
  * Rate limiter for set creation
  * Limit: 20 requests per hour per user
  */
-export const setCreationLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, "1 h"),
-  analytics: true,
-  prefix: "ratelimit:set_creation",
-});
+export const setCreationLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(20, "1 h"),
+      analytics: true,
+      prefix: "ratelimit:set_creation",
+    })
+  : null;
 
 /**
  * Rate limiter for analytics events
  * Limit: 100 requests per minute per IP
  */
-export const analyticsLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(100, "1 m"),
-  analytics: true,
-  prefix: "ratelimit:analytics",
-});
+export const analyticsLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(100, "1 m"),
+      analytics: true,
+      prefix: "ratelimit:analytics",
+    })
+  : null;
 
 /**
  * Helper function to get client identifier (IP address)

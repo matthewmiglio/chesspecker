@@ -19,26 +19,28 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   // Rate limiting: 5 requests per minute per IP
-  const identifier = getClientIdentifier(req);
-  const { success, limit, remaining, reset } = await feedbackLimiter.limit(identifier);
+  if (feedbackLimiter) {
+    const identifier = getClientIdentifier(req);
+    const { success, limit, remaining, reset } = await feedbackLimiter.limit(identifier);
 
-  if (!success) {
-    return NextResponse.json(
-      {
-        error: "Rate limit exceeded. Please try again later.",
-        limit,
-        remaining,
-        reset: new Date(reset).toISOString()
-      },
-      {
-        status: 429,
-        headers: {
-          'X-RateLimit-Limit': limit.toString(),
-          'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': reset.toString(),
+    if (!success) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded. Please try again later.",
+          limit,
+          remaining,
+          reset: new Date(reset).toISOString()
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString(),
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   const body = await req.json();
