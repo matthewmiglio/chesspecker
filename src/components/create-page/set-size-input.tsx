@@ -8,7 +8,7 @@ type SetSizeInputProps = {
 
 const STEP = 100;
 const MIN_SIZE = 200;
-const MAX_SIZE = 1000;
+const MAX_SIZE = 500;
 
 export default function SetSizeInput({ value, onChange }: SetSizeInputProps) {
   const handleDecrement = () => {
