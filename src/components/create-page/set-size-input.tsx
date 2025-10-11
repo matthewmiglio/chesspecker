@@ -59,7 +59,7 @@ export default function SetSizeInput({ value, onChange }: SetSizeInputProps) {
             )}
           </div>
         ))}
-        <span className="ml-2 text-xs text-muted-foreground">{value}/1000</span>
+        <span className="ml-2 text-xs text-muted-foreground">{value}/{MAX_SIZE}</span>
       </div>
     </div>
   );
