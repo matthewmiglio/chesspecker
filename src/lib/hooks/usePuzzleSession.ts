@@ -27,9 +27,11 @@ export function usePuzzleSession({
   currentRepeatIndex,
   puzzleIds,
   fen,
+  startingFen,
   solution,
   solvedIndex,
   setFen,
+  setStartingFen,
   setSolution,
   setSolvedIndex,
   setHighlight,
@@ -45,9 +47,11 @@ export function usePuzzleSession({
   currentRepeatIndex: number;
   puzzleIds: string[];
   fen: string;
+  startingFen: string;
   solution: string[];
   solvedIndex: number;
   setFen: (fen: string) => void;
+  setStartingFen: (fen: string) => void;
   setSolution: (solution: string[]) => void;
   setSolvedIndex: (index: number) => void;
   setHighlight: (square: string | null) => void;
@@ -256,13 +260,41 @@ export function usePuzzleSession({
 
   const showSolution = async () => {
     console.log('[showSolution] Starting solution replay');
+    console.log('[showSolution] Starting FEN:', startingFen);
     console.log('[showSolution] Current FEN:', fen);
     console.log('[showSolution] Full solution:', solution);
     console.log('[showSolution] Solved index:', solvedIndex);
 
-    const chess = new Chess(fen);
-    const remainingSolution = solution.slice(solvedIndex);
+    // Start from the original starting FEN
+    const chess = new Chess(startingFen);
 
+    // Fast-forward through already-solved moves to sync board state with solvedIndex
+    console.log('[showSolution] Fast-forwarding through', solvedIndex, 'already-solved moves');
+    for (let i = 0; i < solvedIndex; i++) {
+      const moveUci = solution[i];
+      console.log(`[showSolution] Fast-forward move ${i}: "${moveUci}"`);
+
+      try {
+        const moveResult = chess.move({
+          from: moveUci.slice(0, 2),
+          to: moveUci.slice(2, 4),
+          promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
+        });
+        console.log(`[showSolution] Fast-forward successful:`, moveResult.san);
+      } catch (error) {
+        console.error(`[showSolution] Fast-forward FAILED at index ${i}:`, error);
+        console.error(`[showSolution] FEN: ${chess.fen()}, Move: ${moveUci}`);
+        // If fast-forward fails, reset to beginning and play all moves
+        console.warn('[showSolution] Resetting to start and playing all moves');
+        chess.load(startingFen);
+        solvedIndex = 0;
+        break;
+      }
+    }
+
+    console.log('[showSolution] Fast-forward complete. FEN:', chess.fen());
+
+    const remainingSolution = solution.slice(solvedIndex);
     console.log('[showSolution] Remaining moves to play:', remainingSolution);
     console.log('[showSolution] Total moves to play:', remainingSolution.length);
 
@@ -373,6 +405,7 @@ export function usePuzzleSession({
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
+      setStartingFen,
       setSolution,
       setSolvedIndex,
       setHighlight
@@ -439,6 +472,7 @@ export function usePuzzleSession({
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
+      setStartingFen,
       setSolution,
       setSolvedIndex,
       setHighlight
@@ -486,6 +520,7 @@ export function usePuzzleSession({
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
+      setStartingFen,
       setSolution,
       setSolvedIndex,
       setHighlight

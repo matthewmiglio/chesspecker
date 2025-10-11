@@ -77,6 +77,7 @@ export const incrementPuzzleIndex = async (
 export const loadPuzzleAndInitialize = async (
   puzzle: ChessPeckerPuzzle,
   setFen: (fen: string) => void,
+  setStartingFen: (fen: string) => void,
   setSolution: (solution: string[]) => void,
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
@@ -95,6 +96,7 @@ export const loadPuzzleAndInitialize = async (
 
   const startingFen = chess.fen();
   setFen(startingFen);
+  setStartingFen(startingFen);
 
   const playerSolution = puzzle.Moves.slice(1);
   setSolution(playerSolution);
@@ -117,6 +119,7 @@ export const handleSetSelect = async (
   setCurrentRepeatIndex: (index: number) => void,
   setCurrentPuzzleIndex: (index: number) => void,
   setFen: (fen: string) => void,
+  setStartingFen: (fen: string) => void,
   setSolution: (solution: string[]) => void,
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void,
@@ -149,6 +152,7 @@ export const handleSetSelect = async (
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
+      setStartingFen,
       setSolution,
       setSolvedIndex,
       setHighlight

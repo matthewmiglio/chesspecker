@@ -15,6 +15,7 @@ type SetSelectTableProps = {
   setCurrentRepeatIndex: (index: number) => void;
   setCurrentPuzzleIndex: (index: number) => void;
   setFen: (fen: string) => void;
+  setStartingFen: (fen: string) => void;
   setSolution: (solution: string[]) => void;
   setSolvedIndex: (index: number) => void;
   setHighlight: (highlight: string | null) => void;
@@ -36,6 +37,7 @@ export default function SetSelectTable({
   setCurrentRepeatIndex,
   setCurrentPuzzleIndex,
   setFen,
+  setStartingFen,
   setSolution,
   setSolvedIndex,
   setHighlight,
@@ -105,6 +107,7 @@ export default function SetSelectTable({
                 setCurrentRepeatIndex,
                 setCurrentPuzzleIndex,
                 setFen,
+                setStartingFen,
                 setSolution,
                 setSolvedIndex,
                 setHighlight,

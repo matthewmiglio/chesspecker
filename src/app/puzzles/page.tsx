@@ -33,6 +33,9 @@ export default function PuzzlesPage() {
   const [fen, setFen] = useState<string>(
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
+  const [startingFen, setStartingFen] = useState<string>(
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  );
   const [solution, setSolution] = useState<string[]>([]);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
@@ -57,9 +60,11 @@ export default function PuzzlesPage() {
     currentRepeatIndex,
     puzzleIds,
     fen,
+    startingFen,
     solution,
     solvedIndex,
     setFen,
+    setStartingFen,
     setSolution,
     setSolvedIndex,
     setHighlight,
@@ -213,6 +218,7 @@ export default function PuzzlesPage() {
                 setCurrentRepeatIndex={setCurrentRepeatIndex}
                 setCurrentPuzzleIndex={setCurrentPuzzleIndex}
                 setFen={setFen}
+                setStartingFen={setStartingFen}
                 setSolution={setSolution}
                 setSolvedIndex={setSolvedIndex}
                 setHighlight={setHighlight}
