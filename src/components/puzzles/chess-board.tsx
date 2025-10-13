@@ -98,6 +98,8 @@ export default function AnimatedBoard({
     // Reset click-to-move state when FEN changes
     setSelectedSquare(null);
     setValidMoves([]);
+    // Clear arrows when puzzle changes
+    setArrows([]);
     console.log('[AnimatedBoard] Board updated, animationPosition cleared');
   }, [fen, currentPuzzleIndex, resetKey ?? 0]); // resetKey forces a reset when replaying
 
@@ -242,7 +244,7 @@ export default function AnimatedBoard({
   const customSquareStyles = useMemo(() => {
     const styles: { [square: string]: React.CSSProperties } = {};
 
-    // Highlight square logic
+    // Highlight square logic (from puzzle feedback)
     if (highlight) {
       styles[highlight] = { backgroundColor: "rgba(255, 0, 0, 0.4)" };
     }
