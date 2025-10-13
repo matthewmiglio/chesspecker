@@ -32,7 +32,7 @@ export default function Navbar() {
         className="hidden lg:flex fixed left-0 top-0 h-screen w-64 z-50 backdrop-blur-md flex-col py-6 px-4 border-r"
         style={{
           background: "var(--background)",
-          borderColor: themeColor,
+          borderColor: "var(--border)",
           boxShadow: `2px 0 8px ${themeColor}20`,
         }}
       >
