@@ -235,7 +235,7 @@ export default function AnimatedBoard({
         if (isCapture) {
           // Capture moves: grey ring around the entire square
           styles[move.to] = {
-            boxShadow: `inset 0 0 0 4px rgba(128, 128, 128, 0.8)`,
+            boxShadow: `inset 0 0 0 4px rgba(128, 128, 128, 0.7)`,
             borderRadius: '8px',
           };
         } else {
@@ -243,9 +243,9 @@ export default function AnimatedBoard({
           styles[move.to] = {
             background: `
               radial-gradient(circle at center,
-                rgba(128, 128, 128, 0.8) 0%,
-                rgba(128, 128, 128, 0.8) 15%,
-                rgba(128, 128, 128, 0.4) 18%,
+                rgba(128, 128, 128, 0.4) 0%,
+                rgba(128, 128, 128, 0.4) 15%,
+                rgba(128, 128, 128, 0.28) 18%,
                 transparent 22%)
             `,
             borderRadius: '50%',
