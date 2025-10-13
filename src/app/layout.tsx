@@ -82,12 +82,14 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Providers>
           <AnalyticsProvider>
             <Navbar />
-            <div className="lg:pl-64">
-              {children}
+            <div className="lg:pl-64 flex flex-col flex-1">
+              <main className="flex-1">
+                {children}
+              </main>
               <Footer />
             </div>
             <Analytics />
