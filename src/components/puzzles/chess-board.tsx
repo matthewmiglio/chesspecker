@@ -22,6 +22,9 @@ interface Props {
   isSessionActive: boolean;
   sideOnBottom: "w" | "b";
   currentPuzzleIndex: number;
+  resetKey?: number; // Optional key to force reset of animation state
+  darkSquareColor?: string;
+  lightSquareColor?: string;
 }
 
 export default function AnimatedBoard({
@@ -33,6 +36,9 @@ export default function AnimatedBoard({
   isSessionActive,
   sideOnBottom,
   currentPuzzleIndex,
+  resetKey,
+  darkSquareColor = '#5994EF',
+  lightSquareColor = '#F2F6FA',
 }: Props) {
   console.log('[AnimatedBoard] Component rendered/mounted with currentPuzzleIndex:', currentPuzzleIndex, 'FEN:', fen);
 
@@ -80,17 +86,20 @@ export default function AnimatedBoard({
   }, []);
 
   useEffect(() => {
-    // When FEN changes externally, update game and clear any animation state
-    console.log('[AnimatedBoard] FEN changed to:', fen);
+    // When FEN or resetKey changes, update game and clear any animation state
+    console.log('[AnimatedBoard] useEffect triggered - fen:', fen, 'resetKey:', resetKey);
+    console.log('[AnimatedBoard] Previous game FEN:', game.fen());
+    console.log('[AnimatedBoard] Clearing animationPosition');
     const updated = new Chess();
     updated.load(fen);
     setGame(updated);
+    console.log('[AnimatedBoard] New game FEN:', updated.fen());
     setAnimationPosition(null); // Clear any ongoing animation
     // Reset click-to-move state when FEN changes
     setSelectedSquare(null);
     setValidMoves([]);
-    console.log('[AnimatedBoard] Board updated with new FEN');
-  }, [fen]);
+    console.log('[AnimatedBoard] Board updated, animationPosition cleared');
+  }, [fen, currentPuzzleIndex, resetKey ?? 0]); // resetKey forces a reset when replaying
 
   const handlePieceDrop = (
     sourceSquare: Square,
@@ -279,7 +288,11 @@ export default function AnimatedBoard({
   const finalPosition = animationPosition ?? fen;
 
   console.log('[AnimatedBoard] Rendering with finalPosition:', finalPosition);
+  console.log('[AnimatedBoard] animationPosition:', animationPosition);
+  console.log('[AnimatedBoard] fen prop:', fen);
   console.log('[AnimatedBoard] isSessionActive:', isSessionActive);
+  console.log('[AnimatedBoard] Chessboard key (currentPuzzleIndex):', currentPuzzleIndex);
+  console.log('[AnimatedBoard] About to render <Chessboard> with position:', finalPosition);
 
   return (
     <div
@@ -292,7 +305,7 @@ export default function AnimatedBoard({
       {/* Board container */}
       <div className="relative block mx-auto" style={{ width: boardWidth, height: boardWidth }}>
         <Chessboard
-          key={currentPuzzleIndex}
+          key={`${currentPuzzleIndex}-${resetKey}-${fen}`}
           position={finalPosition}
           onPieceDrop={handlePieceDrop}
           onSquareClick={handleSquareClick}
@@ -301,6 +314,8 @@ export default function AnimatedBoard({
           arePiecesDraggable={!isBoardLocked && isSessionActive}
           boardWidth={boardWidth}
           customSquareStyles={customSquareStyles}
+          customDarkSquareStyle={{ backgroundColor: darkSquareColor }}
+          customLightSquareStyle={{ backgroundColor: lightSquareColor }}
         />
       </div>
 

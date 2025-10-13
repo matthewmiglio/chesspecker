@@ -41,6 +41,7 @@ export function usePuzzleSession({
   currentPuzzleIndex,
   setPlayerSide,
   autoShowSolution = true,
+  setResetKey,
 }: {
   getSelectedSetId: () => number | null;
   currentRepeatIndex: number;
@@ -62,6 +63,7 @@ export function usePuzzleSession({
   currentPuzzleIndex: number;
   setPlayerSide: (side: "w" | "b") => void;
   autoShowSolution?: boolean;
+  setResetKey: (value: number | ((prev: number) => number)) => void;
 }) {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
@@ -277,6 +279,7 @@ export function usePuzzleSession({
           promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
         });
 
+        console.log('[showSolution] Setting FEN to:', chess.fen());
         setFen(chess.fen());
       } catch (error) {
         console.error(`Error showing solution move:`, error);
@@ -286,6 +289,10 @@ export function usePuzzleSession({
   };
 
   const showFullSolution = async (startingFen: string, allMoves: string[]) => {
+    console.log('[showFullSolution] Starting full solution replay');
+    console.log('[showFullSolution] Starting FEN:', startingFen);
+    console.log('[showFullSolution] Total moves to replay:', allMoves.length);
+
     const chess = new Chess(startingFen);
     const moveSpeed = 1200; // milliseconds per move
 
@@ -293,6 +300,7 @@ export function usePuzzleSession({
     for (let i = 0; i < allMoves.length; i++) {
       const moveUci = allMoves[i];
 
+      console.log(`[showFullSolution] Waiting ${moveSpeed}ms before move ${i + 1}/${allMoves.length}: ${moveUci}`);
       await new Promise((resolve) => setTimeout(resolve, moveSpeed));
 
       try {
@@ -302,12 +310,14 @@ export function usePuzzleSession({
           promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
         });
 
+        console.log(`[showFullSolution] Setting FEN after move ${i + 1}:`, chess.fen());
         setFen(chess.fen());
       } catch (error) {
-        console.error(`Error in full solution replay:`, error);
+        console.error(`[showFullSolution] Error in full solution replay at move ${i + 1}:`, error);
         throw error;
       }
     }
+    console.log('[showFullSolution] Full solution replay completed');
   };
 
   const handleNextPuzzle = async (forceFinish = false) => {
@@ -435,6 +445,9 @@ export function usePuzzleSession({
 
     setHintUsed(false);
     setPuzzleStartTime(Date.now());
+
+    // Increment resetKey to force AnimatedBoard to clear animationPosition state
+    setResetKey(prev => prev + 1);
   };
 
   const handleManualShowSolution = async () => {
@@ -445,23 +458,31 @@ export function usePuzzleSession({
   };
 
   const handleShowReplay = async () => {
+    console.log('[handleShowReplay] Starting replay');
     setShowFeedbackButtons(false);
 
     // Get the current puzzle data to reset to initial position
     const setId = getSelectedSetId();
     if (!setId) {
+      console.log('[handleShowReplay] No setId found, returning');
       return;
     }
 
     const currentPuzzleId = puzzleIds[currentPuzzleIndex];
+    console.log('[handleShowReplay] Current puzzle ID:', currentPuzzleId);
     const puzzleData = await getPuzzleData(currentPuzzleId);
     setCurrentPuzzleData(puzzleData);
 
     if (!puzzleData) {
+      console.log('[handleShowReplay] No puzzle data found, returning');
       return;
     }
 
+    console.log('[handleShowReplay] Initial puzzle FEN:', puzzleData.puzzle.FEN);
+    console.log('[handleShowReplay] Puzzle moves:', puzzleData.puzzle.Moves);
+
     // Reset to initial position and capture starting FEN
+    console.log('[handleShowReplay] Calling loadPuzzleAndInitialize');
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
@@ -470,8 +491,10 @@ export function usePuzzleSession({
       setSolvedIndex,
       setHighlight
     );
+    console.log('[handleShowReplay] loadPuzzleAndInitialize completed');
 
     // Set board to the true starting position (before opponent's first move) for replay
+    console.log('[handleShowReplay] Setting FEN to initial position:', puzzleData.puzzle.FEN);
     setFen(puzzleData.puzzle.FEN);
 
     // Update player side for correct orientation
@@ -490,14 +513,20 @@ export function usePuzzleSession({
     const startingFen = puzzleData.puzzle.FEN;
 
     // Small delay before starting replay
+    console.log('[handleShowReplay] Waiting 500ms before starting full replay');
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Show the full solution from the beginning
+    console.log('[handleShowReplay] Calling showFullSolution with starting FEN:', startingFen);
     await showFullSolution(startingFen, puzzleData.puzzle.Moves);
 
     //wait for 1 second
     const postReplayDelay = 1000; // milliseconds
     await new Promise((resolve) => setTimeout(resolve, postReplayDelay));
+
+    // Increment resetKey to force AnimatedBoard to clear animationPosition state
+    console.log('[handleShowReplay] Incrementing resetKey to clear animation state');
+    setResetKey(prev => prev + 1);
 
     // After replay, show feedback buttons again
     setShowFeedbackButtons(true);

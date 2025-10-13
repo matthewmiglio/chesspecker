@@ -1,4 +1,4 @@
-import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Copy, Play } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Copy, Play, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
@@ -6,6 +6,20 @@ import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { ChessPeckerPuzzle } from "@/lib/types";
 import { useToast } from "@/lib/hooks/useToast";
+
+// Board color themes
+export const BOARD_THEMES = [
+  { name: "Classic Blue", dark: "#5994EF", light: "#F2F6FA" },
+  { name: "Traditional Brown", dark: "#B58863", light: "#F0D9B5" },
+  { name: "Forest Green", dark: "#769656", light: "#EEEED2" },
+  { name: "Ocean Blue", dark: "#4A90A4", light: "#FFFFFF" },
+  { name: "Purple Haze", dark: "#9F7AEA", light: "#E9D5FF" },
+  { name: "Sunset Orange", dark: "#F97316", light: "#FED7AA" },
+  { name: "Bubblegum Pink", dark: "#EC4899", light: "#FCE7F3" },
+  { name: "Neon Cyber", dark: "#10B981", light: "#1F2937" },
+  { name: "Lava Red", dark: "#DC2626", light: "#FEE2E2" },
+  { name: "Cosmic Purple", dark: "#7C3AED", light: "#1E1B4B" },
+] as const;
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -38,6 +52,10 @@ type ChessBoardWrapperProps = {
   puzzleIds: string[];
   autoShowSolution: boolean;
   setAutoShowSolution: (value: boolean) => void;
+  puzzleSetName: string;
+  resetKey: number;
+  boardThemeIndex?: number;
+  setBoardThemeIndex?: (index: number) => void;
 };
 
 export default function ChessBoardWrapper({
@@ -56,6 +74,10 @@ export default function ChessBoardWrapper({
   puzzleIds,
   autoShowSolution,
   setAutoShowSolution,
+  puzzleSetName,
+  resetKey,
+  boardThemeIndex = 0,
+  setBoardThemeIndex,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
   const { success, error } = useToast();
@@ -63,6 +85,11 @@ export default function ChessBoardWrapper({
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
   const [isCopyPressed, setIsCopyPressed] = useState(false);
+  const [showThemeDropdown, setShowThemeDropdown] = useState(false);
+
+  // Get current theme colors
+  const currentTheme = BOARD_THEMES[boardThemeIndex] || BOARD_THEMES[0];
+
 
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
@@ -169,8 +196,12 @@ export default function ChessBoardWrapper({
       <div className={`flex flex-col lg:flex-row gap-6 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
 
         {/* Left: Chess Board */}
-        <Card className="py-10 flex-1 lg:max-w-[65%]">
+        <Card className="py-6 flex-1 lg:max-w-[65%]">
           <CardContent className="p-0 mx-auto">
+            {/* Puzzle Set Title */}
+            <div className="text-center mb-4 px-4">
+              <h2 className="text-3xl font-bold tracking-tight">{puzzleSetName}</h2>
+            </div>
             <AnimatedBoard
               fen={fen}
               solution={solution}
@@ -180,6 +211,9 @@ export default function ChessBoardWrapper({
               isSessionActive={puzzleSession.isSessionActive}
               sideOnBottom={playerSide}
               currentPuzzleIndex={currentPuzzleIndex}
+              resetKey={resetKey}
+              darkSquareColor={currentTheme.dark}
+              lightSquareColor={currentTheme.light}
             />
           </CardContent>
         </Card>
@@ -254,6 +288,50 @@ export default function ChessBoardWrapper({
 
             {/* Divider */}
             <div className="border-t border-border"></div>
+
+            {/* Board Theme Selector */}
+            <div className="relative">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <span className="text-sm font-medium">Board Theme</span>
+                <button
+                  onClick={() => setShowThemeDropdown(!showThemeDropdown)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-background border border-border hover:bg-muted transition-colors"
+                >
+                  <Palette className="h-4 w-4" />
+                  <span className="text-sm">{currentTheme.name}</span>
+                </button>
+              </div>
+
+              {/* Dropdown menu */}
+              {showThemeDropdown && (
+                <div className="absolute right-0 top-full mt-2 w-full bg-card border border-border rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                  {BOARD_THEMES.map((theme, index) => (
+                    <button
+                      key={theme.name}
+                      onClick={() => {
+                        setBoardThemeIndex?.(index);
+                        setShowThemeDropdown(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors ${
+                        index === boardThemeIndex ? 'bg-muted' : ''
+                      }`}
+                    >
+                      <span className="text-sm font-medium">{theme.name}</span>
+                      <div className="flex gap-1">
+                        <div
+                          className="w-6 h-6 rounded border border-border"
+                          style={{ backgroundColor: theme.dark }}
+                        />
+                        <div
+                          className="w-6 h-6 rounded border border-border"
+                          style={{ backgroundColor: theme.light }}
+                        />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Auto Next Puzzle Toggle */}
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">

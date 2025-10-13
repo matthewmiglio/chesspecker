@@ -103,8 +103,11 @@ export const loadPuzzleAndInitialize = async (
   const startingFen = chess.fen();
   console.log('[loadPuzzleAndInitialize] Starting FEN after setup move:', startingFen);
   console.log('[loadPuzzleAndInitialize] CALLING setFen with:', startingFen);
+  console.log('[loadPuzzleAndInitialize] setFen is:', typeof setFen === 'function' ? 'a function' : 'NOT A FUNCTION');
+  console.log('[loadPuzzleAndInitialize] Timestamp before setFen:', Date.now());
   setFen(startingFen);
-  console.log('[loadPuzzleAndInitialize] CALLED setFen');
+  console.log('[loadPuzzleAndInitialize] CALLED setFen - if you see this, setFen executed without error');
+  console.log('[loadPuzzleAndInitialize] Timestamp after setFen:', Date.now());
   setStartingFen(startingFen);
   console.log('[loadPuzzleAndInitialize] CALLED setStartingFen');
 

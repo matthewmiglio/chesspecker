@@ -23,6 +23,9 @@ type PuzzleBoardAreaProps = {
   autoShowSolution: boolean;
   setAutoShowSolution: (value: boolean) => void;
   isLoading?: boolean;
+  resetKey: number;
+  boardThemeIndex?: number;
+  setBoardThemeIndex?: (index: number) => void;
 };
 
 export default function PuzzleBoardArea({
@@ -43,6 +46,9 @@ export default function PuzzleBoardArea({
   autoShowSolution,
   setAutoShowSolution,
   isLoading = false,
+  resetKey,
+  boardThemeIndex,
+  setBoardThemeIndex,
 }: PuzzleBoardAreaProps) {
   if (isLoading) {
     return (
@@ -53,6 +59,22 @@ export default function PuzzleBoardArea({
       </div>
     );
   }
+
+  // Convert to title case
+  const toTitleCase = (str: string) => {
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Truncate and title case the name
+  const displayName = toTitleCase(
+    selectedSet.name.length > 30
+      ? selectedSet.name.substring(0, 30) + '...'
+      : selectedSet.name
+  );
 
   return (
     <div>
@@ -75,6 +97,10 @@ export default function PuzzleBoardArea({
           puzzleIds={puzzleIds}
           autoShowSolution={autoShowSolution}
           setAutoShowSolution={setAutoShowSolution}
+          puzzleSetName={displayName}
+          resetKey={resetKey}
+          boardThemeIndex={boardThemeIndex}
+          setBoardThemeIndex={setBoardThemeIndex}
         />
       )}
     </div>

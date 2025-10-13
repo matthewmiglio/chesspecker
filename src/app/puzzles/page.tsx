@@ -26,18 +26,25 @@ export default function PuzzlesPage() {
   const userIsLoggedIn = authStatus === "authenticated";
   const isAuthChecked = authStatus !== "loading";
 
-  const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
+  console.log('[PuzzlesPage] COMPONENT RENDER START');
+
+  const [selectedSetId, setSelectedSetId] = useState<number | null>(() => {
+    console.log('[PuzzlesPage] Initializing selectedSetId state');
+    return null;
+  });
   const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
-  const [fen, setFen] = useState<string>(
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-  );
+  const [fen, setFen] = useState<string>(() => {
+    const defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    console.log('[PuzzlesPage] Initializing FEN state to:', defaultFen);
+    return defaultFen;
+  });
   const [startingFen, setStartingFen] = useState<string>(
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
 
   // Debug logging for FEN changes
   useEffect(() => {
-    console.log('[PuzzlesPage] FEN state updated to:', fen);
+    console.log('[PuzzlesPage] FEN state updated to:', fen, 'at timestamp:', Date.now());
   }, [fen]);
 
   const [solution, setSolution] = useState<string[]>([]);
@@ -65,6 +72,8 @@ export default function PuzzlesPage() {
   >({});
 
   const [autoShowSolution, setAutoShowSolution] = useState(true);
+  const [resetKey, setResetKey] = useState(0);
+  const [boardThemeIndex, setBoardThemeIndex] = useState(0);
 
   const puzzleSession = usePuzzleSession({
     getSelectedSetId: () => selectedSetId,
@@ -85,7 +94,10 @@ export default function PuzzlesPage() {
     currentPuzzleIndex,
     setPlayerSide,
     autoShowSolution,
+    setResetKey,
   });
+
+  console.log('[PuzzlesPage] After usePuzzleSession - selectedSetId:', selectedSetId, 'fen:', fen, 'isSessionActive:', puzzleSession.isSessionActive);
 
   const selectedSet = userSets.find((s) => s.set_id === selectedSetId);
   const selectedSetIsDone =
@@ -214,6 +226,9 @@ export default function PuzzlesPage() {
             autoShowSolution={autoShowSolution}
             setAutoShowSolution={setAutoShowSolution}
             isLoading={!isSetDataLoaded}
+            resetKey={resetKey}
+            boardThemeIndex={boardThemeIndex}
+            setBoardThemeIndex={setBoardThemeIndex}
           />
         ) : (
           <PuzzleEmptyState
