@@ -36,7 +36,7 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/puzzles" className="font-bold text-2xl flex items-center gap-2">
+        <Link href="/puzzles" className="font-bold text-3xl flex items-center gap-2">
           <span
             style={{
               color: themeColor,

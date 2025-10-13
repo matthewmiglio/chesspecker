@@ -64,8 +64,21 @@ export default function SetSelectTable({
   const { data: session } = useSession();
   const email = session?.user?.email || "unauthenticated@email.com";
 
+  // Adjust grid columns based on number of sets
+  const gridColsClass =
+    sortedSets.length === 1
+      ? "grid-cols-1 max-w-xs"
+      : sortedSets.length === 2
+      ? "grid-cols-1 sm:grid-cols-2 max-w-2xl"
+      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+
   return (
-    <div className="w-[90%] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 py-8">
+    <div
+      className={cn(
+        "w-[90%] mx-auto grid gap-4 py-8",
+        gridColsClass
+      )}
+    >
       {sortedSets.map((set) => {
         const solvedPuzzles =
           (setProgressMap[set.set_id]?.repeat_index ?? 0) * set.size +
@@ -76,24 +89,25 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
+        // Brighter, more varied colors based on progress
         const progressColor =
           progressPercent >= 80
-            ? "var(--green-progress-color)"
+            ? "#22c55e" // Bright green
+            : progressPercent >= 60
+            ? "#3b82f6" // Bright blue
             : progressPercent >= 40
-            ? "var(--yellow-progress-color)"
-            : "var(--red-progress-color)";
+            ? "#f59e0b" // Bright amber/orange
+            : progressPercent >= 20
+            ? "#ef4444" // Bright red
+            : "#8b5cf6"; // Bright purple (for very low progress)
 
         const progressColorStyle = {
           backgroundColor: progressColor,
-          boxShadow: `0 0 16px 19px ${progressColor}`,
         };
 
         return (
           <div
             key={set.set_id}
-            style={{
-              boxShadow: isSelected ? `0 0 12px ${progressColor}` : undefined,
-            }}
             onClick={async () => {
               const setToSelect = userSets.find((s) => s.set_id === set.set_id);
               if (!setToSelect) return;
@@ -121,33 +135,32 @@ export default function SetSelectTable({
               }
             }}
             className={cn(
-              "relative bg-card text-card-foreground rounded-2xl shadow-md p-5 hover:scale-[1.03] transition-all cursor-pointer group",
+              "relative bg-card text-card-foreground rounded-xl shadow-md p-4 hover:scale-[1.02] transition-all cursor-pointer group",
               isSelected && "ring-[2px] ring-offset-2 ring-offset-background"
             )}
           >
-            <div className="mb-4">
-              <div className="text-lg font-bold mb-1 leading-tight line-clamp-2">
+            <div className="mb-3">
+              <div className="text-base font-bold mb-1 leading-tight line-clamp-2">
                 {set.name}
               </div>
-              <div className="text-sm text-muted-foreground">ELO {set.elo}</div>
+              <div className="text-xs text-muted-foreground">ELO {set.elo}</div>
             </div>
-            <span className="absolute top-2 right-3 text-xl opacity-60">
+            <span className="absolute top-2 right-2 text-lg opacity-60">
               {set.elo >= 1200 ? "🔥" : "🧩"}
             </span>
 
             <Progress
               value={progressPercent}
-              className="h-3 rounded-full bg-muted/50"
+              className="h-2 rounded-full bg-muted/50"
               barClassName=""
               style={progressColorStyle}
             />
 
-            <div className="mt-3 text-xs text-muted-foreground">
-              {solvedPuzzles} / {totalPuzzles} puzzles solved (
-              {Math.round(progressPercent)}%)
+            <div className="mt-2 text-xs text-muted-foreground">
+              {solvedPuzzles} / {totalPuzzles} ({Math.round(progressPercent)}%)
             </div>
 
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-3">
               <Button
                 variant="ghost"
                 size="icon"

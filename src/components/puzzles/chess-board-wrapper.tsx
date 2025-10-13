@@ -1,4 +1,4 @@
-import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Search, Download, Play } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Download, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
@@ -150,126 +150,174 @@ export default function ChessBoardWrapper({
     URL.revokeObjectURL(url);
   };
 
+  // Calculate accuracy percentage and color
+  const accuracy = selectedSetId !== null && setAccuracies[selectedSetId]
+    ? Math.round(
+      (setAccuracies[selectedSetId].correct /
+        (setAccuracies[selectedSetId].correct +
+          setAccuracies[selectedSetId].incorrect || 1)) *
+      100
+    )
+    : null;
+
+  const getAccuracyColor = () => {
+    if (accuracy === null) return 'rgb(156, 163, 175)'; // gray
+    if (accuracy >= 80) return 'rgb(34, 197, 94)'; // green
+    if (accuracy >= 60) return 'rgb(234, 179, 8)'; // yellow
+    return 'rgb(239, 68, 68)'; // red
+  };
+
   return (
-    <div className="mx-auto ">
-      <Card className={`py-10 m-0 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
-        <CardContent className="p-0 m-00 mx-auto">
-          <AnimatedBoard
-            fen={fen}
-            solution={solution}
-            solvedIndex={solvedIndex}
-            onMove={puzzleSession.handleMove}
-            highlight={highlight}
-            isSessionActive={puzzleSession.isSessionActive}
-            sideOnBottom={playerSide}
-          />
-        </CardContent>
+    <div className="mx-auto">
+      {/* Side-by-side layout: Board | Stats */}
+      <div className={`flex flex-col lg:flex-row gap-6 transition-opacity duration-500 ${puzzleSession.showFeedbackButtons ? 'opacity-50' : 'opacity-100'}`}>
 
-        <CardFooter className="px-3 py-2 flex justify-center">
-          <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
-            {/* Accuracy */}
-            <div className="flex items-center gap-1">
-              <span className="whitespace-nowrap">Accuracy:</span>
-              <span className="font-medium">
-                {selectedSetId !== null && setAccuracies[selectedSetId]
-                  ? `${Math.round(
-                    (setAccuracies[selectedSetId].correct /
-                      (setAccuracies[selectedSetId].correct +
-                        setAccuracies[selectedSetId].incorrect || 1)) *
-                    100
-                  )}%`
-                  : "N/A"}
-              </span>
+        {/* Left: Chess Board */}
+        <Card className="py-10 flex-1 lg:max-w-[65%]">
+          <CardContent className="p-0 mx-auto">
+            <AnimatedBoard
+              fen={fen}
+              solution={solution}
+              solvedIndex={solvedIndex}
+              onMove={puzzleSession.handleMove}
+              highlight={highlight}
+              isSessionActive={puzzleSession.isSessionActive}
+              sideOnBottom={playerSide}
+              currentPuzzleIndex={currentPuzzleIndex}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Right: Stats & Controls Panel */}
+        <Card className="flex-1 lg:max-w-[35%] p-6">
+          <div className="space-y-6">
+
+            {/* Accuracy Stat Card */}
+            <div
+              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
+              style={{
+                borderColor: getAccuracyColor(),
+                backgroundColor: `${getAccuracyColor()}15`,
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Accuracy</span>
+                <div
+                  className="text-3xl font-bold"
+                  style={{ color: getAccuracyColor() }}
+                >
+                  {accuracy !== null ? `${accuracy}%` : "N/A"}
+                </div>
+              </div>
             </div>
 
-            {/* Puzzle Progress */}
-            <div className="flex items-center gap-1">
-              <PuzzleIcon className="w-4 h-4" />
-              <span>
-                {currentPuzzleIndex} / {selectedSet.size}
-              </span>
+            {/* Puzzle Progress Card */}
+            <div
+              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
+              style={{
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <PuzzleIcon className="w-5 h-5" style={{ color: 'rgb(59, 130, 246)' }} />
+                  <span className="text-sm text-muted-foreground">Puzzle</span>
+                </div>
+                <div className="text-2xl font-bold" style={{ color: 'rgb(59, 130, 246)' }}>
+                  {currentPuzzleIndex} / {selectedSet.size}
+                </div>
+              </div>
             </div>
 
-            {/* Repeat Progress */}
-            <div className="flex items-center gap-1">
-              <RepeatIcon className="w-4 h-4" />
-              <span>
-                {currentRepeatIndex} / {selectedSet.repeats}
-              </span>
+            {/* Repeat Progress Card */}
+            <div
+              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
+              style={{
+                borderColor: 'rgb(168, 85, 247)',
+                backgroundColor: 'rgba(168, 85, 247, 0.1)',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <RepeatIcon className="w-5 h-5" style={{ color: 'rgb(168, 85, 247)' }} />
+                  <span className="text-sm text-muted-foreground">Repeat</span>
+                </div>
+                <div className="text-2xl font-bold" style={{ color: 'rgb(168, 85, 247)' }}>
+                  {currentRepeatIndex} / {selectedSet.repeats}
+                </div>
+              </div>
             </div>
+
+            {/* Divider */}
+            <div className="border-t border-border"></div>
 
             {/* Auto Next Puzzle Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">Auto Next</span>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <span className="text-sm font-medium">Auto Next</span>
               <button
                 onClick={() => {
                   setAutoNextPuzzle(!autoNextPuzzle);
                   puzzleSession.setAutoNextPuzzle(!autoNextPuzzle);
                 }}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  autoNextPuzzle
-                    ? 'bg-primary focus:ring-primary'
-                    : 'bg-muted focus:ring-muted'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2`}
                 style={{
-                  backgroundColor: autoNextPuzzle ? themeColor : undefined,
-                  boxShadow: autoNextPuzzle ? `0 0 6px ${themeColor}40` : undefined
+                  backgroundColor: autoNextPuzzle ? themeColor : 'rgb(156, 163, 175)',
+                  boxShadow: autoNextPuzzle ? `0 0 8px ${themeColor}60` : undefined
                 }}
               >
                 <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-200 ${
-                    autoNextPuzzle ? 'translate-x-5' : 'translate-x-1'
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 shadow-md ${
+                    autoNextPuzzle ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
 
             {/* Auto Show Solution Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">Auto Solution</span>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <span className="text-sm font-medium">Auto Solution</span>
               <button
                 onClick={() => setAutoShowSolution(!autoShowSolution)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  autoShowSolution
-                    ? 'bg-primary focus:ring-primary'
-                    : 'bg-muted focus:ring-muted'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2`}
                 style={{
-                  backgroundColor: autoShowSolution ? themeColor : undefined,
-                  boxShadow: autoShowSolution ? `0 0 6px ${themeColor}40` : undefined
+                  backgroundColor: autoShowSolution ? themeColor : 'rgb(156, 163, 175)',
+                  boxShadow: autoShowSolution ? `0 0 8px ${themeColor}60` : undefined
                 }}
               >
                 <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-200 ${
-                    autoShowSolution ? 'translate-x-5' : 'translate-x-1'
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 shadow-md ${
+                    autoShowSolution ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
 
             {/* Hint Button */}
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                className={getHintButtonClasses()}
-                style={getHintButtonStyle()}
-                onClick={() => {
-                  const move = solution[solvedIndex];
-                  if (move) {
-                    setHighlight(move.slice(2));
-                  } else {
-                    setHighlight(null);
-                  }
-                  puzzleSession.setHintUsed(true);
-                }}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Hint
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              className={`w-full ${getHintButtonClasses()}`}
+              style={{
+                ...getHintButtonStyle(),
+                borderWidth: '2px',
+              }}
+              onClick={() => {
+                const move = solution[solvedIndex];
+                if (move) {
+                  setHighlight(move.slice(2));
+                } else {
+                  setHighlight(null);
+                }
+                puzzleSession.setHintUsed(true);
+              }}
+            >
+              <Eye className="h-5 w-5 mr-2" />
+              <span className="font-semibold">Show Hint</span>
+            </Button>
+
           </div>
-        </CardFooter>
-      </Card>
+        </Card>
+      </div>
 
       {/* Feedback Buttons Overlay */}
       {puzzleSession.showFeedbackButtons && (
@@ -303,16 +351,6 @@ export default function ChessBoardWrapper({
               >
                 <Play className="h-4 w-4" />
                 {autoShowSolution ? "Replay Solution" : "Show Solution"}
-              </Button>
-
-              {/* Analyze Puzzle - Disabled */}
-              <Button
-                disabled
-                variant="ghost"
-                className="w-full flex items-center justify-center gap-3 py-3 opacity-50 cursor-not-allowed"
-              >
-                <Search className="h-4 w-4" />
-                Analyze Puzzle
               </Button>
 
               {/* Export */}

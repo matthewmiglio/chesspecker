@@ -35,10 +35,23 @@ export default function PuzzlesPage() {
   const [startingFen, setStartingFen] = useState<string>(
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
+
+  // Debug logging for FEN changes
+  useEffect(() => {
+    console.log('[PuzzlesPage] FEN state updated to:', fen);
+  }, [fen]);
+
   const [solution, setSolution] = useState<string[]>([]);
   const [currentRepeatIndex, setCurrentRepeatIndex] = useState<number>(0);
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState<number>(0);
   const [puzzleIds, setPuzzleIds] = useState<string[]>([]);
+
+  // Debug logging for selectedSetId changes
+  useEffect(() => {
+    console.log('[PuzzlesPage] selectedSetId changed to:', selectedSetId);
+    console.log('[PuzzlesPage] puzzleIds:', puzzleIds);
+    console.log('[PuzzlesPage] currentPuzzleIndex:', currentPuzzleIndex);
+  }, [selectedSetId, puzzleIds, currentPuzzleIndex]);
   const [setAccuracies, setSetAccuracies] = useState<
     Record<number, { correct: number; incorrect: number }>
   >({});

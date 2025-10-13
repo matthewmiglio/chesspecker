@@ -82,11 +82,17 @@ export const loadPuzzleAndInitialize = async (
   setSolvedIndex: (index: number) => void,
   setHighlight: (highlight: string | null) => void
 ) => {
+  console.log('[loadPuzzleAndInitialize] Starting');
+  console.log('[loadPuzzleAndInitialize] Puzzle FEN:', puzzle.FEN);
+  console.log('[loadPuzzleAndInitialize] Puzzle moves:', puzzle.Moves);
+  console.log('[loadPuzzleAndInitialize] setFen function:', typeof setFen, setFen);
+
   const { Chess } = await import("chess.js");
   const chess = new Chess(puzzle.FEN);
 
   if (puzzle.Moves.length > 0) {
     const opponentSetupMove = puzzle.Moves[0];
+    console.log('[loadPuzzleAndInitialize] Applying opponent setup move:', opponentSetupMove);
     chess.move({
       from: opponentSetupMove.slice(0, 2),
       to: opponentSetupMove.slice(2, 4),
@@ -95,13 +101,19 @@ export const loadPuzzleAndInitialize = async (
   }
 
   const startingFen = chess.fen();
+  console.log('[loadPuzzleAndInitialize] Starting FEN after setup move:', startingFen);
+  console.log('[loadPuzzleAndInitialize] CALLING setFen with:', startingFen);
   setFen(startingFen);
+  console.log('[loadPuzzleAndInitialize] CALLED setFen');
   setStartingFen(startingFen);
+  console.log('[loadPuzzleAndInitialize] CALLED setStartingFen');
 
   const playerSolution = puzzle.Moves.slice(1);
+  console.log('[loadPuzzleAndInitialize] Player solution (moves 1+):', playerSolution);
   setSolution(playerSolution);
   setSolvedIndex(0);
   setHighlight(null);
+  console.log('[loadPuzzleAndInitialize] Initialization complete');
 };
 
 export const handleSetSelect = async (
@@ -126,6 +138,8 @@ export const handleSetSelect = async (
   setPlayerSide: (side: "w" | "b") => void,
   preloadedSet?: { repeat_index: number; puzzle_index: number }
 ) => {
+  console.log('[handleSetSelect] Starting set selection, setId:', setId);
+
   //increment total daily stats
   bumpDailyUsage({ puzzle_starts: 1 });
 
@@ -138,10 +152,13 @@ export const handleSetSelect = async (
   const set = userSets.find((s) => s.set_id === setId);
 
   if (!set || !set.elo || !set.size || set.puzzle_index == null) {
+    console.log('[handleSetSelect] Set not found or invalid');
     return;
   }
 
   const puzzleIds = set.puzzle_ids;
+  console.log('[handleSetSelect] Puzzle IDs:', puzzleIds);
+  console.log('[handleSetSelect] Starting at puzzle index:', set.puzzle_index);
   setPuzzleIds(puzzleIds);
 
 
@@ -149,6 +166,7 @@ export const handleSetSelect = async (
   const puzzleData = await getPuzzleData(puzzleIds[set.puzzle_index]);
 
   if (puzzleData) {
+    console.log('[handleSetSelect] Got puzzle data, calling loadPuzzleAndInitialize');
     await loadPuzzleAndInitialize(
       puzzleData.puzzle,
       setFen,
@@ -163,6 +181,7 @@ export const handleSetSelect = async (
     // Determine player side after opponent's setup move
     if (puzzleData.puzzle.Moves.length > 0) {
       const opponentSetupMove = puzzleData.puzzle.Moves[0];
+      console.log('[handleSetSelect] Determining player side, setup move:', opponentSetupMove);
       chess.move({
         from: opponentSetupMove.slice(0, 2),
         to: opponentSetupMove.slice(2, 4),
@@ -170,8 +189,10 @@ export const handleSetSelect = async (
       });
     }
     const turn = chess.turn();
+    console.log('[handleSetSelect] Player side:', turn);
     setPlayerSide(turn);
   } else {
+    console.log('[handleSetSelect] No puzzle data found');
     return;
   }
 

@@ -21,6 +21,7 @@ interface Props {
   highlight: string | null;
   isSessionActive: boolean;
   sideOnBottom: "w" | "b";
+  currentPuzzleIndex: number;
 }
 
 export default function AnimatedBoard({
@@ -31,10 +32,13 @@ export default function AnimatedBoard({
   highlight,
   isSessionActive,
   sideOnBottom,
+  currentPuzzleIndex,
 }: Props) {
+  console.log('[AnimatedBoard] Component rendered/mounted with currentPuzzleIndex:', currentPuzzleIndex, 'FEN:', fen);
+
   const themeColor = useThemeAccentColor();
   const [game, setGame] = useState(new Chess(fen));
-  const [boardPosition, setBoardPosition] = useState(fen);
+  const [animationPosition, setAnimationPosition] = useState<string | null>(null);
   const [isBoardLocked, setIsBoardLocked] = useState(false);
   const [arrows, setArrows] = useState<{ from: Square; to: Square }[]>([]);
   const [arrowStart, setArrowStart] = useState<Square | null>(null);
@@ -44,8 +48,16 @@ export default function AnimatedBoard({
   const [validMoves, setValidMoves] = useState<Move[]>([]);
   const [boardWidth, setBoardWidth] = useState(() => {
     if (typeof window !== "undefined") {
-      const factor = window.innerWidth > 600 ? 0.7 : 1;
-      return Math.min(window.innerWidth, window.innerHeight) * factor;
+      const width = window.innerWidth;
+      // On mobile (<1024px): use more space
+      // On desktop (>=1024px): constrain to fit in left column with stats on right
+      if (width >= 1024) {
+        // Desktop: board is in left column (~65% of container), so use ~50% of window width max
+        return Math.min(width * 0.45, 600);
+      } else {
+        // Mobile: full width with some padding
+        return Math.min(width * 0.9, 500);
+      }
     }
     return 300;
   });
@@ -53,9 +65,13 @@ export default function AnimatedBoard({
   useEffect(() => {
     const updateBoardSize = () => {
       const width = window.innerWidth;
-      const height = window.innerHeight;
-      const factor = width > 600 ? 0.7 : 1;
-      setBoardWidth(Math.min(width, height) * factor);
+      if (width >= 1024) {
+        // Desktop side-by-side layout
+        setBoardWidth(Math.min(width * 0.45, 600));
+      } else {
+        // Mobile stacked layout
+        setBoardWidth(Math.min(width * 0.9, 500));
+      }
     };
 
     updateBoardSize();
@@ -64,13 +80,16 @@ export default function AnimatedBoard({
   }, []);
 
   useEffect(() => {
+    // When FEN changes externally, update game and clear any animation state
+    console.log('[AnimatedBoard] FEN changed to:', fen);
     const updated = new Chess();
     updated.load(fen);
     setGame(updated);
-    setBoardPosition(fen);
+    setAnimationPosition(null); // Clear any ongoing animation
     // Reset click-to-move state when FEN changes
     setSelectedSquare(null);
     setValidMoves([]);
+    console.log('[AnimatedBoard] Board updated with new FEN');
   }, [fen]);
 
   const handlePieceDrop = (
@@ -98,7 +117,7 @@ export default function AnimatedBoard({
     onMove(sourceSquare + targetSquare, true);
 
     if (result.newFen) {
-      setBoardPosition(result.newFen);
+      setAnimationPosition(result.newFen);
     }
 
     if (result.nextGame) {
@@ -115,7 +134,7 @@ export default function AnimatedBoard({
           nextGame.move(replyMove);
         }
 
-        setBoardPosition(nextGame.fen());
+        setAnimationPosition(nextGame.fen());
         setGame(nextGame);
         setIsBoardLocked(false);
       }, 0);
@@ -162,7 +181,7 @@ export default function AnimatedBoard({
         // Add delay for animation BEFORE updating position
         setTimeout(() => {
           if (result.moveResult?.newFen) {
-            setBoardPosition(result.moveResult.newFen);
+            setAnimationPosition(result.moveResult.newFen);
           }
 
           if (result.moveResult?.nextGame) {
@@ -179,7 +198,7 @@ export default function AnimatedBoard({
                 nextGame.move(replyMove);
               }
 
-              setBoardPosition(nextGame.fen());
+              setAnimationPosition(nextGame.fen());
               setGame(nextGame);
               setIsBoardLocked(false);
             }, 350); // Slightly longer delay for bot move
@@ -257,6 +276,11 @@ export default function AnimatedBoard({
     return styles;
   }, [highlight, selectedSquare, validMoves, themeColor]);
 
+  const finalPosition = animationPosition ?? fen;
+
+  console.log('[AnimatedBoard] Rendering with finalPosition:', finalPosition);
+  console.log('[AnimatedBoard] isSessionActive:', isSessionActive);
+
   return (
     <div
       className="w-full overflow-x-hidden"
@@ -268,7 +292,8 @@ export default function AnimatedBoard({
       {/* Board container */}
       <div className="relative block mx-auto" style={{ width: boardWidth, height: boardWidth }}>
         <Chessboard
-          position={boardPosition}
+          key={currentPuzzleIndex}
+          position={finalPosition}
           onPieceDrop={handlePieceDrop}
           onSquareClick={handleSquareClick}
           animationDuration={300}
