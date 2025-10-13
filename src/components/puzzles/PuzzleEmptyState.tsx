@@ -11,6 +11,7 @@ type PuzzleEmptyStateProps = {
   userSetsLength: number;
   userIsLoggedIn: boolean;
   selectedSetExists: boolean;
+  isLoading?: boolean;
 };
 
 export default function PuzzleEmptyState({
@@ -18,8 +19,21 @@ export default function PuzzleEmptyState({
   userSetsLength,
   userIsLoggedIn,
   selectedSetExists,
+  isLoading = false,
 }: PuzzleEmptyStateProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto flex items-center justify-center h-full min-h-[400px] border bg-muted/20">
+        <div className="text-center p-8">
+          <div className="animate-pulse text-muted-foreground">
+            <div className="text-lg">Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex items-center justify-center h-full min-h-[400px] border bg-muted/20">

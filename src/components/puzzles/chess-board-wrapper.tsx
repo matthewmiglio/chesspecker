@@ -1,4 +1,4 @@
-import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Download, Play } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Copy, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
@@ -121,33 +121,19 @@ export default function ChessBoardWrapper({
     };
   };
 
-  const handleExportPuzzle = () => {
+  const handleCopyFen = async () => {
     if (!puzzleIds || puzzleIds.length === 0 || currentPuzzleIndex >= puzzleIds.length) {
       return;
     }
 
-    const currentPuzzleId = puzzleIds[currentPuzzleIndex];
-    const filename = `chesspecker_${currentPuzzleId}.fen`;
-
     // Get the starting FEN from puzzle data (not current position)
     const startingFen = puzzleSession.currentPuzzleData?.puzzle?.FEN || fen;
 
-    // Create a blob with the starting FEN data
-    const blob = new Blob([startingFen], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary download link
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-
-    // Trigger the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Cleanup
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      await navigator.clipboard.writeText(startingFen);
+    } catch (error) {
+      console.error('Failed to copy FEN to clipboard:', error);
+    }
   };
 
   // Calculate accuracy percentage and color
@@ -360,14 +346,14 @@ export default function ChessBoardWrapper({
                 {autoShowSolution ? "Replay Solution" : "Show Solution"}
               </Button>
 
-              {/* Export */}
+              {/* Copy FEN */}
               <Button
-                onClick={handleExportPuzzle}
+                onClick={handleCopyFen}
                 variant="ghost"
                 className="w-full flex items-center justify-center gap-3 py-3"
               >
-                <Download className="h-4 w-4" />
-                Export
+                <Copy className="h-4 w-4" />
+                Copy FEN
               </Button>
             </div>
           </div>

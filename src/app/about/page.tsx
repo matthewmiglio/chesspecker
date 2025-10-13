@@ -77,8 +77,8 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl order-2 md:order-1">
               <Image
-                src="/misc/67e6ad8f236b59cdbb74c8f87008baec504510e4.webp"
-                alt="Magnus Carlsen in deep thought"
+                src="/misc/Harry-Benson-Bobby-Fischer-Buenos-Aires.jpg"
+                alt="Bobby Fischer in Buenos Aires"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center 20%" }}
                 className={`transition-opacity duration-1000 ease-in-out ${
@@ -98,7 +98,7 @@ export default function AboutPage() {
               </div>
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed text-left">
                 Every feature, every algorithm, every piece of the training system is built around one simple idea:
-                <span className="text-foreground font-semibold block mt-4"> make chess improvement as intelligent and efficient as possible</span>.
+                <span className="text-foreground font-semibold block mt-4"> make chess improvement as intelligent and efficient as possible.</span>
               </p>
               <p className="text-lg text-muted-foreground/80 text-left">
                 No ads, no fluff — just effective training tools for chess players who want to improve.

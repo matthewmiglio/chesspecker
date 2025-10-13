@@ -1,18 +1,20 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
+import ExistingSets from "@/components/create-page/ExistingSets";
 import { useToast } from "@/lib/hooks/useToast";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 
 import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
 import { bumpDailyUsage } from "@/lib/api/usageApi";
 
-import { createUserSet } from "@/lib/api/setsApi";
+import { getUserSets, createUserSet } from "@/lib/api/setsApi";
 import { upsertAccuracy } from "@/lib/api/accuraciesApi";
 
 export default function CreatePuzzleSetPage() {
@@ -32,6 +34,30 @@ export default function CreatePuzzleSetPage() {
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
   const [accuracyProgress, setAccuracyProgress] = useState(0);
+
+  const [userSets, setUserSets] = useState<ChessPeckerSet[]>([]);
+  const [isSetsLoading, setIsSetsLoading] = useState(true);
+
+  // Fetch user's existing sets
+  useEffect(() => {
+    const fetchSets = async () => {
+      if (!isLoggedIn) {
+        setIsSetsLoading(false);
+        return;
+      }
+
+      try {
+        const sets = await getUserSets();
+        setUserSets(sets);
+      } catch (err) {
+        console.error("Error fetching user sets:", err);
+      } finally {
+        setIsSetsLoading(false);
+      }
+    };
+
+    fetchSets();
+  }, [isLoggedIn]);
 
   const addNewSetToDatabase = async (
     elo: number,
@@ -189,40 +215,48 @@ export default function CreatePuzzleSetPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Create Puzzle Set</h1>
 
-      <div className="max-w-2xl">
-        <Card
-          className={
-            !isLoggedIn
-              ? "blur-sm pointer-events-none opacity-50"
-              : ""
-          }
-        >
-          <CreateSetForm
-            name={name}
-            setName={setName}
-            description={description}
-            setDescription={setDescription}
-            repeatCount={repeatCount}
-            setRepeatCount={setRepeatCount}
-            setSize={setSize}
-            setSetSize={setSetSize}
-            difficultySliderValue={difficultySliderValue}
-            setDifficultySliderValue={setDifficultySliderValue}
-            handleCreateSetButton={handleCreateSetButton}
-          />
-        </Card>
-
-        {isCreatingSet && (
-          <div className="mt-6">
-            <PuzzleSetCreationProgress
-              puzzleProgress={puzzleProgress}
-              accuracyProgress={accuracyProgress}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Create Form Section */}
+        <div>
+          <Card
+            className={
+              !isLoggedIn
+                ? "blur-sm pointer-events-none opacity-50"
+                : ""
+            }
+          >
+            <CreateSetForm
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              repeatCount={repeatCount}
+              setRepeatCount={setRepeatCount}
+              setSize={setSize}
+              setSetSize={setSetSize}
+              difficultySliderValue={difficultySliderValue}
+              setDifficultySliderValue={setDifficultySliderValue}
+              handleCreateSetButton={handleCreateSetButton}
             />
-          </div>
-        )}
+          </Card>
+
+          {isCreatingSet && (
+            <div className="mt-6">
+              <PuzzleSetCreationProgress
+                puzzleProgress={puzzleProgress}
+                accuracyProgress={accuracyProgress}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Existing Sets Section */}
+        <div>
+          <ExistingSets sets={userSets} isLoading={isSetsLoading} />
+        </div>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ type PuzzleBoardAreaProps = {
   puzzleIds: string[];
   autoShowSolution: boolean;
   setAutoShowSolution: (value: boolean) => void;
+  isLoading?: boolean;
 };
 
 export default function PuzzleBoardArea({
@@ -41,7 +42,18 @@ export default function PuzzleBoardArea({
   puzzleIds,
   autoShowSolution,
   setAutoShowSolution,
+  isLoading = false,
 }: PuzzleBoardAreaProps) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[500px]">
+        <div className="animate-pulse text-muted-foreground text-center">
+          <div className="text-lg mb-2">Loading puzzle board...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {selectedSetIsDone ? (

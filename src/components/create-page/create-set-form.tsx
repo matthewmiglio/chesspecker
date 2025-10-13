@@ -41,36 +41,32 @@ export default function CreateSetForm({
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton}>
-      <CardHeader>
-        <CardTitle>Configure Your Puzzle Set</CardTitle>
-        <CardDescription>
-          Customize your training experience by setting the difficulty, size, and number of repeats
-        </CardDescription>
+      <CardHeader className="pb-8">
+        <CardTitle>Create New Set</CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-
+      <CardContent className="space-y-10">
+        <div className="space-y-4">
           <FancyNameInput value={name} onChange={setName} />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
+        <div className="space-y-4">
+          <label className="text-sm font-medium">
             Repeat Count
           </label>
           <RepeatCountInput value={repeatCount} onChange={setRepeatCount} />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
+        <div className="space-y-4">
+          <label className="text-sm font-medium">
             Set Size
           </label>
           <SetSizeInput value={setSize} onChange={setSetSize} />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            ELO Target
+        <div className="space-y-4">
+          <label className="text-sm font-medium">
+            Difficulty (ELO)
           </label>
           <EloTargetInput
             value={difficultySliderValue}
@@ -79,8 +75,10 @@ export default function CreateSetForm({
         </div>
       </CardContent>
 
-      <CardFooter className="pt-4 justify-end">
-        <Button type="submit">Create Puzzle Set</Button>
+      <CardFooter className="pt-8">
+        <Button type="submit" size="lg" className="w-full">
+          Create Puzzle Set
+        </Button>
       </CardFooter>
     </form>
   );

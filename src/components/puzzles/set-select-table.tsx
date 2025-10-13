@@ -28,6 +28,7 @@ type SetSelectTableProps = {
   puzzleSession: { handleStartSession: () => Promise<void> };
   handleSetDelete: (id: number) => void;
   selectedSetId: number | null;
+  isLoading?: boolean;
 };
 
 export default function SetSelectTable({
@@ -46,7 +47,34 @@ export default function SetSelectTable({
   puzzleSession,
   handleSetDelete,
   selectedSetId,
+  isLoading = false,
 }: SetSelectTableProps) {
+  if (isLoading) {
+    return (
+      <div className="w-[90%] ml-[5%] py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="relative bg-card text-card-foreground rounded-lg border-2 p-6 animate-pulse"
+            >
+              <div className="mb-4">
+                <div className="h-6 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+              </div>
+              <div className="h-2 bg-muted rounded-full mb-3"></div>
+              <div className="h-4 bg-muted rounded w-2/3"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (userSets.length === 0) {
+    return null;
+  }
+
   const sortedSets = [...userSets].sort((a, b) => {
     const aSolved =
       (setProgressMap[a.set_id]?.repeat_index ?? 0) * a.size +

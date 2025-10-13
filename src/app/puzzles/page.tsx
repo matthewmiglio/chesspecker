@@ -18,7 +18,6 @@ import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
 import SetSelectTable from "@/components/puzzles/set-select-table";
 import PuzzleBoardArea from "@/components/puzzles/PuzzleBoardArea";
 import PuzzleEmptyState from "@/components/puzzles/PuzzleEmptyState";
-import PuzzlePageLoading from "@/components/puzzles/PuzzlePageSkeleton";
 import { showConfirmDeletePopup } from "@/components/puzzles/ConfirmDeletePopup";
 import FeedbackCTA from "@/components/puzzles/FeedbackCTA";
 
@@ -182,71 +181,73 @@ export default function PuzzlesPage() {
     run();
   }, [authStatus, session]);
 
+  // Show not logged in state immediately when we know user isn't authenticated
+  if (isAuthChecked && !userIsLoggedIn) {
+    return (
+      <div>
+        <div className="flex justify-center items-center h-[60vh]">
+          <NotLoggedInButton />
+        </div>
+        <FeedbackCTA />
+      </div>
+    );
+  }
+
   return (
     <div>
-      {isAuthChecked && isSetDataLoaded ? (
-        userIsLoggedIn ? (
-          <div className="mx-auto">
-            {selectedSet ? (
-              <PuzzleBoardArea
-                selectedSet={selectedSet}
-                selectedSetId={selectedSetId}
-                selectedSetIsDone={selectedSetIsDone}
-                fen={fen}
-                solution={solution}
-                solvedIndex={solvedIndex}
-                puzzleSession={puzzleSession}
-                highlight={highlight}
-                setHighlight={setHighlight}
-                playerSide={playerSide}
-                setAccuracies={setAccuracies}
-                currentPuzzleIndex={currentPuzzleIndex}
-                currentRepeatIndex={currentRepeatIndex}
-                puzzleIds={puzzleIds}
-                autoShowSolution={autoShowSolution}
-                setAutoShowSolution={setAutoShowSolution}
-              />
-            ) : (
-              <PuzzleEmptyState
-                heroImage={heroImage}
-                userSetsLength={userSets.length}
-                userIsLoggedIn={userIsLoggedIn}
-                selectedSetExists={!!selectedSet}
-              />
-            )}
-
-            {userSets.length !== 0 && (
-              <SetSelectTable
-                userSets={userSets}
-                selectedSetId={selectedSetId}
-                setSelectedSetId={setSelectedSetId}
-                setPuzzleIds={setPuzzleIds}
-                setCurrentRepeatIndex={setCurrentRepeatIndex}
-                setCurrentPuzzleIndex={setCurrentPuzzleIndex}
-                setFen={setFen}
-                setStartingFen={setStartingFen}
-                setSolution={setSolution}
-                setSolvedIndex={setSolvedIndex}
-                setHighlight={setHighlight}
-                setPlayerSide={setPlayerSide}
-                setProgressMap={setProgressMap}
-                setAccuracies={setAccuracies}
-                puzzleSession={puzzleSession}
-                handleSetDelete={handleSetDelete}
-              />
-            )}
-          </div>
+      <div className="mx-auto">
+        {selectedSet ? (
+          <PuzzleBoardArea
+            selectedSet={selectedSet}
+            selectedSetId={selectedSetId}
+            selectedSetIsDone={selectedSetIsDone}
+            fen={fen}
+            solution={solution}
+            solvedIndex={solvedIndex}
+            puzzleSession={puzzleSession}
+            highlight={highlight}
+            setHighlight={setHighlight}
+            playerSide={playerSide}
+            setAccuracies={setAccuracies}
+            currentPuzzleIndex={currentPuzzleIndex}
+            currentRepeatIndex={currentRepeatIndex}
+            puzzleIds={puzzleIds}
+            autoShowSolution={autoShowSolution}
+            setAutoShowSolution={setAutoShowSolution}
+            isLoading={!isSetDataLoaded}
+          />
         ) : (
-          <div className="flex justify-center items-center h-[60vh]">
-            <NotLoggedInButton />
-          </div>
-        )
-      ) : (
-        <PuzzlePageLoading />
-      )}
+          <PuzzleEmptyState
+            heroImage={heroImage}
+            userSetsLength={userSets.length}
+            userIsLoggedIn={userIsLoggedIn}
+            selectedSetExists={!!selectedSet}
+            isLoading={!isSetDataLoaded}
+          />
+        )}
+
+        <SetSelectTable
+          userSets={userSets}
+          selectedSetId={selectedSetId}
+          setSelectedSetId={setSelectedSetId}
+          setPuzzleIds={setPuzzleIds}
+          setCurrentRepeatIndex={setCurrentRepeatIndex}
+          setCurrentPuzzleIndex={setCurrentPuzzleIndex}
+          setFen={setFen}
+          setStartingFen={setStartingFen}
+          setSolution={setSolution}
+          setSolvedIndex={setSolvedIndex}
+          setHighlight={setHighlight}
+          setPlayerSide={setPlayerSide}
+          setProgressMap={setProgressMap}
+          setAccuracies={setAccuracies}
+          puzzleSession={puzzleSession}
+          handleSetDelete={handleSetDelete}
+          isLoading={!isSetDataLoaded}
+        />
+      </div>
 
       <FeedbackCTA />
     </div>
-
   );
 }

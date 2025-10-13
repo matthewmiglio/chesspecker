@@ -117,16 +117,16 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="px-6 pt-6"
+            className="px-8 pt-8 pb-2"
           >
             <h2 className="text-xl font-semibold tracking-tight">We value your feedback</h2>
-            <p className="text-sm text-muted-foreground">Tell us what’s working great and what we should improve.</p>
+            <p className="text-sm text-muted-foreground">Tell us what's working great and what we should improve.</p>
           </motion.div>
 
-          <form onSubmit={handleSubmit} className="px-6 pb-6 pt-4 space-y-4">
+          <form onSubmit={handleSubmit} className="px-8 pb-8 pt-6 space-y-6">
             {/* Name */}
             <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.2 }}>
-              <label htmlFor="fb-name" className="block text-sm font-medium mb-1">Name</label>
+              <label htmlFor="fb-name" className="block text-sm font-medium mb-2">Name</label>
               <Input
                 id="fb-name"
                 name="name"
@@ -139,9 +139,9 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
             </motion.div>
 
             {/* Category + Rating */}
-            <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.2, delay: 0.03 }} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.2, delay: 0.03 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
+                <label className="block text-sm font-medium mb-2">Category</label>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((c) => (
                     <button
@@ -161,7 +161,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Rating (optional)</label>
+                <label className="block text-sm font-medium mb-2">Rating (optional)</label>
                 <div className="flex items-center gap-1" aria-label="rating">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <button
@@ -186,8 +186,8 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
 
             {/* Message */}
             <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.2, delay: 0.06 }}>
-              <div className="flex items-center justify-between">
-                <label htmlFor="fb-message" className="text-sm font-medium mb-1">Message</label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="fb-message" className="text-sm font-medium">Message</label>
                 <span className={join("text-xs", tooLong ? "text-red-500" : "text-muted-foreground")}>
                   {charsLeft} characters left
                 </span>
