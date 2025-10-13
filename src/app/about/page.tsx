@@ -140,18 +140,6 @@ export default function AboutPage() {
                 Most platforms seemed built for engagement metrics rather than <span className="text-foreground font-semibold">actual learning efficiency</span>.
               </p>
 
-              <div className="py-8 text-center">
-                <p className="text-2xl md:text-3xl font-semibold text-primary">
-                  So I decided to build something better.
-                </p>
-              </div>
-
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed text-left">
-                I started coding ChessPecker in 2024, combining my software development background
-                with this newfound chess passion. There&apos;s something
-                <span className="text-foreground font-semibold"> magical</span> about building exactly
-                the training tool I wished existed.
-              </p>
             </div>
           </div>
         </section>
