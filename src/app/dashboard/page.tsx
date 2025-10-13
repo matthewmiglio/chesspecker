@@ -77,6 +77,20 @@ export default function AccuracyStatsPage() {
   }, [selectedSetId]);
 
 
+  // Get the selected set to check its repeat_index and puzzle_index
+  const selectedSet = userSets.find((set) => set.set_id === selectedSetId);
+
+  // Calculate number of fully completed repeats
+  // A repeat is fully completed when puzzle_index has reached the end (size) and moved to next repeat
+  const completedRepeats = selectedSet ? selectedSet.repeat_index : 0;
+  const hasInsufficientRepeats = completedRepeats < 2;
+
+  // Filter accuracy data to only show completed repeats
+  // Only include data for repeat indices 0 to (completedRepeats - 1)
+  const filteredAccuracyData = accuracyData.filter(
+    (data) => data.repeat < completedRepeats
+  );
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Puzzle Set Accuracy</h1>
@@ -91,8 +105,10 @@ export default function AccuracyStatsPage() {
             />
           )}
 
-          {accuracyData.length > 0 ? (
-            <AccuracyChartCard accuracyData={accuracyData} />
+          {hasInsufficientRepeats ? (
+            <NoDataCard hasInsufficientRepeats />
+          ) : filteredAccuracyData.length > 0 ? (
+            <AccuracyChartCard accuracyData={filteredAccuracyData} />
           ) : (
             <NoDataCard />
           )}
