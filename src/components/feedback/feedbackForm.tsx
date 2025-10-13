@@ -120,7 +120,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
             className="px-8 pt-8 pb-2"
           >
             <h2 className="text-xl font-semibold tracking-tight">We value your feedback</h2>
-            <p className="text-sm text-muted-foreground">Tell us what's working great and what we should improve.</p>
+            <p className="text-sm text-muted-foreground">Tell us what&apos;s working great and what we should improve.</p>
           </motion.div>
 
           <form onSubmit={handleSubmit} className="px-8 pb-8 pt-6 space-y-6">

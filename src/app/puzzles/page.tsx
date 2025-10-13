@@ -70,7 +70,6 @@ export default function PuzzlesPage() {
     getSelectedSetId: () => selectedSetId,
     currentRepeatIndex,
     puzzleIds,
-    fen,
     startingFen,
     solution,
     solvedIndex,

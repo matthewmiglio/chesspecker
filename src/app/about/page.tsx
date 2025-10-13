@@ -9,9 +9,6 @@ export default function AboutPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [image1Loaded, setImage1Loaded] = useState(false);
   const [image2Loaded, setImage2Loaded] = useState(false);
-  const [image3Loaded, setImage3Loaded] = useState(false);
-  const [image4Loaded, setImage4Loaded] = useState(false);
-  const [image5Loaded, setImage5Loaded] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);

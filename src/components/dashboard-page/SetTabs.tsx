@@ -51,7 +51,9 @@ export default function SetTabs({
               boxShadow: isSelected
                 ? `0 0 20px ${themeColor}40`
                 : undefined,
-              ringColor: isSelected ? themeColor : undefined,
+              ...(isSelected && {
+                '--tw-ring-color': themeColor,
+              } as React.CSSProperties),
             }}
           >
             <div className="flex items-center justify-between">

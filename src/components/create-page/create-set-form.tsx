@@ -8,8 +8,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
-  CardDescription
+  CardTitle
 } from "@/components/ui/card";
 import FancyNameInput from "@/components/create-page/set-name-input";
 import RepeatCountInput from "@/components/create-page/repeat-count-input";

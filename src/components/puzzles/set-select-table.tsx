@@ -49,6 +49,9 @@ export default function SetSelectTable({
   selectedSetId,
   isLoading = false,
 }: SetSelectTableProps) {
+  const { data: session } = useSession();
+  const email = session?.user?.email || "unauthenticated@email.com";
+
   if (isLoading) {
     return (
       <div className="w-[90%] ml-[5%] py-8">
@@ -88,9 +91,6 @@ export default function SetSelectTable({
     const bPercent = bTotal > 0 ? bSolved / bTotal : 0;
     return aPercent - bPercent;
   });
-
-  const { data: session } = useSession();
-  const email = session?.user?.email || "unauthenticated@email.com";
 
   // Adjust grid columns based on number of sets
   const gridColsClass =

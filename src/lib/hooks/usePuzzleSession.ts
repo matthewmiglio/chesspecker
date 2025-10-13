@@ -26,7 +26,6 @@ export function usePuzzleSession({
   getSelectedSetId,
   currentRepeatIndex,
   puzzleIds,
-  fen,
   startingFen,
   solution,
   solvedIndex,
@@ -46,7 +45,6 @@ export function usePuzzleSession({
   getSelectedSetId: () => number | null;
   currentRepeatIndex: number;
   puzzleIds: string[];
-  fen: string;
   startingFen: string;
   solution: string[];
   solvedIndex: number;
@@ -257,7 +255,7 @@ export function usePuzzleSession({
           to: moveUci.slice(2, 4),
           promotion: moveUci.length > 4 ? moveUci.slice(4) : undefined,
         });
-      } catch (error) {
+      } catch {
         // If fast-forward fails, reset to beginning and play all moves
         chess.load(startingFen);
         solvedIndex = 0;
