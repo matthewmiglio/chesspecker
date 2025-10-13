@@ -45,8 +45,8 @@ export default function ContactPage() {
       icon: MessageSquare,
       label: "Discord",
       value: "matt03416",
-      href: null,
-      external: false,
+      href: "https://discord.com/users/204047286102261761",
+      external: true,
     },
     {
       icon: Globe,
