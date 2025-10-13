@@ -73,8 +73,13 @@ export default function AccuracyStatsPage() {
       fetchAccuracyData(selectedSetId, setAccuracyData, setIsAccuracyChecked);
     } else {
       console.log('[Dashboard] No set selected yet');
+      // If no sets available and sets have been checked, mark accuracy as checked too
+      if (isSetsChecked && userSets.length === 0) {
+        console.log('[Dashboard] No sets available, marking accuracy as checked');
+        setIsAccuracyChecked(true);
+      }
     }
-  }, [selectedSetId]);
+  }, [selectedSetId, isSetsChecked, userSets.length]);
 
 
   // Get the selected set to check its repeat_index and puzzle_index
@@ -105,7 +110,9 @@ export default function AccuracyStatsPage() {
             />
           )}
 
-          {hasInsufficientRepeats ? (
+          {userSets.length === 0 ? (
+            <NoDataCard noSets />
+          ) : hasInsufficientRepeats ? (
             <NoDataCard hasInsufficientRepeats />
           ) : filteredAccuracyData.length > 0 ? (
             <AccuracyChartCard accuracyData={filteredAccuracyData} />
