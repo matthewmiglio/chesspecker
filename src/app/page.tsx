@@ -77,10 +77,15 @@ function TestimonialsCarousel({
   themeColor: string;
   autoAdvanceMs?: number;
 }) {
-  // Start at a random testimonial on each page load
-  const [index, setIndex] = useState(() => Math.floor(Math.random() * TESTIMONIALS.length));
+  // Start at 0 for SSR, then randomize on mount to avoid hydration mismatch
+  const [index, setIndex] = useState(0);
   const size = TESTIMONIALS.length;
   const timerRef = useRef<number | null>(null);
+
+  // Randomize starting index after mount (client-side only)
+  useEffect(() => {
+    setIndex(Math.floor(Math.random() * TESTIMONIALS.length));
+  }, []);
 
   const go = (next: number) => {
     setIndex((prev) => (prev + next + size) % size);
@@ -204,9 +209,8 @@ export default function Home() {
             fill
             style={{ objectFit: "contain" }}
             priority
-            className={`transition-opacity duration-700 ease-in-out ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
+            className={`transition-opacity duration-700 ease-in-out ${imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
             onLoad={() => setImageLoaded(true)}
           />
         </div>
