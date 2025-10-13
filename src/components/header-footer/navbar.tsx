@@ -6,7 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import LoginButton from "./LoginButton";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart } from "lucide-react";
 import LoginStreakDisplay from "./LoginStreakDisplay";
 
 export default function Navbar() {
@@ -15,13 +15,13 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Practice", href: "/puzzles" },
-    { name: "Create", href: "/create" },
-    { name: "Performance", href: "/dashboard" },
-    { name: "About", href: "/about" },
-    { name: "Feedback", href: "/feedback" },
-    { name: "Donate", href: "/donate" },
+    { name: "Home", href: "/", icon: Home },
+    { name: "Practice", href: "/puzzles", icon: Puzzle },
+    { name: "Create", href: "/create", icon: Plus },
+    { name: "Performance", href: "/dashboard", icon: BarChart3 },
+    { name: "About", href: "/about", icon: Info },
+    { name: "Feedback", href: "/feedback", icon: MessageSquare },
+    { name: "Donate", href: "/donate", icon: Heart },
   ];
 
 
@@ -51,19 +51,20 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <div className="flex flex-col gap-2 flex-1">
-          {navLinks.map(({ name, href }) => {
+          {navLinks.map(({ name, href, icon: Icon }) => {
             const isActive = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
-                className="relative font-medium transition-all duration-200 px-4 py-3 rounded-lg"
+                className="relative font-medium transition-all duration-200 px-4 py-3 rounded-lg flex items-center gap-3"
                 style={{
                   color: isActive ? themeColor : "var(--muted-foreground)",
                   background: isActive ? `${themeColor}15` : "transparent",
                 }}
               >
-                {name}
+                <Icon className="w-5 h-5" />
+                <span>{name}</span>
                 {isActive && (
                   <span
                     className="absolute left-0 top-0 h-full w-[3px] rounded-r-full animate-pulse"
@@ -130,11 +131,11 @@ export default function Navbar() {
             }}
           >
             <div className="container mx-auto px-4 py-4 flex flex-col gap-y-4 text-base">
-              {navLinks.map(({ name, href }) => (
+              {navLinks.map(({ name, href, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="block px-3 py-2 rounded-md font-medium transition-colors"
+                  className="flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-colors"
                   style={{
                     color:
                       pathname === href ? themeColor : "var(--muted-foreground)",
@@ -143,7 +144,8 @@ export default function Navbar() {
                   }}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {name}
+                  <Icon className="w-5 h-5" />
+                  <span>{name}</span>
                 </Link>
               ))}
 
