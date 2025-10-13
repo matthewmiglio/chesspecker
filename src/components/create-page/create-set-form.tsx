@@ -6,7 +6,10 @@ import SetSizeInput from "@/components/create-page/set-size-input";
 import { Button } from "@/components/ui/button";
 import {
   CardContent,
-  CardFooter
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription
 } from "@/components/ui/card";
 import FancyNameInput from "@/components/create-page/set-name-input";
 import RepeatCountInput from "@/components/create-page/repeat-count-input";
@@ -37,10 +40,15 @@ export default function CreateSetForm({
   handleCreateSetButton,
 }: CreateSetFormProps) {
   return (
-    <form onSubmit={handleCreateSetButton} className="space-y-6">
-     
+    <form onSubmit={handleCreateSetButton}>
+      <CardHeader>
+        <CardTitle>Configure Your Puzzle Set</CardTitle>
+        <CardDescription>
+          Customize your training experience by setting the difficulty, size, and number of repeats
+        </CardDescription>
+      </CardHeader>
 
-      <CardContent className="mt-8 space-y-6">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
 
           <FancyNameInput value={name} onChange={setName} />

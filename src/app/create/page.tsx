@@ -33,10 +33,6 @@ export default function CreatePuzzleSetPage() {
   const [puzzleProgress, setPuzzleProgress] = useState(0);
   const [accuracyProgress, setAccuracyProgress] = useState(0);
 
-  // Always use dark mode color
-  const themeColor = "var(--red-progress-color)";
-
-
   const addNewSetToDatabase = async (
     elo: number,
     size: number,
@@ -193,46 +189,39 @@ export default function CreatePuzzleSetPage() {
   };
 
   return (
-    <div className="max-w-[90%] mx-auto">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="pt-6 text-3xl font-bold mb-6"></h1>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Create Puzzle Set</h1>
 
-        <div
-          className="rounded-xl p-[2px] transition-all duration-300"
-          style={{
-            boxShadow: `0 0 12px ${themeColor}`,
-            border: `3px solid ${themeColor}`,
-            borderRadius: "1rem",
-          }}
+      <div className="max-w-2xl">
+        <Card
+          className={
+            !isLoggedIn
+              ? "blur-sm pointer-events-none opacity-50"
+              : ""
+          }
         >
-          <Card
-            className={
-              !isLoggedIn
-                ? "blur-sm pointer-events-none opacity-50"
-                : "rounded-xl"
-            }
-          >
-            <CreateSetForm
-              name={name}
-              setName={setName}
-              description={description}
-              setDescription={setDescription}
-              repeatCount={repeatCount}
-              setRepeatCount={setRepeatCount}
-              setSize={setSize}
-              setSetSize={setSetSize}
-              difficultySliderValue={difficultySliderValue}
-              setDifficultySliderValue={setDifficultySliderValue}
-              handleCreateSetButton={handleCreateSetButton}
-            />
-          </Card>
-        </div>
+          <CreateSetForm
+            name={name}
+            setName={setName}
+            description={description}
+            setDescription={setDescription}
+            repeatCount={repeatCount}
+            setRepeatCount={setRepeatCount}
+            setSize={setSize}
+            setSetSize={setSetSize}
+            difficultySliderValue={difficultySliderValue}
+            setDifficultySliderValue={setDifficultySliderValue}
+            handleCreateSetButton={handleCreateSetButton}
+          />
+        </Card>
 
         {isCreatingSet && (
-          <PuzzleSetCreationProgress
-            puzzleProgress={puzzleProgress}
-            accuracyProgress={accuracyProgress}
-          />
+          <div className="mt-6">
+            <PuzzleSetCreationProgress
+              puzzleProgress={puzzleProgress}
+              accuracyProgress={accuracyProgress}
+            />
+          </div>
         )}
       </div>
     </div>
