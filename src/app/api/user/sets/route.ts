@@ -95,32 +95,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Rate limiting: 20 requests per hour per user email
-  const { setCreationLimiter } = await import("@/lib/rateLimit");
-
-  if (setCreationLimiter) {
-    const { success, limit, remaining, reset } = await setCreationLimiter.limit(session.user.email);
-
-    if (!success) {
-      return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Please try again later.",
-          limit,
-          remaining,
-          reset: new Date(reset).toISOString()
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': limit.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': reset.toString(),
-          }
-        }
-      );
-    }
-  }
-
   try {
     const body = await request.json();
 

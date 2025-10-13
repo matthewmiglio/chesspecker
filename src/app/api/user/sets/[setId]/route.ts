@@ -45,63 +45,62 @@ export async function DELETE(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // First verify the set belongs to this user
-    console.log('[API DELETE /user/sets/:setId] Verifying ownership');
-    const { data: setData, error: fetchError } = await supabase
-      .from("chessPeckerSets")
-      .select("email")
-      .eq("set_id", setId)
-      .single();
+    console.log('[API DELETE /user/sets/:setId] Calling delete_user_set RPC');
 
-    if (fetchError || !setData) {
-      console.error('[API DELETE /user/sets/:setId] Set not found:', fetchError);
+    // Call the delete_user_set SQL function
+    // This function handles ownership verification, cascading deletes, and returns stats
+    const { data, error } = await supabase
+      .rpc('delete_user_set', {
+        user_email: session.user.email,
+        p_set_id: setId
+      });
+
+    if (error) {
+      console.error('[API DELETE /user/sets/:setId] RPC error:', error);
+
+      // Handle specific error cases
+      if (error.message.includes('not found')) {
+        return NextResponse.json(
+          { error: "Set not found" },
+          { status: 404 }
+        );
+      }
+
+      if (error.message.includes('Forbidden') || error.message.includes('does not own')) {
+        return NextResponse.json(
+          { error: "Unauthorized: You do not own this set" },
+          { status: 403 }
+        );
+      }
+
       return NextResponse.json(
-        { error: "Set not found" },
-        { status: 404 }
-      );
-    }
-
-    if (setData.email !== session.user.email) {
-      console.error('[API DELETE /user/sets/:setId] Ownership mismatch');
-      return NextResponse.json(
-        { error: "Unauthorized: You do not own this set" },
-        { status: 403 }
-      );
-    }
-
-    // Delete accuracy records first
-    console.log('[API DELETE /user/sets/:setId] Deleting accuracy records');
-    const { error: accError } = await supabase
-      .from("chessPeckerSetAccuracies")
-      .delete()
-      .eq("set_id", setId);
-
-    if (accError) {
-      console.error('[API DELETE /user/sets/:setId] Error deleting accuracies:', accError);
-      return NextResponse.json(
-        { error: accError.message },
+        { error: error.message },
         { status: 500 }
       );
     }
 
-    // Delete the set
-    console.log('[API DELETE /user/sets/:setId] Deleting set');
-    const { error: setError } = await supabase
-      .from("chessPeckerSets")
-      .delete()
-      .eq("set_id", setId);
+    // data is an array with one row containing deletion stats
+    const result = data?.[0];
 
-    if (setError) {
-      console.error('[API DELETE /user/sets/:setId] Error deleting set:', setError);
+    if (!result?.set_deleted) {
+      console.error('[API DELETE /user/sets/:setId] Set was not deleted');
       return NextResponse.json(
-        { error: setError.message },
+        { error: "Failed to delete set" },
         { status: 500 }
       );
     }
 
-    console.log('[API DELETE /user/sets/:setId] Successfully deleted');
+    console.log('[API DELETE /user/sets/:setId] Successfully deleted:', {
+      setId: result.deleted_set_id,
+      accuraciesDeleted: result.accuracies_deleted
+    });
+
     return NextResponse.json(
-      { message: "Set and related accuracy records deleted successfully" },
+      {
+        message: "Set and related accuracy records deleted successfully",
+        deletedSetId: result.deleted_set_id,
+        accuraciesDeleted: result.accuracies_deleted
+      },
       { status: 200 }
     );
   } catch (err) {

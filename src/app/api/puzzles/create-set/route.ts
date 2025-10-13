@@ -1,34 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabaseClient";
-import { puzzleCreationLimiter, getClientIdentifier } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
   console.log('[API GET /puzzles/create-set] Request received');
-
-  // Rate limiting: 10 requests per hour per IP
-  if (puzzleCreationLimiter) {
-    const identifier = getClientIdentifier(req);
-    const { success, limit, remaining, reset } = await puzzleCreationLimiter.limit(identifier);
-
-    if (!success) {
-      return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Please try again later.",
-          limit,
-          remaining,
-          reset: new Date(reset).toISOString()
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': limit.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': reset.toString(),
-          }
-        }
-      );
-    }
-  }
 
   const { searchParams } = new URL(req.url);
   const targetParam = searchParams.get("target");

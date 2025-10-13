@@ -17,33 +17,6 @@ export async function POST(req: Request) {
   console.log('[API POST /analytics/add_event] Request received');
 
   try {
-    // Rate limiting: 100 requests per minute per IP
-    const { analyticsLimiter, getClientIdentifier } = await import('@/lib/rateLimit');
-
-    if (analyticsLimiter) {
-      const identifier = getClientIdentifier(req);
-      const { success, limit, remaining, reset } = await analyticsLimiter.limit(identifier);
-
-      if (!success) {
-        return NextResponse.json(
-          {
-            error: "Rate limit exceeded. Please try again later.",
-            limit,
-            remaining,
-            reset: new Date(reset).toISOString()
-          },
-          {
-            status: 429,
-            headers: {
-              'X-RateLimit-Limit': limit.toString(),
-              'X-RateLimit-Remaining': remaining.toString(),
-              'X-RateLimit-Reset': reset.toString(),
-            }
-          }
-        );
-      }
-    }
-
     const body = await req.json();
     console.log('[API POST /analytics/add_event] Request body:', body);
 

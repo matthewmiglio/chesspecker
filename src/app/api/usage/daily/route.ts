@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { dailyStatsLimiter, getClientIdentifier } from "@/lib/rateLimit";
 
 /**
  * POST /api/usage/daily
@@ -21,31 +20,6 @@ import { dailyStatsLimiter, getClientIdentifier } from "@/lib/rateLimit";
  */
 export async function POST(request: NextRequest) {
   console.log('[API POST /usage/daily] Request received');
-
-  // Rate limiting: 100 requests per minute per IP
-  if (dailyStatsLimiter) {
-    const identifier = getClientIdentifier(request);
-    const { success, limit, remaining, reset } = await dailyStatsLimiter.limit(identifier);
-
-    if (!success) {
-      return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Please try again later.",
-          limit,
-          remaining,
-          reset: new Date(reset).toISOString()
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': limit.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': reset.toString(),
-          }
-        }
-      );
-    }
-  }
 
   try {
     const body = await request.json();
