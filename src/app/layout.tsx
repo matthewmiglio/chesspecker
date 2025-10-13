@@ -86,8 +86,10 @@ export default function RootLayout({
         <Providers>
           <AnalyticsProvider>
             <Navbar />
-            {children}
-            <Footer />
+            <div className="lg:pl-64">
+              {children}
+              <Footer />
+            </div>
             <Analytics />
           </AnalyticsProvider>
         </Providers>
