@@ -192,6 +192,13 @@ export default function ChessBoardWrapper({
         <Card className="flex-1 lg:max-w-[35%] p-6">
           <div className="space-y-6">
 
+            {/* To Move Indicator */}
+            <div className="text-center pb-2 border-b border-border">
+              <span className="text-sm font-medium text-muted-foreground">
+                {playerSide === "w" ? "White" : "Black"} to move
+              </span>
+            </div>
+
             {/* Accuracy Stat Card */}
             <div
               className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"

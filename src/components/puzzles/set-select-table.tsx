@@ -75,7 +75,7 @@ export default function SetSelectTable({
   return (
     <div
       className={cn(
-        "w-[90%] mx-auto grid gap-4 py-8",
+        "w-[90%] ml-[5%] grid gap-6 py-8",
         gridColsClass
       )}
     >
@@ -89,21 +89,17 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        // Brighter, more varied colors based on progress
+        // Color scheme matching stats window style
         const progressColor =
           progressPercent >= 80
-            ? "#22c55e" // Bright green
+            ? "rgb(34, 197, 94)" // green
             : progressPercent >= 60
-            ? "#3b82f6" // Bright blue
+            ? "rgb(59, 130, 246)" // blue
             : progressPercent >= 40
-            ? "#f59e0b" // Bright amber/orange
+            ? "rgb(234, 179, 8)" // yellow
             : progressPercent >= 20
-            ? "#ef4444" // Bright red
-            : "#8b5cf6"; // Bright purple (for very low progress)
-
-        const progressColorStyle = {
-          backgroundColor: progressColor,
-        };
+            ? "rgb(239, 68, 68)" // red
+            : "rgb(168, 85, 247)"; // purple (for very low progress)
 
         return (
           <div
@@ -135,32 +131,38 @@ export default function SetSelectTable({
               }
             }}
             className={cn(
-              "relative bg-card text-card-foreground rounded-xl shadow-md p-4 hover:scale-[1.02] transition-all cursor-pointer group",
+              "relative bg-card text-card-foreground rounded-lg border-2 p-6 hover:shadow-lg transition-all duration-300 cursor-pointer",
               isSelected && "ring-[2px] ring-offset-2 ring-offset-background"
             )}
+            style={{
+              borderColor: progressColor,
+              backgroundColor: `${progressColor}15`,
+            }}
           >
-            <div className="mb-3">
-              <div className="text-base font-bold mb-1 leading-tight line-clamp-2">
-                {set.name}
+            <div className="mb-4">
+              <div className="flex items-start justify-between mb-2">
+                <div className="text-base font-bold leading-tight line-clamp-2 flex-1">
+                  {set.name}
+                </div>
+                <span className="text-lg ml-2">
+                  {set.elo >= 1200 ? "🔥" : "🧩"}
+                </span>
               </div>
               <div className="text-xs text-muted-foreground">ELO {set.elo}</div>
             </div>
-            <span className="absolute top-2 right-2 text-lg opacity-60">
-              {set.elo >= 1200 ? "🔥" : "🧩"}
-            </span>
 
             <Progress
               value={progressPercent}
               className="h-2 rounded-full bg-muted/50"
               barClassName=""
-              style={progressColorStyle}
+              style={{ backgroundColor: progressColor }}
             />
 
-            <div className="mt-2 text-xs text-muted-foreground">
+            <div className="mt-3 text-xs text-muted-foreground">
               {solvedPuzzles} / {totalPuzzles} ({Math.round(progressPercent)}%)
             </div>
 
-            <div className="flex justify-end mt-3">
+            <div className="flex justify-end mt-4">
               <Button
                 variant="ghost"
                 size="icon"
