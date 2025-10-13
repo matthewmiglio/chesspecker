@@ -132,7 +132,7 @@ export default function SetSelectTable({
             }}
             className={cn(
               "relative bg-card text-card-foreground rounded-lg border-2 p-6 hover:shadow-lg transition-all duration-300 cursor-pointer",
-              isSelected && "ring-[2px] ring-offset-2 ring-offset-background"
+              isSelected && "shadow-[0_0_25px_rgba(234,179,8,0.9)]"
             )}
             style={{
               borderColor: progressColor,
