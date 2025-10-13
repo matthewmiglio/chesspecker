@@ -49,7 +49,8 @@ function TestimonialsCarousel({
   themeColor: string;
   autoAdvanceMs?: number;
 }) {
-  const [index, setIndex] = useState(0);
+  // Start at a random testimonial on each page load
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * TESTIMONIALS.length));
   const size = TESTIMONIALS.length;
   const timerRef = useRef<number | null>(null);
 
