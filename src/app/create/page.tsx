@@ -1,8 +1,7 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
@@ -34,16 +33,8 @@ export default function CreatePuzzleSetPage() {
   const [puzzleProgress, setPuzzleProgress] = useState(0);
   const [accuracyProgress, setAccuracyProgress] = useState(0);
 
-  const { resolvedTheme } = useTheme();
-  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
-
-  useEffect(() => {
-    setThemeColor(
-      resolvedTheme === "dark"
-        ? "var(--red-progress-color)"
-        : "var(--blue-progress-color)"
-    );
-  }, [resolvedTheme]);
+  // Always use dark mode color
+  const themeColor = "var(--red-progress-color)";
 
 
   const addNewSetToDatabase = async (

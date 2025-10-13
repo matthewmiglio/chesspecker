@@ -19,10 +19,10 @@ interface ToastProps {
 }
 
 const toastStyles = {
-  success: "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300",
-  error: "bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300",
-  warning: "bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300",
-  info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300",
+  success: "bg-green-900/20 border-green-800 text-green-300",
+  error: "bg-red-900/20 border-red-800 text-red-300",
+  warning: "bg-yellow-900/20 border-yellow-800 text-yellow-300",
+  info: "bg-blue-900/20 border-blue-800 text-blue-300",
 };
 
 const toastIcons = {
@@ -53,7 +53,7 @@ export function ToastComponent({ toast, onDismiss }: ToastProps) {
         </div>
         <button
           onClick={() => onDismiss(toast.id)}
-          className="flex-shrink-0 p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          className="flex-shrink-0 p-1 rounded-md hover:bg-white/10 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>

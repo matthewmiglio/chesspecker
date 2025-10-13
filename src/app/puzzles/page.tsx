@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
 
 import { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
 import {
@@ -10,6 +9,7 @@ import {
   getSetAccuracy,
   getSetProgress,
 } from "@/lib/api/puzzleApi";
+import { deleteUserSet } from "@/lib/api/setsApi";
 
 import { PuzzleSet } from "@/lib/types";
 
@@ -24,7 +24,6 @@ import FeedbackCTA from "@/components/puzzles/FeedbackCTA";
 
 export default function PuzzlesPage() {
   const { data: session, status: authStatus } = useSession();
-  const { resolvedTheme } = useTheme();
   const userIsLoggedIn = authStatus === "authenticated";
   const isAuthChecked = authStatus !== "loading";
 
@@ -81,22 +80,16 @@ export default function PuzzlesPage() {
   const selectedSetIsDone =
     !!selectedSet && currentRepeatIndex >= (selectedSet?.repeats ?? Infinity);
 
-  const heroImage =
-    resolvedTheme === "dark"
-      ? "/heros/chess-focus-white.png"
-      : "/heros/chess-focus-black.png";
+  // Always use dark mode image
+  const heroImage = "/heros/chess-focus-white.png";
 
   const handleSetDelete = async (setId: number) => {
     const confirmed = await showConfirmDeletePopup();
     if (!confirmed) return;
 
-    const res = await fetch("/api/sets/removeSet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ set_id: setId }),
-    });
+    const success = await deleteUserSet(setId);
 
-    if (res.ok) {
+    if (success) {
       setUserSets((prev) => prev.filter((set) => set.set_id !== setId));
       if (selectedSetId === setId) {
         setSelectedSetId(null);

@@ -1,20 +1,6 @@
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-
 /**
- * Returns red if dark mode, blue if light mode.
+ * Returns the accent color for the theme (always red since we only have dark mode).
  */
 export const useThemeAccentColor = (): string => {
-  const { resolvedTheme } = useTheme();
-  const [color, setColor] = useState("var(--red-progress-color)");
-
-  useEffect(() => {
-    setColor(
-      resolvedTheme === "dark"
-        ? "var(--red-progress-color)"
-        : "var(--blue-progress-color)"
-    );
-  }, [resolvedTheme]);
-
-  return color;
+  return "var(--red-progress-color)";
 };

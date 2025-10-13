@@ -5,7 +5,6 @@ import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "./mode-toggle";
 import LoginButton from "./LoginButton";
 import { Menu, X } from "lucide-react";
 import LoginStreakDisplay from "./LoginStreakDisplay";
@@ -80,12 +79,10 @@ export default function Navbar() {
           <LoginStreakDisplay />
 
           <LoginButton />
-          <ModeToggle />
         </div>
 
         {/* Mobile Toggle */}
         <div className="flex items-center gap-3 sm:hidden">
-          <ModeToggle />
           <Button
             variant="ghost"
             size="icon"

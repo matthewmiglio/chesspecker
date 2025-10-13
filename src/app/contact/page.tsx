@@ -2,8 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Github, MessageSquare, Globe, ExternalLink } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 const personStructuredData = {
   "@context": "https://schema.org",
@@ -25,16 +23,8 @@ const personStructuredData = {
 };
 
 export default function ContactPage() {
-  const { resolvedTheme } = useTheme();
-  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
-
-  useEffect(() => {
-    setThemeColor(
-      resolvedTheme === "dark"
-        ? "var(--red-progress-color)"
-        : "var(--blue-progress-color)"
-    );
-  }, [resolvedTheme]);
+  // Always use dark mode color
+  const themeColor = "var(--red-progress-color)";
 
   const contactMethods = [
     {

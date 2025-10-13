@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-green-progress-color: var(--green-progress-color);
@@ -48,62 +46,8 @@
 
 :root {
   --radius: 0.625rem;
-  --background: rgb(255, 255, 255);
-
-
-  --green-progress-color : rgb(24, 190, 93);
-  --red-progress-color : rgb(244, 67, 54);
-  --yellow-progress-color : rgb(255, 235, 59);
-  --blue-progress-color: rgb(66, 165, 245);
-  --violet-progress-color: rgb(138, 43, 226);
-  --red-color: rgb(244, 67, 54);
-  --orange-color: rgb(255, 111, 0);
-  --yellow-color: rgb(255, 235, 59);
-  --green-color: rgb(0, 200, 83);
-  --indigo-color: rgb(63, 81, 181);
-  --blue-color: rgb(66, 165, 245);
-  --violet-color: rgb(138, 43, 226);
-  --icon-green: var(--green-progress-color);
-  --icon-red: var(--red-progress-color);
-  --icon-yellow: rgb(255, 193, 7);
-
-  --foreground: rgb(37, 37, 37);
-
-  --card: rgb(245, 245, 245);
-
-  --card-foreground: rgb(37, 37, 37);
-
-  --popover: rgb(255, 255, 255);
-
-  --popover-foreground: rgb(37, 37, 37);
-
-  --primary: rgb(50, 50, 50);
-
-  --primary-foreground: rgb(250, 250, 250);
-
-  --secondary: rgb(245, 245, 245);
-
-  --secondary-foreground: rgb(50, 50, 50);
-
-  --muted: rgb(245, 245, 245);
-
-  --muted-foreground: rgb(140, 140, 140);
-
-  --accent: rgb(245, 245, 245);
-
-  --accent-foreground: rgb(50, 50, 50);
-
-  --border: rgb(235, 235, 235);
-
-  --input: rgb(235, 235, 235);
-
-  --ring: rgb(180, 180, 180);
-}
-
-html.dark {
   --background: rgb(20, 20, 20);
 
-
   --green-progress-color : rgb(24, 190, 93);
   --red-progress-color : rgb(244, 67, 54);
   --yellow-progress-color : rgb(255, 235, 59);
@@ -119,7 +63,6 @@ html.dark {
   --icon-green: var(--green-progress-color);
   --icon-red: var(--red-progress-color);
   --icon-yellow: rgb(255, 193, 7);
-
 
   --foreground: rgb(245, 245, 245);
 

@@ -1,10 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import HomeStructuredData from "@/components/structured-data/HomeStructuredData";
 
@@ -158,28 +158,10 @@ function TestimonialsCarousel({
 
 /* ---------- Page ---------- */
 export default function Home() {
-  const { resolvedTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
-  const [themeColor, setThemeColor] = useState("var(--red-progress-color)");
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setThemeColor(
-      resolvedTheme === "dark"
-        ? "var(--red-progress-color)"
-        : "var(--blue-progress-color)"
-    );
-  }, [resolvedTheme]);
-
-  if (!isMounted) return null;
-
-  const heroImage =
-    resolvedTheme === "dark"
-      ? "/heros/chess_duel_white.png"
-      : "/heros/chess_duel_black.png";
+  // Always use dark mode styling
+  const themeColor = "var(--red-progress-color)";
+  const heroImage = "/heros/chess_duel_white.png";
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
@@ -193,10 +175,14 @@ export default function Home() {
             fill
             style={{ objectFit: "contain" }}
             priority
+            className={`transition-opacity duration-700 ease-in-out ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setImageLoaded(true)}
           />
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-snug md:leading-snug">
           Chess Tactics Training with the <span style={{ color: themeColor }}>Woodpecker Method</span>
         </h1>
 

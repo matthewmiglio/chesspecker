@@ -81,7 +81,7 @@ export default function PuzzleSetCreationProgress({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
-      <div className="w-full max-w-sm mx-4 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-primary/10">
+      <div className="w-full max-w-sm mx-4 p-6 bg-gray-900 rounded-2xl shadow-2xl border-2 border-primary/10">
        
 
         {/* Current Step Information */}

@@ -4,7 +4,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
-import { useTheme } from "next-themes";
 import { ChessPeckerPuzzle } from "@/lib/types";
 
 type ChessBoardWrapperProps = {
@@ -58,7 +57,6 @@ export default function ChessBoardWrapper({
   setAutoShowSolution,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
-  const { resolvedTheme } = useTheme();
   const [showHintHighlight, setShowHintHighlight] = useState(false);
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
@@ -114,9 +112,8 @@ export default function ChessBoardWrapper({
   const getHintButtonStyle = () => {
     if (!showHintHighlight) return {};
 
-    const outlineColor = resolvedTheme === "dark"
-      ? "rgb(244, 67, 54)" // red for dark mode
-      : "rgb(66, 165, 245)"; // blue for light mode
+    // Always use red color for dark mode
+    const outlineColor = "rgb(244, 67, 54)";
 
     return {
       borderColor: outlineColor,

@@ -1,27 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 export default function NoDataCard() {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const heroImage =
-    resolvedTheme === "dark"
-      ? "/heros/chess-boy-white.png"
-      : "/heros/chess-boy-black.png";
-
-  if (!mounted) {
-    return null;
-  }
+  // Always use dark mode image
+  const heroImage = "/heros/chess-boy-white.png";
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center text-center px-4 py-12">
@@ -34,7 +21,10 @@ export default function NoDataCard() {
           style={{ objectFit: "contain" }}
           priority
           sizes="(max-width: 768px) 100vw, 400px"
-          className="rounded-xl"
+          className={`rounded-xl transition-opacity duration-700 ease-in-out ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setImageLoaded(true)}
         />
       </div>
 

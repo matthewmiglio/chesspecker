@@ -223,7 +223,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               <Button type="submit" className="w-full sm:w-auto" disabled={!canSubmit} aria-disabled={!canSubmit}>
                 {label}
               </Button>
-              <Button asChild variant="outline" className="w-full sm:w-auto border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950">
+              <Button asChild variant="outline" className="w-full sm:w-auto border-orange-500 text-orange-600 hover:bg-orange-950 hover:text-orange-700">
                 <Link href="https://donate.stripe.com/4gM7sN3Vj4vO2u4dzF4Ja04" target="_blank" rel="noopener noreferrer">
                   Support ChessPecker ❤️
                 </Link>

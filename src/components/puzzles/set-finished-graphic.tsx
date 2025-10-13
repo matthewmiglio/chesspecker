@@ -9,20 +9,11 @@ export default function SetFinishedGraphic() {
     <div className="flex flex-col items-center justify-center text-center px-4 py-12 animate-fadeIn">
       {/* Hero Image */}
       <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg aspect-square mb-8">
-        {/* Light mode image */}
-        <Image
-          src="/set-completed-hero-black.png"
-          alt="Celebratory Chess Pieces (Light Mode)"
-          fill
-          className="block dark:hidden object-contain drop-shadow-lg"
-          priority
-        />
-        {/* Dark mode image */}
         <Image
           src="/set-completed-hero-white.png"
-          alt="Celebratory Chess Pieces (Dark Mode)"
+          alt="Celebratory Chess Pieces"
           fill
-          className="hidden dark:block object-contain drop-shadow-2xl"
+          className="object-contain drop-shadow-2xl"
           priority
         />
       </div>

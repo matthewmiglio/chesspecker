@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import CreateSetButton from "@/components/puzzles/create-set-button";
 import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
@@ -18,6 +19,8 @@ export default function PuzzleEmptyState({
   userIsLoggedIn,
   selectedSetExists,
 }: PuzzleEmptyStateProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <div className="mx-auto flex items-center justify-center h-full min-h-[400px] border bg-muted/20">
       <div className="text-center p-8">
@@ -30,7 +33,10 @@ export default function PuzzleEmptyState({
                 fill
                 style={{ objectFit: "contain" }}
                 priority
-                className="rounded-xl"
+                className={`rounded-xl transition-opacity duration-700 ease-in-out ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setImageLoaded(true)}
               />
             </div>
             <div className="text-muted-foreground text-lg tracking-wide animate-fade-in">

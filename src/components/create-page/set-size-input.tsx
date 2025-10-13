@@ -47,13 +47,13 @@ export default function SetSizeInput({ value, onChange }: SetSizeInputProps) {
       
       <div className="flex items-center gap-1">
         {segments.map((segment, index) => (
-          <div key={index} className="relative w-8 h-2 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
+          <div key={index} className="relative w-8 h-2 bg-gray-700 rounded-sm overflow-hidden">
             {segment.filled && (
-              <div className="absolute inset-0 bg-blue-500 dark:bg-red-500" />
+              <div className="absolute inset-0 bg-red-500" />
             )}
             {segment.partial && (
-              <div 
-                className="absolute inset-0 bg-blue-500 dark:bg-red-500 transition-all duration-200" 
+              <div
+                className="absolute inset-0 bg-red-500 transition-all duration-200" 
                 style={{ width: `${segment.progress}%` }}
               />
             )}
