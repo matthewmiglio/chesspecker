@@ -17,6 +17,8 @@ export default function AboutPage() {
   if (!isMounted) return null;
 
 
+   
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-background via-background to-background/95">
       <AboutStructuredData />

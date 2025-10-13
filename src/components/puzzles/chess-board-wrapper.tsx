@@ -5,6 +5,7 @@ import AnimatedBoard from "@/components/puzzles/chess-board";
 import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { ChessPeckerPuzzle } from "@/lib/types";
+import { useToast } from "@/lib/hooks/useToast";
 
 type ChessBoardWrapperProps = {
   fen: string;
@@ -57,9 +58,11 @@ export default function ChessBoardWrapper({
   setAutoShowSolution,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
+  const { success, error } = useToast();
   const [showHintHighlight, setShowHintHighlight] = useState(false);
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
   const [autoNextPuzzle, setAutoNextPuzzle] = useState(false);
+  const [isCopyPressed, setIsCopyPressed] = useState(false);
 
   useEffect(() => {
     if (selectedSetId && puzzleSession && !puzzleSession.isSessionActive) {
@@ -123,16 +126,23 @@ export default function ChessBoardWrapper({
 
   const handleCopyFen = async () => {
     if (!puzzleIds || puzzleIds.length === 0 || currentPuzzleIndex >= puzzleIds.length) {
+      error("No puzzle available to copy");
       return;
     }
 
     // Get the starting FEN from puzzle data (not current position)
     const startingFen = puzzleSession.currentPuzzleData?.puzzle?.FEN || fen;
 
+    // Trigger pressed animation
+    setIsCopyPressed(true);
+    setTimeout(() => setIsCopyPressed(false), 150);
+
     try {
       await navigator.clipboard.writeText(startingFen);
-    } catch (error) {
-      console.error('Failed to copy FEN to clipboard:', error);
+      success("FEN copied to clipboard!");
+    } catch (err) {
+      console.error('Failed to copy FEN to clipboard:', err);
+      error("Failed to copy FEN to clipboard");
     }
   };
 
@@ -350,7 +360,9 @@ export default function ChessBoardWrapper({
               <Button
                 onClick={handleCopyFen}
                 variant="ghost"
-                className="w-full flex items-center justify-center gap-3 py-3"
+                className={`w-full flex items-center justify-center gap-3 py-3 transition-all duration-150 hover:bg-muted/80 hover:scale-[1.02] active:scale-95 active:brightness-75 ${
+                  isCopyPressed ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 <Copy className="h-4 w-4" />
                 Copy FEN
