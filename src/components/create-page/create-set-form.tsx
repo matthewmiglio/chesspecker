@@ -2,6 +2,7 @@ import type React from "react";
 
 import EloTargetInput from "@/components/create-page/set-elo-input";
 import SetSizeInput from "@/components/create-page/set-size-input";
+import ThemeSelector from "@/components/create-page/theme-selector";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,8 @@ type CreateSetFormProps = {
   setSetSize: (value: number) => void;
   difficultySliderValue: number;
   setDifficultySliderValue: (value: number) => void;
+  selectedThemes: string[];
+  setSelectedThemes: (themes: string[]) => void;
   handleCreateSetButton: (e: React.FormEvent) => void;
 };
 
@@ -36,6 +39,8 @@ export default function CreateSetForm({
   setSetSize,
   difficultySliderValue,
   setDifficultySliderValue,
+  selectedThemes,
+  setSelectedThemes,
   handleCreateSetButton,
 }: CreateSetFormProps) {
   return (
@@ -70,6 +75,16 @@ export default function CreateSetForm({
           <EloTargetInput
             value={difficultySliderValue}
             onChange={setDifficultySliderValue}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <label className="text-sm font-medium">
+            Themes
+          </label>
+          <ThemeSelector
+            selectedThemes={selectedThemes}
+            onChange={setSelectedThemes}
           />
         </div>
       </CardContent>

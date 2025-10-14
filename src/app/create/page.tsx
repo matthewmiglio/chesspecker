@@ -9,6 +9,7 @@ import PuzzleSetCreationProgress from "@/components/create-page/set-creation-pro
 import ExistingSets from "@/components/create-page/ExistingSets";
 import { useToast } from "@/lib/hooks/useToast";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
+import { PUZZLE_THEMES_OVER_10K } from "@/lib/constants/puzzleThemes";
 
 import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
@@ -30,6 +31,7 @@ export default function CreatePuzzleSetPage() {
   const [repeatCount, setRepeatCount] = useState<number>(8);
   const [difficultySliderValue, setDifficultySliderValue] =
     useState<number>(1500);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([...PUZZLE_THEMES_OVER_10K]);
 
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
@@ -74,7 +76,7 @@ export default function CreatePuzzleSetPage() {
       info("Creating puzzle set...", "Please wait", 6000);
 
       // Phase 1: Puzzle Generation
-      const puzzleIds = await createNewPuzzleList(size, elo, setPuzzleProgress);
+      const puzzleIds = await createNewPuzzleList(size, elo, selectedThemes, setPuzzleProgress);
 
       if (!puzzleIds || puzzleIds.length === 0) {
         throw new Error('No puzzles were generated');
@@ -140,6 +142,7 @@ export default function CreatePuzzleSetPage() {
   const createNewPuzzleList = async (
     puzzle_count: number,
     targetElo: number,
+    themes: string[],
     onProgress: (progress: number) => void
   ): Promise<string[]> => {
     if (puzzle_count > maxSetSize) {
@@ -147,8 +150,10 @@ export default function CreatePuzzleSetPage() {
     }
 
     try {
+      // Build themes query parameter
+      const themesParam = themes.length > 0 ? themes.join(',') : PUZZLE_THEMES_OVER_10K.join(',');
       const response = await fetch(
-        `/api/puzzles/create-set?target=${targetElo}&size=${puzzle_count}&margin=100&tails_pct=0.10`
+        `/api/puzzles/create-set?target=${targetElo}&size=${puzzle_count}&margin=100&tails_pct=0.10&themes=${themesParam}`
       );
 
       if (!response.ok) {
@@ -184,6 +189,11 @@ export default function CreatePuzzleSetPage() {
 
     if (setSize <= 0 || repeatCount <= 0) {
       error("Please ensure set size and repeat count are valid.", "Invalid Values");
+      return;
+    }
+
+    if (selectedThemes.length === 0) {
+      error("Please select at least one theme.", "No Themes Selected");
       return;
     }
 
@@ -239,6 +249,8 @@ export default function CreatePuzzleSetPage() {
               setSetSize={setSetSize}
               difficultySliderValue={difficultySliderValue}
               setDifficultySliderValue={setDifficultySliderValue}
+              selectedThemes={selectedThemes}
+              setSelectedThemes={setSelectedThemes}
               handleCreateSetButton={handleCreateSetButton}
             />
           </Card>
