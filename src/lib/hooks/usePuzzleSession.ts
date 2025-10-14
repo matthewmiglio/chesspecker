@@ -22,6 +22,9 @@ import {
   incrementUserIncorrect,
 } from "@/lib/api/userStatsApi";
 
+// Animation speed for solution playback (milliseconds per move)
+const SOLUTION_MOVE_MS = 700;
+
 export function usePuzzleSession({
   getSelectedSetId,
   currentRepeatIndex,
@@ -270,7 +273,7 @@ export function usePuzzleSession({
     for (let i = 0; i < remainingSolution.length; i++) {
       const moveUci = remainingSolution[i];
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, SOLUTION_MOVE_MS));
 
       try {
         chess.move({
@@ -294,14 +297,13 @@ export function usePuzzleSession({
     console.log('[showFullSolution] Total moves to replay:', allMoves.length);
 
     const chess = new Chess(startingFen);
-    const moveSpeed = 1200; // milliseconds per move
 
     // Play ALL puzzle moves from the beginning (including opponent's setup)
     for (let i = 0; i < allMoves.length; i++) {
       const moveUci = allMoves[i];
 
-      console.log(`[showFullSolution] Waiting ${moveSpeed}ms before move ${i + 1}/${allMoves.length}: ${moveUci}`);
-      await new Promise((resolve) => setTimeout(resolve, moveSpeed));
+      console.log(`[showFullSolution] Waiting ${SOLUTION_MOVE_MS}ms before move ${i + 1}/${allMoves.length}: ${moveUci}`);
+      await new Promise((resolve) => setTimeout(resolve, SOLUTION_MOVE_MS));
 
       try {
         chess.move({
