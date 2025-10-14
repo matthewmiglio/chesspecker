@@ -157,7 +157,7 @@ export default function SetSelectTable({
               }
             }}
             className={cn(
-              "relative bg-card text-card-foreground rounded-lg border-2 p-6 hover:shadow-lg transition-all duration-300 cursor-pointer",
+              "relative bg-card text-card-foreground rounded-lg border-2 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer",
               isSelected && "shadow-[0_0_25px_rgba(234,179,8,0.9)]"
             )}
             style={{
@@ -165,8 +165,8 @@ export default function SetSelectTable({
               backgroundColor: `${progressColor}15`,
             }}
           >
-            <div className="mb-4">
-              <div className="flex items-start justify-between mb-2">
+            <div className="mb-3">
+              <div className="flex items-start justify-between mb-1">
                 <div className="text-base font-bold leading-tight line-clamp-2 flex-1">
                   {set.name}
                 </div>
@@ -184,11 +184,11 @@ export default function SetSelectTable({
               style={{ backgroundColor: progressColor }}
             />
 
-            <div className="mt-3 text-xs text-muted-foreground">
+            <div className="mt-2 text-xs text-muted-foreground">
               {solvedPuzzles} / {totalPuzzles} ({Math.round(progressPercent)}%)
             </div>
 
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-2">
               <Button
                 variant="ghost"
                 size="icon"
