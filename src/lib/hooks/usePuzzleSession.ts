@@ -13,7 +13,7 @@ import {
   loadPuzzleAndInitialize,
   updateThisSetAccuracy,
   updatePuzzleProgress,
-} from "@/lib/hooks/usePuzzleData";
+} from "@/lib/utils/puzzleHelpers";
 
 import { bumpDailyUsage } from "@/lib/api/usageApi";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { PuzzleSet } from "@/lib/types";
-import { handleSetSelect } from "@/lib/hooks/usePuzzleData";
+import { handleSetSelect } from "@/lib/utils/puzzleHelpers";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
