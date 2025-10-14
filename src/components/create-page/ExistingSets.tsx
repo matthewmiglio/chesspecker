@@ -1,14 +1,17 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 
 type ExistingSetsProps = {
   sets: ChessPeckerSet[];
   isLoading: boolean;
+  onDeleteSet: (setId: number) => void;
 };
 
-export default function ExistingSets({ sets, isLoading }: ExistingSetsProps) {
+export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingSetsProps) {
   if (isLoading) {
     return (
       <Card>
@@ -89,8 +92,21 @@ export default function ExistingSets({ sets, isLoading }: ExistingSetsProps) {
                         </span>
                       </div>
                     </div>
-                    <div className="text-xl ml-2">
-                      {set.elo >= 1800 ? "🔥" : set.elo >= 1400 ? "⚡" : "🧩"}
+                    <div className="flex items-center gap-2 ml-2">
+                      <div className="text-xl">
+                        {set.elo >= 1800 ? "🔥" : set.elo >= 1400 ? "⚡" : "🧩"}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteSet(set.set_id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
 

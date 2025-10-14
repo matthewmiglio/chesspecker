@@ -15,8 +15,9 @@ import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/us
 
 import { bumpDailyUsage } from "@/lib/api/usageApi";
 
-import { getUserSets, createUserSet } from "@/lib/api/setsApi";
+import { getUserSets, createUserSet, deleteUserSet } from "@/lib/api/setsApi";
 import { upsertAccuracy } from "@/lib/api/accuraciesApi";
+import { showConfirmDeletePopup } from "@/components/puzzles/ConfirmDeletePopup";
 
 export default function CreatePuzzleSetPage() {
   const maxSetSize = 500;
@@ -264,6 +265,17 @@ export default function CreatePuzzleSetPage() {
     }
   };
 
+  const handleSetDelete = async (setId: number) => {
+    const confirmed = await showConfirmDeletePopup();
+    if (!confirmed) return;
+
+    const success = await deleteUserSet(setId);
+
+    if (success) {
+      setUserSets((prev) => prev.filter((set) => set.set_id !== setId));
+    }
+  };
+
   const handleCreateSetButton = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -371,7 +383,7 @@ export default function CreatePuzzleSetPage() {
 
         {/* Existing Sets Section */}
         <div>
-          <ExistingSets sets={userSets} isLoading={isSetsLoading} />
+          <ExistingSets sets={userSets} isLoading={isSetsLoading} onDeleteSet={handleSetDelete} />
         </div>
       </div>
     </div>
