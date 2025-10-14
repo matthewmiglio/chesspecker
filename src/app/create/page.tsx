@@ -67,7 +67,7 @@ export default function CreatePuzzleSetPage() {
     size: number,
     repeats: number,
     name: string
-  ) => {
+  ): Promise<{ success: true; set_id: number } | { success: false; phase: string; error: string }> => {
 
     try {
       setIsCreatingSet(true);
@@ -93,9 +93,10 @@ export default function CreatePuzzleSetPage() {
       });
 
       if (!setId) {
-        error("Failed to create puzzle set", "Creation Failed");
+        const errorMsg = "Failed to create puzzle set in database";
+        error(errorMsg, "Creation Failed");
         setIsCreatingSet(false);
-        return null;
+        return { success: false, phase: 'database_insert', error: errorMsg };
       }
 
       // Phase 3: Accuracy Tracking Setup
@@ -130,13 +131,13 @@ export default function CreatePuzzleSetPage() {
 
       setIsCreatingSet(false);
       success(`"${name}" created successfully!`, "Puzzle Set Ready");
-      return { set_id: setId };
+      return { success: true, set_id: setId };
 
     } catch (err) {
       setIsCreatingSet(false);
       const message = err instanceof Error ? err.message : "Unknown error";
       error(`Unexpected error in set creation: ${message}`, "Creation Failed");
-      return null;
+      return { success: false, phase: 'puzzle_generation', error: message };
     }
   };
 
@@ -329,13 +330,29 @@ export default function CreatePuzzleSetPage() {
     );
 
     // Only redirect if creation was successful
-    if (result) {
-      console.log('[handleCreateSetButton] Set creation successful, redirecting...');
+    if (result.success) {
+      console.log('[handleCreateSetButton] Set creation successful, redirecting...', {
+        setId: result.set_id,
+        name,
+        elo: difficultySliderValue,
+        size: setSize,
+        repeats: repeatCount
+      });
       setTimeout(() => {
         window.location.href = "/puzzles";
       }, 1500); // Give time to see success toast
     } else {
-      console.error('[handleCreateSetButton] Set creation failed');
+      console.error('[handleCreateSetButton] Set creation failed', {
+        phase: result.phase,
+        error: result.error,
+        params: {
+          name,
+          elo: difficultySliderValue,
+          size: setSize,
+          repeats: repeatCount,
+          themes: selectedThemes.length > 0 ? selectedThemes : 'all themes'
+        }
+      });
     }
   };
 
