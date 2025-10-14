@@ -3,7 +3,9 @@
 **Assemble. Practice. Repeat. Share.**  
 A modern platform for chess enthusiasts to build and solve custom puzzle sets.
 
-![image](https://github.com/user-attachments/assets/d598132a-8822-4e43-b0c2-5cd7e64e8dd8)
+<img width="1887" height="945" alt="image" src="https://github.com/user-attachments/assets/9cebb037-dd73-4896-9bed-af80153b4e07" />
+<img width="1279" height="758" alt="image" src="https://github.com/user-attachments/assets/4324d71b-a6a8-4499-824a-d4d6c120c9ce" />
+
 
 
 ## 🚀 What is Chesspecker?
