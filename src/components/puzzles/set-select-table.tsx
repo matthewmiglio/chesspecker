@@ -117,17 +117,15 @@ export default function SetSelectTable({
 
         const isSelected = selectedSetId === set.set_id;
 
-        // Color scheme matching stats window style
+        // Color scheme: red -> orange -> yellow -> green based on progress
         const progressColor =
-          progressPercent >= 80
-            ? "rgb(34, 197, 94)" // green
-            : progressPercent >= 60
-            ? "rgb(59, 130, 246)" // blue
-            : progressPercent >= 40
-            ? "rgb(234, 179, 8)" // yellow
-            : progressPercent >= 20
-            ? "rgb(239, 68, 68)" // red
-            : "rgb(168, 85, 247)"; // purple (for very low progress)
+          progressPercent >= 75
+            ? "rgb(34, 197, 94)" // green (75-100%)
+            : progressPercent >= 50
+            ? "rgb(234, 179, 8)" // yellow (50-74%)
+            : progressPercent >= 25
+            ? "rgb(249, 115, 22)" // orange (25-49%)
+            : "rgb(239, 68, 68)"; // red (0-24%)
 
         return (
           <div
