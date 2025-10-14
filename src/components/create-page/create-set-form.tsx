@@ -47,11 +47,11 @@ export default function CreateSetForm({
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton}>
-      <CardHeader className="pb-8">
+      <CardHeader className="pb-10">
         <CardTitle>Create New Set</CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-10">
+      <CardContent className="space-y-12">
         <div className="space-y-4">
           <FancyNameInput value={name} onChange={setName} />
         </div>
@@ -91,7 +91,7 @@ export default function CreateSetForm({
         </div>
       </CardContent>
 
-      <CardFooter className="pt-8">
+      <CardFooter className="pt-10">
         <Button
           type="submit"
           size="lg"

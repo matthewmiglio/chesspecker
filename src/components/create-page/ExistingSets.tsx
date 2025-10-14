@@ -51,7 +51,7 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-6">
         <CardTitle>Your Existing Sets ({sets.length})</CardTitle>
         <CardDescription>
           Review your current puzzle sets
@@ -59,7 +59,7 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
       </CardHeader>
       <CardContent>
         <div className="max-h-[600px] overflow-y-auto pr-2">
-          <div className="space-y-3">
+          <div className="space-y-4">
             {sets.map((set) => {
               const progressPercent = set.size > 0
                 ? ((set.repeat_index * set.size + set.puzzle_index) / (set.repeats * set.size)) * 100
@@ -68,9 +68,9 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
               return (
                 <div
                   key={set.set_id}
-                  className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                  className="p-5 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h3 className="font-semibold text-base leading-tight line-clamp-2 mb-1">
                         {set.name}
@@ -110,8 +110,8 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
                     </div>
                   </div>
 
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                  <div className="mt-4">
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
                       <span>Progress</span>
                       <span>{Math.round(progressPercent)}%</span>
                     </div>
