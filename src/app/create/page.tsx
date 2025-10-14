@@ -143,43 +143,135 @@ export default function CreatePuzzleSetPage() {
     puzzle_count: number,
     targetElo: number,
     themes: string[],
-    onProgress: (progress: number) => void
+    onProgress: (progress: number) => void,
+    retryCount = 0
   ): Promise<string[]> => {
     if (puzzle_count > maxSetSize) {
       puzzle_count = maxSetSize;
     }
 
+    const maxRetries = 1;
+    const retryDelay = 1000; // 1 second
+
     try {
       // Build themes query parameter
       const themesParam = themes.length > 0 ? themes.join(',') : PUZZLE_THEMES_OVER_10K.join(',');
-      const response = await fetch(
-        `/api/puzzles/create-set?target=${targetElo}&size=${puzzle_count}&margin=100&tails_pct=0.10&themes=${themesParam}`
-      );
+      const url = `/api/puzzles/create-set?target=${targetElo}&size=${puzzle_count}&margin=100&tails_pct=0.10&themes=${themesParam}`;
+
+      console.log('[createNewPuzzleList] Requesting puzzles:', {
+        target: targetElo,
+        size: puzzle_count,
+        margin: 100,
+        tails_pct: 0.10,
+        themes: themes.length > 0 ? themes : PUZZLE_THEMES_OVER_10K,
+        retryCount
+      });
+
+      const response = await fetch(url);
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => 'No response body');
-        throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: await response.text().catch(() => 'No response body') };
+        }
+
+        console.error('[createNewPuzzleList] API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          params: { target: targetElo, size: puzzle_count, themes }
+        });
+
+        // Handle timeout (504) or server errors (5xx) with retry
+        if ((response.status === 504 || response.status >= 500) && retryCount < maxRetries && errorData.retryable !== false) {
+          const suggestion = errorData.suggestion || 'Try again in a moment';
+          info(`Request timed out. ${suggestion}`, "Retrying...", 3000);
+
+          await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, retryCount)));
+          return createNewPuzzleList(puzzle_count, targetElo, themes, onProgress, retryCount + 1);
+        }
+
+        // Handle theme validation errors
+        if (response.status === 400 && errorData.allowedThemes) {
+          throw new Error(`${errorData.error}`);
+        }
+
+        throw new Error(errorData.error || `API request failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+
+      console.log('[createNewPuzzleList] API response:', {
+        puzzlesCount: data.puzzles?.length,
+        target: data.target,
+        size: data.size,
+        themes: data.themes,
+        ms: data.ms
+      });
 
       if (!data || !data.puzzles || !Array.isArray(data.puzzles)) {
         throw new Error(`Invalid puzzle data received: ${JSON.stringify(data)}`);
       }
 
       const puzzles = data.puzzles;
-      const puzzleIds = puzzles.map((p: { PuzzleId: string }) => p.PuzzleId);
+      const puzzleIds: string[] = puzzles.map((p: { PuzzleId: string }) => p.PuzzleId);
+
+      // Deduplicate puzzle IDs
+      const uniquePuzzleIds: string[] = Array.from(new Set(puzzleIds));
+
+      if (uniquePuzzleIds.length < puzzleIds.length) {
+        console.warn('[createNewPuzzleList] Removed duplicate puzzles:', {
+          original: puzzleIds.length,
+          unique: uniquePuzzleIds.length,
+          duplicatesRemoved: puzzleIds.length - uniquePuzzleIds.length
+        });
+      }
+
+      // Enforce 500 puzzle cap
+      if (uniquePuzzleIds.length > 500) {
+        console.warn('[createNewPuzzleList] Capping puzzles at 500:', {
+          original: uniquePuzzleIds.length,
+          capped: 500
+        });
+        info("Puzzle set capped at 500 puzzles", "Note", 4000);
+        onProgress(100);
+        return uniquePuzzleIds.slice(0, 500);
+      }
+
+      // Display success summary
+      const themesStr = themes.length > 3
+        ? `${themes.slice(0, 3).join(', ')}... (+${themes.length - 3} more)`
+        : themes.join(', ');
+
+      console.log('[createNewPuzzleList] Success:', {
+        puzzles: uniquePuzzleIds.length,
+        themes: themesStr,
+        timeMs: data.ms
+      });
 
       onProgress(100);
-      return puzzleIds;
+      return uniquePuzzleIds;
 
     } catch (err) {
+      console.error('[createNewPuzzleList] Exception:', {
+        error: err instanceof Error ? err.message : String(err),
+        params: { target: targetElo, size: puzzle_count, themes },
+        retryCount
+      });
       throw err;
     }
   };
 
   const handleCreateSetButton = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent double-submit
+    if (isCreatingSet) {
+      console.warn('[handleCreateSetButton] Already creating a set, ignoring duplicate submission');
+      return;
+    }
 
     // Validation
     if (name.trim() === "") {
@@ -203,6 +295,14 @@ export default function CreatePuzzleSetPage() {
       return;
     }
 
+    console.log('[handleCreateSetButton] Starting set creation:', {
+      name,
+      elo: difficultySliderValue,
+      size: setSize,
+      repeats: repeatCount,
+      themes: selectedThemes
+    });
+
     // Track usage statistics
     bumpDailyUsage({ set_creates: 1, puzzle_requests: setSize });
     incrementUserSetCreate();
@@ -218,9 +318,12 @@ export default function CreatePuzzleSetPage() {
 
     // Only redirect if creation was successful
     if (result) {
+      console.log('[handleCreateSetButton] Set creation successful, redirecting...');
       setTimeout(() => {
         window.location.href = "/puzzles";
       }, 1500); // Give time to see success toast
+    } else {
+      console.error('[handleCreateSetButton] Set creation failed');
     }
   };
 
@@ -252,6 +355,7 @@ export default function CreatePuzzleSetPage() {
               selectedThemes={selectedThemes}
               setSelectedThemes={setSelectedThemes}
               handleCreateSetButton={handleCreateSetButton}
+              isCreatingSet={isCreatingSet}
             />
           </Card>
 

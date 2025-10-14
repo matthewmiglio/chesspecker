@@ -28,6 +28,7 @@ type CreateSetFormProps = {
   selectedThemes: string[];
   setSelectedThemes: (themes: string[]) => void;
   handleCreateSetButton: (e: React.FormEvent) => void;
+  isCreatingSet?: boolean;
 };
 
 export default function CreateSetForm({
@@ -42,6 +43,7 @@ export default function CreateSetForm({
   selectedThemes,
   setSelectedThemes,
   handleCreateSetButton,
+  isCreatingSet = false,
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton}>
@@ -90,8 +92,13 @@ export default function CreateSetForm({
       </CardContent>
 
       <CardFooter className="pt-8">
-        <Button type="submit" size="lg" className="w-full">
-          Create Puzzle Set
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={isCreatingSet}
+        >
+          {isCreatingSet ? "Creating Set..." : "Create Puzzle Set"}
         </Button>
       </CardFooter>
     </form>

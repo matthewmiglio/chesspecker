@@ -105,7 +105,8 @@ export async function GET(req: NextRequest) {
         code: error.code,
         message: error.message,
         details: error.details,
-        hint: error.hint
+        hint: error.hint,
+        params: { target: clampedTarget, size, margin, tailsPct, themes }
       });
 
       // Check if error is related to theme validation from Postgres
@@ -114,13 +115,32 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
           {
             error: `Invalid themes provided. Allowed themes: ${allowedThemesStr}`,
-            allowedThemes: PUZZLE_THEMES_OVER_10K
+            allowedThemes: PUZZLE_THEMES_OVER_10K,
+            retryable: false
           },
           { status: 400 }
         );
       }
 
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      // Check for statement timeout (PGRST116 or message containing "timeout")
+      const isTimeout = error.code === 'PGRST116' ||
+                        (error.message && error.message.toLowerCase().includes('timeout'));
+
+      if (isTimeout) {
+        return NextResponse.json(
+          {
+            error: 'The query took too long to complete. Try fewer themes or a smaller set size.',
+            retryable: true,
+            suggestion: 'Try reducing the number of themes or lowering the set size.'
+          },
+          { status: 504 }
+        );
+      }
+
+      return NextResponse.json({
+        error: error.message,
+        retryable: true
+      }, { status: 500 });
     }
 
     const puzzles = data || [];
@@ -138,10 +158,14 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error('[API GET /puzzles/create-set] Unexpected error:', {
       error: err instanceof Error ? err.message : String(err),
-      stack: err instanceof Error ? err.stack : undefined
+      stack: err instanceof Error ? err.stack : undefined,
+      params: { target: clampedTarget, size, margin, tailsPct, themes }
     });
     return NextResponse.json(
-      { error: "Failed to create puzzle set" },
+      {
+        error: "Failed to create puzzle set",
+        retryable: true
+      },
       { status: 500 }
     );
   }
