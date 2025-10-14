@@ -37,6 +37,10 @@ export async function GET(req: NextRequest) {
   const margin = Number(marginParam);
   const tailsPct = Number(tailsPctParam);
 
+  // Clamp target ELO to minimum of 700 for puzzle fetching
+  // (UI allows 500, but actual puzzles are always 700+)
+  const clampedTarget = Math.max(700, target);
+
   // Validate and normalize themes
   const themes = validateThemes(rawThemes);
 
@@ -77,7 +81,8 @@ export async function GET(req: NextRequest) {
 
     const t0 = Date.now();
     console.log('[API GET /puzzles/create-set] Calling create_puzzle_set RPC with params:', {
-      _target: target,
+      _target: clampedTarget,
+      _target_original: target,
       _size: size,
       _margin: margin,
       _tails_pct: tailsPct,
@@ -85,7 +90,7 @@ export async function GET(req: NextRequest) {
     });
 
     const { data, error } = await sb.rpc("create_puzzle_set", {
-      _target: target,
+      _target: clampedTarget,
       _size: size,
       _margin: margin,
       _tails_pct: tailsPct,

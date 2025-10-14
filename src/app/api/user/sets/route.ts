@@ -8,7 +8,7 @@ import { z } from "zod";
 // Validation schema for creating a set
 const createSetSchema = z.object({
   name: z.string().min(1, "Set name is required").max(200, "Set name must be 200 characters or less").trim(),
-  elo: z.number().int().min(0, "ELO must be positive").max(4000, "ELO must be 4000 or less"),
+  elo: z.number().int().min(500, "ELO must be at least 500").max(4000, "ELO must be 4000 or less"),
   size: z.number().int().min(1, "Size must be at least 1").max(500, "Size must be 500 or less"),
   repeats: z.number().int().min(1, "Repeats must be at least 1").max(50, "Repeats must be 50 or less"),
   puzzleIds: z.array(z.string().max(50)).max(500, "Cannot specify more than 500 puzzle IDs").optional(),
