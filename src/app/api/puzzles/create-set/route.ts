@@ -37,9 +37,9 @@ export async function GET(req: NextRequest) {
   const margin = Number(marginParam);
   const tailsPct = Number(tailsPctParam);
 
-  // Clamp target ELO to minimum of 700 for puzzle fetching
-  // (UI allows 500, but actual puzzles are always 700+)
-  const clampedTarget = Math.max(700, target);
+  // Clamp target ELO to minimum of 700 and maximum of 2100 for puzzle fetching
+  // (UI allows 500-2500, but actual puzzles are clamped to 700-2100)
+  const clampedTarget = Math.min(2100, Math.max(700, target));
 
   // Validate and normalize themes
   const themes = validateThemes(rawThemes);
