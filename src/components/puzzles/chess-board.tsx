@@ -40,12 +40,8 @@ export default function AnimatedBoard({
   darkSquareColor = '#5994EF',
   lightSquareColor = '#F2F6FA',
 }: Props) {
-  console.log('[AnimatedBoard] Component rendered/mounted with currentPuzzleIndex:', currentPuzzleIndex, 'FEN:', fen);
-
   const themeColor = useThemeAccentColor();
   const [game, setGame] = useState(new Chess(fen));
-  const [animationPosition, setAnimationPosition] = useState<string | null>(null);
-  const [isBoardLocked, setIsBoardLocked] = useState(false);
   const [arrows, setArrows] = useState<{ from: Square; to: Square }[]>([]);
   const [arrowStart, setArrowStart] = useState<Square | null>(null);
 
@@ -85,23 +81,22 @@ export default function AnimatedBoard({
     return () => window.removeEventListener("resize", updateBoardSize);
   }, []);
 
+  // Extract resetKey value to avoid complex expression in dependency array
+  const effectiveResetKey = resetKey ?? 0;
+
   useEffect(() => {
-    // When FEN or resetKey changes, update game and clear any animation state
-    console.log('[AnimatedBoard] useEffect triggered - fen:', fen, 'resetKey:', resetKey);
-    console.log('[AnimatedBoard] Previous game FEN:', game.fen());
-    console.log('[AnimatedBoard] Clearing animationPosition');
+    // When FEN or resetKey changes, update game state
     const updated = new Chess();
     updated.load(fen);
     setGame(updated);
-    console.log('[AnimatedBoard] New game FEN:', updated.fen());
-    setAnimationPosition(null); // Clear any ongoing animation
+
     // Reset click-to-move state when FEN changes
     setSelectedSquare(null);
     setValidMoves([]);
+
     // Clear arrows when puzzle changes
     setArrows([]);
-    console.log('[AnimatedBoard] Board updated, animationPosition cleared');
-  }, [fen, currentPuzzleIndex, resetKey ?? 0]); // resetKey forces a reset when replaying
+  }, [fen, currentPuzzleIndex, effectiveResetKey]); // resetKey forces a reset when replaying
 
   const handlePieceDrop = (
     sourceSquare: Square,
@@ -114,7 +109,7 @@ export default function AnimatedBoard({
       solution,
       solvedIndex,
       isSessionActive,
-      isBoardLocked,
+      isBoardLocked: false, // No longer needed
     });
 
     if (!result.valid) return false;
@@ -124,16 +119,12 @@ export default function AnimatedBoard({
       return false;
     }
 
-    setIsBoardLocked(true);
-    onMove(sourceSquare + targetSquare, true);
-
-    if (result.newFen) {
-      setAnimationPosition(result.newFen);
-    }
-
+    // Update game state immediately - this triggers the animation
     if (result.nextGame) {
-      const nextGame = result.nextGame; // <- capture it here safely!
+      setGame(result.nextGame);
+      onMove(sourceSquare + targetSquare, true);
 
+      // After the user's move animates (300ms), play the opponent's reply
       setTimeout(() => {
         const replyUci = solution[solvedIndex + 1];
         if (replyUci) {
@@ -142,13 +133,12 @@ export default function AnimatedBoard({
             to: replyUci.slice(2, 4) as Square,
             promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
           };
-          nextGame.move(replyMove);
-        }
 
-        setAnimationPosition(nextGame.fen());
-        setGame(nextGame);
-        setIsBoardLocked(false);
-      }, 0);
+          const nextGame = new Chess(result.nextGame!.fen());
+          nextGame.move(replyMove);
+          setGame(nextGame);
+        }
+      }, 350); // Slightly longer than animation duration (300ms)
     }
 
     return true;
@@ -163,7 +153,7 @@ export default function AnimatedBoard({
       solution,
       solvedIndex,
       isSessionActive,
-      isBoardLocked,
+      isBoardLocked: false, // No longer needed
     });
 
     switch (result.action) {
@@ -186,37 +176,27 @@ export default function AnimatedBoard({
           return;
         }
 
-        setIsBoardLocked(true);
-        onMove(selectedSquare! + square, true);
+        // Update game state immediately - this triggers the animation
+        if (result.moveResult.nextGame) {
+          setGame(result.moveResult.nextGame);
+          onMove(selectedSquare! + square, true);
 
-        // Add delay for animation BEFORE updating position
-        setTimeout(() => {
-          if (result.moveResult?.newFen) {
-            setAnimationPosition(result.moveResult.newFen);
-          }
+          // After the user's move animates (300ms), play the opponent's reply
+          setTimeout(() => {
+            const replyUci = solution[solvedIndex + 1];
+            if (replyUci) {
+              const replyMove = {
+                from: replyUci.slice(0, 2) as Square,
+                to: replyUci.slice(2, 4) as Square,
+                promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
+              };
 
-          if (result.moveResult?.nextGame) {
-            const nextGame = result.moveResult.nextGame;
-
-            setTimeout(() => {
-              const replyUci = solution[solvedIndex + 1];
-              if (replyUci) {
-                const replyMove = {
-                  from: replyUci.slice(0, 2) as Square,
-                  to: replyUci.slice(2, 4) as Square,
-                  promotion: replyUci.length > 4 ? replyUci.slice(4) : undefined,
-                };
-                nextGame.move(replyMove);
-              }
-
-              setAnimationPosition(nextGame.fen());
+              const nextGame = new Chess(result.moveResult!.nextGame!.fen());
+              nextGame.move(replyMove);
               setGame(nextGame);
-              setIsBoardLocked(false);
-            }, 350); // Slightly longer delay for bot move
-          } else {
-            setIsBoardLocked(false);
-          }
-        }, 50); // Small delay for user move animation
+            }
+          }, 350); // Slightly longer than animation duration (300ms)
+        }
         break;
       case "none":
       default:
@@ -287,15 +267,6 @@ export default function AnimatedBoard({
     return styles;
   }, [highlight, selectedSquare, validMoves, themeColor]);
 
-  const finalPosition = animationPosition ?? fen;
-
-  console.log('[AnimatedBoard] Rendering with finalPosition:', finalPosition);
-  console.log('[AnimatedBoard] animationPosition:', animationPosition);
-  console.log('[AnimatedBoard] fen prop:', fen);
-  console.log('[AnimatedBoard] isSessionActive:', isSessionActive);
-  console.log('[AnimatedBoard] Chessboard key (currentPuzzleIndex):', currentPuzzleIndex);
-  console.log('[AnimatedBoard] About to render <Chessboard> with position:', finalPosition);
-
   return (
     <div
       className="w-full overflow-x-hidden"
@@ -307,13 +278,13 @@ export default function AnimatedBoard({
       {/* Board container */}
       <div className="relative block mx-auto" style={{ width: boardWidth, height: boardWidth }}>
         <Chessboard
-          key={`${currentPuzzleIndex}-${resetKey}-${fen}`}
-          position={finalPosition}
+          key={`${currentPuzzleIndex}-${resetKey}`}
+          position={game.fen()}
           onPieceDrop={handlePieceDrop}
           onSquareClick={handleSquareClick}
           animationDuration={300}
           boardOrientation={sideOnBottom === "w" ? "white" : "black"}
-          arePiecesDraggable={!isBoardLocked && isSessionActive}
+          arePiecesDraggable={isSessionActive}
           boardWidth={boardWidth}
           customSquareStyles={customSquareStyles}
           customDarkSquareStyle={{ backgroundColor: darkSquareColor }}
