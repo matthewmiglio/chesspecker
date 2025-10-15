@@ -201,7 +201,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-6 py-0 relative overflow-hidden">
       <HomeStructuredData />
       {/* HERO SECTION */}
-      <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
+      <div className="flex flex-col items-center text-center max-w-[55rem] space-y-6">
         <div className="relative w-68 h-68 md:w-106 md:h-106 transition-transform">
           <Image
             src={heroImage}
@@ -215,7 +215,7 @@ export default function Home() {
           />
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-snug md:leading-snug">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-snug md:leading-snug">
           Chess Tactics Training with the <span style={{ color: themeColor }}>Woodpecker Method</span>
         </h1>
 
