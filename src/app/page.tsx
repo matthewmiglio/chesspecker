@@ -136,7 +136,7 @@ function TestimonialsCarousel({
         style={{ boxShadow: `0 0 18px ${themeColor}` }}
       >
         {/* Airy stage */}
-        <div className="relative h-[420px] md:h-[460px]">
+        <div className="relative h-[315px] md:h-[345px]">
           {TESTIMONIALS.map((t, i) => {
             const isActive = i === index;
             const shouldRender = visibleSlides.includes(i);
@@ -202,7 +202,7 @@ export default function Home() {
       <HomeStructuredData />
       {/* HERO SECTION */}
       <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
-        <div className="relative w-85 h-85 md:w-132 md:h-132 transition-transform">
+        <div className="relative w-68 h-68 md:w-106 md:h-106 transition-transform">
           <Image
             src={heroImage}
             alt="Chess tactics training with ChessPecker - Woodpecker Method for pattern recognition"
@@ -221,11 +221,6 @@ export default function Home() {
 
         <p className="text-muted-foreground text-lg md:text-xl px-4 font-semibold">
           Train Smarter. Play Better.
-        </p>
-
-        <p className="text-muted-foreground text-base md:text-lg px-4">
-          Build custom puzzle sets, master tactical patterns, and track your
-          progress across every training session.
         </p>
 
         {/* Buttons */}
