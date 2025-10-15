@@ -97,7 +97,7 @@ export default function AboutPage() {
               </div>
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed text-left">
                 Every feature, every algorithm, every piece of the training system is built around one simple idea:
-                <span className="text-foreground font-semibold block mt-4"> make chess improvement as intelligent and efficient as possible.</span>
+                <span className="text-foreground font-semibold block mt-4"> make chess improvement as efficient as possible.</span>
               </p>
               <p className="text-lg text-muted-foreground/80 text-left">
                 No ads, no fluff — just effective training tools for chess players who want to improve.
