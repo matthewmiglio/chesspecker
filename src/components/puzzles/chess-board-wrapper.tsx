@@ -2,6 +2,7 @@ import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight,
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
+import PuzzleTimer from "@/components/puzzles/PuzzleTimer";
 import { useEffect, useState } from "react";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import { ChessPeckerPuzzle } from "@/lib/types";
@@ -37,6 +38,8 @@ type ChessBoardWrapperProps = {
     handleManualShowSolution: () => Promise<void>;
     currentPuzzleData: { puzzle: ChessPeckerPuzzle } | null;
     setAutoNextPuzzle: (value: boolean) => void;
+    puzzleStartTime: number | null;
+    isTimerRunning: boolean;
   };
   highlight: string | null;
   setHighlight: (highlight: string | null) => void;
@@ -198,9 +201,18 @@ export default function ChessBoardWrapper({
         {/* Left: Chess Board */}
         <Card className="py-6 flex-1 lg:max-w-[65%]">
           <CardContent className="p-0 mx-auto">
-            {/* Puzzle Set Title */}
-            <div className="text-center mb-4 px-4">
-              <h2 className="text-3xl font-bold tracking-tight">{puzzleSetName}</h2>
+            {/* Puzzle Set Title with Timer */}
+            <div className="flex items-center mb-4 px-4">
+              <div className="flex-shrink-0">
+                <PuzzleTimer
+                  startTime={puzzleSession.puzzleStartTime}
+                  isRunning={puzzleSession.isTimerRunning}
+                />
+              </div>
+              <div className="flex-1 text-center">
+                <h2 className="text-3xl font-bold tracking-tight">{puzzleSetName}</h2>
+              </div>
+              <div className="flex-shrink-0 w-[60px]"></div>
             </div>
             <AnimatedBoard
               fen={fen}

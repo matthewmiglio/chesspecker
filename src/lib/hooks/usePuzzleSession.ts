@@ -76,6 +76,7 @@ export function usePuzzleSession({
 
   // Timing state for puzzle duration tracking
   const [puzzleStartTime, setPuzzleStartTime] = useState<number | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   // One-time marking logic to prevent duplicate accuracy records
   const [puzzleAttempted, setPuzzleAttempted] = useState(false);
@@ -89,6 +90,7 @@ export function usePuzzleSession({
     setPuzzleOutcome(null);
     setRetryCounter(0);
     setPuzzleStartTime(Date.now());
+    setIsTimerRunning(true);
   }, [currentPuzzleIndex, currentRepeatIndex]);
 
   const handleIncorrectMove = async () => {
@@ -103,6 +105,7 @@ export function usePuzzleSession({
 
     setPuzzleAttempted(true);
     setPuzzleOutcome('incorrect');
+    setIsTimerRunning(false);
     showRedX();
 
     const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0;
@@ -152,6 +155,7 @@ export function usePuzzleSession({
 
     setPuzzleAttempted(true);
     setPuzzleOutcome('correct');
+    setIsTimerRunning(false);
 
     const timeTaken = puzzleStartTime ? (Date.now() - puzzleStartTime) / 1000 : 0;
 
@@ -185,6 +189,7 @@ export function usePuzzleSession({
 
     setPuzzleAttempted(true);
     setPuzzleOutcome('correct');
+    setIsTimerRunning(false);
 
     // Show yellow warning instead of red X
     showYellowWarning();
@@ -402,6 +407,7 @@ export function usePuzzleSession({
 
     setIsSessionActive(true);
     setPuzzleStartTime(Date.now());
+    setIsTimerRunning(true);
   };
 
   const handleContinueToNext = async () => {
@@ -447,6 +453,7 @@ export function usePuzzleSession({
 
     setHintUsed(false);
     setPuzzleStartTime(Date.now());
+    setIsTimerRunning(true);
 
     // Increment resetKey to force AnimatedBoard to clear animationPosition state
     setResetKey(prev => prev + 1);
@@ -549,5 +556,7 @@ export function usePuzzleSession({
     handleManualShowSolution,
     currentPuzzleData,
     setAutoNextPuzzle,
+    puzzleStartTime,
+    isTimerRunning,
   };
 }
