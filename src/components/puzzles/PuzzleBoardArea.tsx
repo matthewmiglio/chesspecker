@@ -2,11 +2,11 @@
 
 import SetFinishedGraphic from "@/components/puzzles/set-finished-graphic";
 import ChessBoardWrapper from "@/components/puzzles/chess-board-wrapper";
-import { PuzzleSet } from "@/lib/types";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import type { ReturnTypeUsePuzzleSession } from "@/lib/types";
 
 type PuzzleBoardAreaProps = {
-  selectedSet: PuzzleSet;
+  selectedSet: ChessPeckerSet;
   selectedSetId: number | null;
   selectedSetIsDone: boolean;
   fen: string;

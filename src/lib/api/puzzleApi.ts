@@ -44,28 +44,6 @@ export const addCorrectAttempt = async (setId: number, repeatIndex: number, time
   }
 };
 
-/**
- * Fetches all sets for the current user.
- * Uses the new secure API that validates session server-side.
- *
- * @deprecated The email parameter is no longer used - auth is handled server-side
- */
-export const getAllSetData = async () => {
-  const response = await fetch("/api/user/sets", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include", // Include session cookies
-  });
-
-  if (!response.ok) {
-    console.error("Failed to fetch user sets");
-    return null;
-  }
-
-  const result = await response.json();
-  return result.sets as PuzzleSet[];
-};
-
 export const getSetAccuracy = async (setId: number, repeatIndex: number) => {
   try {
     const accuracies = await getAccuracies(setId);

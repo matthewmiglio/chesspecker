@@ -1,6 +1,6 @@
 "use client";
 
-import { PuzzleSet } from "@/lib/types";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { handleSetSelect } from "@/lib/utils/puzzleHelpers";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,7 +9,7 @@ import { Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 type SetSelectTableProps = {
-  userSets: PuzzleSet[];
+  userSets: ChessPeckerSet[];
   setSelectedSetId: (id: number) => void;
   setPuzzleIds: (ids: string[]) => void;
   setCurrentRepeatIndex: (index: number) => void;

@@ -5,13 +5,12 @@ import { useSession } from "next-auth/react";
 
 import { usePuzzleSession } from "@/lib/hooks/usePuzzleSession";
 import {
-  getAllSetData,
   getSetAccuracy,
   getSetProgress,
 } from "@/lib/api/puzzleApi";
-import { deleteUserSet } from "@/lib/api/setsApi";
+import { getUserSets, deleteUserSet } from "@/lib/api/setsApi";
 
-import { PuzzleSet } from "@/lib/types";
+import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 
 
 import NotLoggedInButton from "@/components/puzzles/not-logged-in-button";
@@ -32,7 +31,7 @@ export default function PuzzlesPage() {
     console.log('[PuzzlesPage] Initializing selectedSetId state');
     return null;
   });
-  const [userSets, setUserSets] = useState<PuzzleSet[]>([]);
+  const [userSets, setUserSets] = useState<ChessPeckerSet[]>([]);
   const [fen, setFen] = useState<string>(() => {
     const defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     console.log('[PuzzlesPage] Initializing FEN state to:', defaultFen);
@@ -140,9 +139,9 @@ export default function PuzzlesPage() {
 
 
       try {
-        const sets = await getAllSetData();
+        const sets = await getUserSets();
 
-        if (!sets) {
+        if (!sets || sets.length === 0) {
           setIsSetDataLoaded(true);
           return;
         }

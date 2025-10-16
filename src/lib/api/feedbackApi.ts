@@ -30,14 +30,3 @@ export async function submitFeedback({
   }
 }
 
-export async function fetchAllFeedback() {
-  try {
-    const res = await fetch(`${BASE}/getAll`, { method: "GET" });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to fetch feedback");
-    return data.feedback;
-  } catch (err) {
-    console.error("[feedbackApi] fetchAllFeedback error:", err);
-    return [];
-  }
-}
