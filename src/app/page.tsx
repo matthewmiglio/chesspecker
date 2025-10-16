@@ -215,7 +215,7 @@ export default function Home() {
           />
         </div>
 
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-snug md:leading-snug">
+        <h1 className="text-5xl md:text-6xl font-extrabold ">
           Chess Tactics Training with the <span style={{ color: themeColor }}>Woodpecker Method</span>
         </h1>
 
