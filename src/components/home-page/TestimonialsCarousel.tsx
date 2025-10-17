@@ -90,7 +90,7 @@ export function TestimonialsCarousel({
                     style={{ color: themeColor }}
                   />
                   <p className="text-2xl md:text-[28px] leading-relaxed md:leading-[2.1rem] text-foreground/90">
-                    "{t.quote}"
+                    &ldquo;{t.quote}&rdquo;
                   </p>
                   <div className="mt-10 text-base md:text-lg">
                     <span className="font-semibold text-foreground">{t.name}</span>
