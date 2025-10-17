@@ -11,7 +11,7 @@ export function HeroSection({ themeColor }: { themeColor: string }) {
 
   return (
     <div className="flex flex-col items-center text-center max-w-[55rem] space-y-6">
-      <div className="relative w-68 h-68 md:w-106 md:h-106 transition-transform">
+      <div className="mt-6 md:mt-16 relative w-82 h-82 md:w-127 md:h-127 transition-transform">
         <Image
           src={heroImage}
           alt="Chess tactics training with ChessPecker - Woodpecker Method for pattern recognition"

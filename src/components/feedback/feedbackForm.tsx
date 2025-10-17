@@ -240,7 +240,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 backdrop-blur-[2px] bg-background/60 flex items-center justify-center rounded-xl"
+            className="absolute inset-0 backdrop-blur-md bg-background/80 flex items-center justify-center rounded-xl"
           >
             <motion.div
               initial={{ scale: 0.98, opacity: 0 }}
@@ -248,7 +248,7 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
               className="text-center p-6"
             >
-              <p className="text-sm text-muted-foreground mb-3">Please log in to submit feedback.</p>
+              <p className="text-sm text-foreground mb-3">Please log in to submit feedback.</p>
               <Button asChild>
                 <Link href="/api/auth/signin">Sign in</Link>
               </Button>

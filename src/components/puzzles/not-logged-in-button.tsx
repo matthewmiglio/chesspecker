@@ -5,7 +5,7 @@ export default function NotLoggedInButton() {
   return (
     <div className="flex flex-col justify-center items-center gap-6">
       <Image
-        src="/heros/table_study_white.png"
+        src="/heros/chess-focus-white.png"
         alt="Study chess"
         width={400}
         height={400}

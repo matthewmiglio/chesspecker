@@ -362,7 +362,7 @@ export default function CreatePuzzleSetPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Create Form Section */}
-        <div>
+        <div className="relative">
           <Card
             className={
               !isLoggedIn
@@ -388,6 +388,17 @@ export default function CreatePuzzleSetPage() {
             />
           </Card>
 
+          {!isLoggedIn && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button
+                onClick={() => window.location.href = "/auth/signin"}
+                className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                You must Log in to create a set
+              </button>
+            </div>
+          )}
+
           {isCreatingSet && (
             <div className="mt-8">
               <PuzzleSetCreationProgress
@@ -400,7 +411,7 @@ export default function CreatePuzzleSetPage() {
 
         {/* Existing Sets Section */}
         <div>
-          <ExistingSets sets={userSets} isLoading={isSetsLoading} onDeleteSet={handleSetDelete} />
+          <ExistingSets sets={userSets} isLoading={isSetsLoading} onDeleteSet={handleSetDelete} isLoggedIn={isLoggedIn} />
         </div>
       </div>
     </div>

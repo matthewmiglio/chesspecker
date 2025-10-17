@@ -9,12 +9,19 @@ type ExistingSetsProps = {
   sets: ChessPeckerSet[];
   isLoading: boolean;
   onDeleteSet: (setId: number) => void;
+  isLoggedIn: boolean;
 };
 
-export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingSetsProps) {
+export default function ExistingSets({ sets, isLoading, onDeleteSet, isLoggedIn }: ExistingSetsProps) {
   if (isLoading) {
     return (
-      <Card>
+      <Card
+        className={
+          !isLoggedIn
+            ? "blur-sm pointer-events-none opacity-50 transition-all duration-300"
+            : "transition-all duration-300"
+        }
+      >
         <CardHeader>
           <CardTitle>Your Existing Sets</CardTitle>
           <CardDescription>
@@ -32,7 +39,13 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
 
   if (sets.length === 0) {
     return (
-      <Card>
+      <Card
+        className={
+          !isLoggedIn
+            ? "blur-sm pointer-events-none opacity-50 transition-all duration-300"
+            : "transition-all duration-300"
+        }
+      >
         <CardHeader>
           <CardTitle>Your Existing Sets</CardTitle>
           <CardDescription>
@@ -50,7 +63,13 @@ export default function ExistingSets({ sets, isLoading, onDeleteSet }: ExistingS
   }
 
   return (
-    <Card>
+    <Card
+      className={
+        !isLoggedIn
+          ? "blur-sm pointer-events-none opacity-50 transition-all duration-300"
+          : "transition-all duration-300"
+      }
+    >
       <CardHeader className="pb-6">
         <CardTitle>Your Existing Sets ({sets.length})</CardTitle>
         <CardDescription>

@@ -47,7 +47,6 @@ export function TestimonialsCarousel({
   return (
     <section className="m-28 w-full max-w-6xl px-4">
       <div className="mb-10 flex items-center justify-between">
-        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">What People Are Saying</h2>
         <div className="flex gap-3">
           <button
             aria-label="Previous testimonial"
