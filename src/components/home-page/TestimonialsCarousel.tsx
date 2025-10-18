@@ -70,7 +70,7 @@ export function TestimonialsCarousel({
         style={{ boxShadow: `0 0 18px ${themeColor}` }}
       >
         {/* Airy stage */}
-        <div className="relative h-[315px] md:h-[345px]">
+        <div className="relative h-[500px] md:h-[345px]">
           {TESTIMONIALS.map((t, i) => {
             const isActive = i === index;
             const shouldRender = visibleSlides.includes(i);
