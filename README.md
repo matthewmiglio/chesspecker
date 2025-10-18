@@ -1,4 +1,4 @@
-# ♟️ Chesspecker
+# Chesspecker
 
 **Assemble. Practice. Repeat. Share.**  
 A modern platform for chess enthusiasts to build and solve custom puzzle sets.
@@ -8,17 +8,17 @@ A modern platform for chess enthusiasts to build and solve custom puzzle sets.
 
 
 
-## 🚀 What is Chesspecker?
+## What is Chesspecker?
 
 **Chesspecker** is a web app built with **Next.js** that lets users:
-- 🧩 **Assemble** personalized chess puzzle sets
-- 🧠 **Practice** tactics and techniques
-- 🔁 **Repeat** your sets until mastery
-- 🔗 **Share** puzzle collections with friends or the chess community
+- **Assemble** personalized chess puzzle sets
+- **Practice** tactics and techniques
+- **Repeat** your sets until mastery
+- **Share** puzzle collections with friends or the chess community
 
 Whether you're a casual player or training for your next tournament, Chesspecker helps sharpen your skills through deliberate, targeted practice.
 
-⚙️ Tech Stack
+## Tech Stack
 Next.js (TypeScript)
 React
 Tailwind CSS (for styling)
@@ -30,7 +30,7 @@ Recharts (statistics & graphs)
 Lichess API (live puzzles source)
 Framer Motion (animations)
 
-## 📦 Getting Started
+## Getting Started
 
 Clone the repo and install dependencies:
 
