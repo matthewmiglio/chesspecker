@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import CreateSetForm from "@/components/create-page/create-set-form";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
@@ -391,7 +391,7 @@ export default function CreatePuzzleSetPage() {
           {!isLoggedIn && (
             <div className="absolute inset-0 flex items-center justify-center">
               <button
-                onClick={() => window.location.href = "/auth/signin"}
+                onClick={() => signIn("google")}
                 className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
               >
                 You must Log in to create a set

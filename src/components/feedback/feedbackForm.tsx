@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -249,8 +249,8 @@ export default function EnhancedFeedbackForm({ className }: EnhancedFeedbackForm
               className="text-center p-6"
             >
               <p className="text-sm text-foreground mb-3">Please log in to submit feedback.</p>
-              <Button asChild>
-                <Link href="/api/auth/signin">Sign in</Link>
+              <Button onClick={() => signIn("google")}>
+                Sign in
               </Button>
             </motion.div>
           </motion.div>
