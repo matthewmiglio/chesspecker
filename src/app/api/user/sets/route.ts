@@ -5,6 +5,12 @@ import { createClient } from "@supabase/supabase-js";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { z } from "zod";
 
+// Premium tier limits (must match usePremiumStatus.ts)
+const FREE_TIER_LIMITS = {
+  maxSets: 3,
+  maxSetSize: 100,
+};
+
 // Validation schema for creating a set
 const createSetSchema = z.object({
   name: z.string().min(1, "Set name is required").max(200, "Set name must be 200 characters or less").trim(),
@@ -116,6 +122,38 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // Get user's tier to enforce premium limits
+    const { data: userData } = await supabase
+      .from("ChessPeckerUsers")
+      .select("tier")
+      .eq("email", session.user.email.toLowerCase())
+      .single();
+
+    const isPremium = userData?.tier === "premium";
+
+    // Enforce set size limit based on tier
+    const maxSetSize = isPremium ? 500 : FREE_TIER_LIMITS.maxSetSize;
+    if (size > maxSetSize) {
+      return NextResponse.json(
+        { error: `Free tier is limited to ${FREE_TIER_LIMITS.maxSetSize} puzzles per set. Upgrade to Premium for up to 500.` },
+        { status: 403 }
+      );
+    }
+
+    // Enforce set count limit for free users
+    if (!isPremium) {
+      const { data: existingSets } = await supabase
+        .rpc('get_user_sets', { user_email: session.user.email });
+
+      const setCount = existingSets?.length ?? 0;
+      if (setCount >= FREE_TIER_LIMITS.maxSets) {
+        return NextResponse.json(
+          { error: `Free tier is limited to ${FREE_TIER_LIMITS.maxSets} puzzle sets. Upgrade to Premium for unlimited sets.` },
+          { status: 403 }
+        );
+      }
+    }
 
     // Call create_user_set() RPC function
     const { data, error } = await supabase

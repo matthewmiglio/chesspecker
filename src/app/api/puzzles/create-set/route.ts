@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { createClient } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { validateThemes, PUZZLE_THEMES_OVER_10K } from "@/lib/constants/puzzleThemes";
+import { authOptions } from "@/lib/auth/authOptions";
+
+// Premium tier limits (must match usePremiumStatus.ts)
+const FREE_TIER_LIMITS = {
+  maxSetSize: 100,
+  freeThemes: ["mateIn1", "mateIn2", "fork", "pin", "endgame"],
+};
 
 export async function GET(req: NextRequest) {
   console.log('[API GET /puzzles/create-set] Request received');
@@ -73,6 +82,48 @@ export async function GET(req: NextRequest) {
       { error: "size must be between 1 and 500" },
       { status: 400 }
     );
+  }
+
+  // Check premium status for theme and size restrictions
+  const session = await getServerSession(authOptions);
+  let isPremium = false;
+
+  if (session?.user?.email) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: userData } = await supabase
+      .from("ChessPeckerUsers")
+      .select("tier")
+      .eq("email", session.user.email.toLowerCase())
+      .single();
+
+    isPremium = userData?.tier === "premium";
+  }
+
+  // Enforce size limit for free users
+  if (!isPremium && size > FREE_TIER_LIMITS.maxSetSize) {
+    return NextResponse.json(
+      { error: `Free tier is limited to ${FREE_TIER_LIMITS.maxSetSize} puzzles per set. Upgrade to Premium for up to 500.` },
+      { status: 403 }
+    );
+  }
+
+  // Enforce theme restrictions for free users
+  if (!isPremium) {
+    const premiumThemesRequested = themes.filter(t => !FREE_TIER_LIMITS.freeThemes.includes(t));
+    if (premiumThemesRequested.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Free tier themes: ${FREE_TIER_LIMITS.freeThemes.join(', ')}. Upgrade to Premium for all ${PUZZLE_THEMES_OVER_10K.length} themes.`,
+          premiumThemesRequested,
+          allowedFreeThemes: FREE_TIER_LIMITS.freeThemes
+        },
+        { status: 403 }
+      );
+    }
   }
 
   try {

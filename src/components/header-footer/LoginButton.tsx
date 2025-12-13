@@ -1,6 +1,8 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Crown } from "lucide-react";
+import { usePremiumStatus } from "@/lib/hooks/usePremiumStatus";
 
 interface LoginButtonProps {
   loginText?: string;
@@ -12,6 +14,7 @@ export default function LoginButton({
   showLogout = true,
 }: LoginButtonProps) {
   const { data: session } = useSession();
+  const { isPremium } = usePremiumStatus();
 
   // Always use dark mode styling
   const buttonClasses = "bg-white text-black";
@@ -24,8 +27,15 @@ export default function LoginButton({
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
       {session ? (
         <>
-          <span className="text-foreground">
+          <span className="text-foreground flex items-center gap-1.5">
             Welcome {displayName}
+            <Crown
+              className={`w-4 h-4 ${
+                isPremium
+                  ? "text-yellow-400 fill-yellow-400"
+                  : "text-orange-600 fill-orange-600"
+              }`}
+            />
           </span>
           {showLogout && (
             <button

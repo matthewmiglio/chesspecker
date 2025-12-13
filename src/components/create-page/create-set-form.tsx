@@ -29,6 +29,8 @@ type CreateSetFormProps = {
   setSelectedThemes: (themes: string[]) => void;
   handleCreateSetButton: (e: React.FormEvent) => void;
   isCreatingSet?: boolean;
+  isPremium?: boolean;
+  onLockedThemeClick?: () => void;
 };
 
 export default function CreateSetForm({
@@ -44,6 +46,8 @@ export default function CreateSetForm({
   setSelectedThemes,
   handleCreateSetButton,
   isCreatingSet = false,
+  isPremium = false,
+  onLockedThemeClick,
 }: CreateSetFormProps) {
   return (
     <form onSubmit={handleCreateSetButton}>
@@ -67,7 +71,7 @@ export default function CreateSetForm({
           <label className="text-sm font-medium">
             Set Size
           </label>
-          <SetSizeInput value={setSize} onChange={setSetSize} />
+          <SetSizeInput value={setSize} onChange={setSetSize} isPremium={isPremium} />
         </div>
 
         <div className="space-y-4">
@@ -87,6 +91,8 @@ export default function CreateSetForm({
           <ThemeSelector
             selectedThemes={selectedThemes}
             onChange={setSelectedThemes}
+            isPremium={isPremium}
+            onLockedThemeClick={onLockedThemeClick}
           />
         </div>
       </CardContent>

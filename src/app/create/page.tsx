@@ -10,6 +10,9 @@ import ExistingSets from "@/components/create-page/ExistingSets";
 import { useToast } from "@/lib/hooks/useToast";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { PUZZLE_THEMES_OVER_10K } from "@/lib/constants/puzzleThemes";
+import { usePremiumStatus, FREE_TIER_LIMITS } from "@/lib/hooks/usePremiumStatus";
+import { Crown } from "lucide-react";
+import Link from "next/link";
 
 import { incrementUserSetCreate,incrementUserPuzzleRequests } from "@/lib/api/userStatsApi";
 
@@ -24,15 +27,17 @@ export default function CreatePuzzleSetPage() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user?.email;
   const { success, error, info } = useToast();
+  const { isPremium } = usePremiumStatus();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const [setSize, setSetSize] = useState<number>(200);
+  // Initialize with free tier defaults
+  const [setSize, setSetSize] = useState<number>(100);
   const [repeatCount, setRepeatCount] = useState<number>(8);
   const [difficultySliderValue, setDifficultySliderValue] =
     useState<number>(1500);
-  const [selectedThemes, setSelectedThemes] = useState<string[]>([...PUZZLE_THEMES_OVER_10K]);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([...FREE_TIER_LIMITS.freeThemes]);
 
   const [isCreatingSet, setIsCreatingSet] = useState(false);
   const [puzzleProgress, setPuzzleProgress] = useState(0);
@@ -302,6 +307,12 @@ export default function CreatePuzzleSetPage() {
       return;
     }
 
+    // Check set limit for free users
+    if (!isPremium && userSets.length >= FREE_TIER_LIMITS.maxSets) {
+      error(`Free tier is limited to ${FREE_TIER_LIMITS.maxSets} puzzle sets. Upgrade to Premium for unlimited sets.`, "Set Limit Reached");
+      return;
+    }
+
     const email = session?.user?.email;
     if (!email) {
       error("Please log in to create puzzle sets.", "Authentication Required");
@@ -356,16 +367,40 @@ export default function CreatePuzzleSetPage() {
     }
   };
 
+  // Check if free user has reached set limit
+  const hasReachedSetLimit = !isPremium && userSets.length >= FREE_TIER_LIMITS.maxSets;
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-10">Create Puzzle Set</h1>
+
+      {/* Set limit warning for free users */}
+      {hasReachedSetLimit && (
+        <div className="mb-8 p-4 rounded-lg bg-[var(--theme-color)]/10 border border-[var(--theme-color)]/30">
+          <div className="flex items-center gap-3">
+            <Crown className="w-6 h-6 text-[var(--theme-color)]" />
+            <div className="flex-1">
+              <p className="font-medium">You&apos;ve reached the free tier limit of {FREE_TIER_LIMITS.maxSets} puzzle sets</p>
+              <p className="text-sm text-muted-foreground">
+                Delete an existing set or upgrade to Premium for unlimited sets.
+              </p>
+            </div>
+            <Link
+              href="/pricing"
+              className="px-4 py-2 rounded-lg bg-[var(--theme-color)] text-white font-medium hover:bg-[var(--theme-color)]/80 transition-colors"
+            >
+              Upgrade
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Create Form Section */}
         <div className="relative">
           <Card
             className={
-              !isLoggedIn
+              !isLoggedIn || hasReachedSetLimit
                 ? "blur-sm pointer-events-none opacity-50"
                 : ""
             }
@@ -385,6 +420,8 @@ export default function CreatePuzzleSetPage() {
               setSelectedThemes={setSelectedThemes}
               handleCreateSetButton={handleCreateSetButton}
               isCreatingSet={isCreatingSet}
+              isPremium={isPremium}
+              onLockedThemeClick={() => info("Upgrade to Premium to unlock all 21 themes", "Premium Feature")}
             />
           </Card>
 
