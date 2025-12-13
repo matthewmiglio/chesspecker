@@ -212,9 +212,9 @@ function PricingContent() {
           </div>
 
           {/* Premium tier */}
-          <div className="p-8 rounded-2xl bg-gradient-to-br from-[var(--theme-color)]/20 to-[var(--theme-color)]/5 border-2 border-[var(--theme-color)]/50 relative mt-4">
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-[var(--theme-color)]/20 to-[var(--theme-color)]/5 border-2 border-[var(--theme-color)]/50">
             {billingPeriod === "monthly" && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--theme-color)] text-white text-sm px-4 py-1 rounded-full">
+              <div className="bg-[var(--theme-color)] text-white text-sm px-4 py-1 rounded-full w-fit mx-auto -mt-4 mb-4">
                 Recommended
               </div>
             )}
