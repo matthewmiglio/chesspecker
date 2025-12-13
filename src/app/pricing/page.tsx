@@ -10,7 +10,7 @@ function PricingContent() {
   const { status: sessionStatus } = useSession();
   const { isPremium, isLoading: premiumLoading, refetch } = usePremiumStatus();
   const searchParams = useSearchParams();
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("yearly");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
