@@ -255,7 +255,11 @@ function PricingContent() {
               <button
                 onClick={handleCheckout}
                 disabled={isCheckoutLoading || sessionStatus !== "authenticated"}
-                className="w-full py-3 rounded-lg bg-[var(--theme-color)] hover:bg-[var(--theme-color)]/80 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[var(--theme-color)]/30"
+                className="w-full py-3 rounded-lg text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "var(--theme-color)",
+                  boxShadow: "0 4px 14px 0 rgba(0, 200, 150, 0.3)"
+                }}
               >
                 {isCheckoutLoading ? (
                   <>
