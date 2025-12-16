@@ -25,6 +25,15 @@ function PricingContent() {
     }
   }, [searchParams, refetch]);
 
+  // Safety check: ensure user is registered in ChessPeckerUsers table
+  useEffect(() => {
+    if (sessionStatus === "authenticated") {
+      fetch("/api/user/ensure-registered", { method: "POST" }).catch(() => {
+        // Silently fail - not critical for page functionality
+      });
+    }
+  }, [sessionStatus]);
+
   const handleCheckout = async () => {
     if (sessionStatus !== "authenticated") {
       setMessage({ type: "error", text: "Please sign in to upgrade" });
