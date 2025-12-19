@@ -4,8 +4,26 @@ import { useEffect, useState, useMemo } from "react";
 import { Chess, Square, Move } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
+import { useSfx } from "@/lib/hooks/useSfx";
 
 import ArrowOverlay from "@/components/puzzles/ArrowOverlay";
+
+function getMoveSound(game: Chess): "check" | "take" | "move" {
+  const history = game.history({ verbose: true });
+  const lastMove = history[history.length - 1];
+
+  if (game.inCheck()) return "check";
+
+  if (
+    lastMove?.captured ||
+    lastMove?.flags.includes("c") ||
+    lastMove?.flags.includes("e")
+  ) {
+    return "take";
+  }
+
+  return "move";
+}
 import {
   handlePieceDropHelper,
   handleRightMouseDownHelper,
@@ -41,6 +59,7 @@ export default function AnimatedBoard({
   lightSquareColor = '#F2F6FA',
 }: Props) {
   const themeColor = useThemeAccentColor();
+  const { play: playSfx } = useSfx();
   const [game, setGame] = useState(new Chess(fen));
   const [arrows, setArrows] = useState<{ from: Square; to: Square }[]>([]);
   const [arrowStart, setArrowStart] = useState<Square | null>(null);
@@ -122,6 +141,7 @@ export default function AnimatedBoard({
     // Update game state immediately - this triggers the animation
     if (result.nextGame) {
       setGame(result.nextGame);
+      playSfx(getMoveSound(result.nextGame));
       onMove(sourceSquare + targetSquare, true);
 
       // After the user's move animates (300ms), play the opponent's reply
@@ -137,6 +157,7 @@ export default function AnimatedBoard({
           const nextGame = new Chess(result.nextGame!.fen());
           nextGame.move(replyMove);
           setGame(nextGame);
+          playSfx(getMoveSound(nextGame));
         }
       }, 350); // Slightly longer than animation duration (300ms)
     }
@@ -179,6 +200,7 @@ export default function AnimatedBoard({
         // Update game state immediately - this triggers the animation
         if (result.moveResult.nextGame) {
           setGame(result.moveResult.nextGame);
+          playSfx(getMoveSound(result.moveResult.nextGame));
           onMove(selectedSquare! + square, true);
 
           // After the user's move animates (300ms), play the opponent's reply
@@ -194,6 +216,7 @@ export default function AnimatedBoard({
               const nextGame = new Chess(result.moveResult!.nextGame!.fen());
               nextGame.move(replyMove);
               setGame(nextGame);
+              playSfx(getMoveSound(nextGame));
             }
           }, 350); // Slightly longer than animation duration (300ms)
         }
