@@ -82,7 +82,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Update user to premium - subscription details will be updated by subscription.updated event
+  // Fetch subscription to get current_period_end
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const periodEnd = new Date(subscription.current_period_end * 1000);
+
   const { error } = await supabase
     .from("ChessPeckerUsers")
     .update({
@@ -90,6 +93,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
       subscription_status: "active",
+      subscription_ends_at: periodEnd.toISOString(),
     })
     .eq("email", customerEmail.toLowerCase());
 
