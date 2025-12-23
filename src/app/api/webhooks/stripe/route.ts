@@ -84,7 +84,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // Fetch subscription to get current_period_end
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  const periodEnd = new Date(subscription.current_period_end * 1000);
+  const subData = subscription as unknown as { current_period_end?: number };
+  const periodEnd = subData.current_period_end
+    ? new Date(subData.current_period_end * 1000)
+    : new Date();
 
   const { error } = await supabase
     .from("ChessPeckerUsers")
