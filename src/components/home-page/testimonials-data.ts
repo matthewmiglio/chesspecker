@@ -55,5 +55,10 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Mohmadsameer9687",
     monthYear: "September 2025",
     quote: "I love this site. It did help me get better at chess. I was 100 elo now I am 500. Thanks for creating this site and helping people get better."
+  },
+  {
+    name: "Adam Ismail",
+    monthYear: "December 2024",
+    quote: "I gave it a try and I really liked it! I always wanted to do the woodpecker method and now it's just one click away. Absolute cinema!"
   }
 ];
