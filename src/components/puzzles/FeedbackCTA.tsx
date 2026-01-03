@@ -11,7 +11,7 @@ export default function FeedbackCTA({ className }: { className?: string }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-600">
-              // FEEDBACK_REQUEST
+              {"// FEEDBACK_REQUEST"}
             </p>
             <h3 className="text-zinc-200 text-sm uppercase tracking-wider">
               Help us improve ChessPecker

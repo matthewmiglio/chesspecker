@@ -55,7 +55,7 @@ type ChessBoardWrapperProps = {
   puzzleIds: string[];
   autoShowSolution: boolean;
   setAutoShowSolution: (value: boolean) => void;
-  puzzleSetName: string;
+  puzzleSetName?: string;
   resetKey: number;
   boardThemeIndex?: number;
   setBoardThemeIndex?: (index: number) => void;
@@ -77,7 +77,6 @@ export default function ChessBoardWrapper({
   puzzleIds,
   autoShowSolution,
   setAutoShowSolution,
-  puzzleSetName,
   resetKey,
   boardThemeIndex = 0,
   setBoardThemeIndex,
@@ -130,29 +129,6 @@ export default function ChessBoardWrapper({
 
     return () => clearTimeout(timer); // Cleanup timer
   }, [puzzleSession.isSessionActive, fen]); // Reset only when puzzle loads, not when user makes moves
-
-  // Create hint button styling based on theme and highlight state
-  const getHintButtonClasses = () => {
-    const baseClasses = "flex items-center p-2 transition-all duration-300";
-    if (!showHintHighlight) {
-      return baseClasses;
-    }
-
-
-    return `${baseClasses} border-2 rounded-md`;
-  };
-
-  const getHintButtonStyle = () => {
-    if (!showHintHighlight) return {};
-
-    // Always use red color for dark mode
-    const outlineColor = "rgb(244, 67, 54)";
-
-    return {
-      borderColor: outlineColor,
-      boxShadow: `0 0 8px ${outlineColor}40` // 40 for opacity
-    };
-  };
 
   const handleCopyFen = async () => {
     if (!puzzleIds || puzzleIds.length === 0 || currentPuzzleIndex >= puzzleIds.length) {

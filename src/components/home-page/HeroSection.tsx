@@ -15,7 +15,7 @@ export function HeroSection({ themeColor }: { themeColor: string }) {
           <div className="flex-1 p-10 md:py-32 md:px-16 space-y-8">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-[0.3em] font-mono" style={{ color: themeColor }}>
-                // CHESS_TRAINING_SYSTEM
+                {"// CHESS_TRAINING_SYSTEM"}
               </p>
               <h1 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-wide">
                 Woodpecker<br />Method

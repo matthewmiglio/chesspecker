@@ -45,7 +45,7 @@ export function TestimonialsCarousel({
         <div className="p-8 md:p-12">
           <div className="flex justify-between items-center mb-8">
             <p className="text-xs uppercase tracking-[0.3em] font-mono" style={{ color: themeColor }}>
-              // USER_FEEDBACK
+              {"// USER_FEEDBACK"}
             </p>
             <div className="flex gap-2">
               <button onClick={() => go(-1)} className="w-11 h-11 flex items-center justify-center border border-zinc-700 hover:bg-zinc-800 transition">
@@ -71,7 +71,7 @@ export function TestimonialsCarousel({
                   <div className="flex items-center gap-3">
                     <div className="h-px flex-grow max-w-12" style={{ backgroundColor: themeColor }} />
                     <p className="text-zinc-400 font-mono text-sm">
-                      {t.name.toUpperCase()} <span className="text-zinc-600">// {t.monthYear}</span>
+                      {t.name.toUpperCase()} <span className="text-zinc-600">{"// "}{t.monthYear}</span>
                     </p>
                   </div>
                 </div>
