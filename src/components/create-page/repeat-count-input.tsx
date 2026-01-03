@@ -33,7 +33,7 @@ const RepeatCountInput: FC<RepeatCountInputProps> = ({ value, onChange }) => {
             type="button"
             onClick={() => onChange(count)}
             className={cn(
-              "w-10 h-10 rounded-md border text-sm font-medium transition-all duration-200 transform",
+              "w-11 h-11 rounded-md border text-sm font-medium transition-all duration-200 transform",
               isSelected 
                 ? "scale-110 shadow-lg border-2 border-white ring-2 ring-offset-2 ring-offset-background"
                 : "hover:scale-105 border-transparent"

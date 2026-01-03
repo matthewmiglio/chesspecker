@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { TESTIMONIALS } from "./testimonials-data";
 
-/* ---------- Airy, Always-Scrolling Carousel ---------- */
 export function TestimonialsCarousel({
   themeColor,
   autoAdvanceMs = 6000,
@@ -12,12 +11,10 @@ export function TestimonialsCarousel({
   themeColor: string;
   autoAdvanceMs?: number;
 }) {
-  // Start at 0 for SSR, then randomize on mount to avoid hydration mismatch
   const [index, setIndex] = useState(0);
   const size = TESTIMONIALS.length;
   const timerRef = useRef<number | null>(null);
 
-  // Randomize starting index after mount (client-side only)
   useEffect(() => {
     setIndex(Math.floor(Math.random() * TESTIMONIALS.length));
   }, []);
@@ -26,7 +23,6 @@ export function TestimonialsCarousel({
     setIndex((prev) => (prev + next + size) % size);
   };
 
-  // Always auto-advance (no pause on hover)
   useEffect(() => {
     timerRef.current = window.setTimeout(() => {
       setIndex((prev) => (prev + 1) % size);
@@ -36,7 +32,6 @@ export function TestimonialsCarousel({
     };
   }, [index, autoAdvanceMs, size]);
 
-  // Render only the current and adjacent slides for smooth fades
   const visibleSlides = useMemo(() => {
     const prev = (index - 1 + size) % size;
     const curr = index;
@@ -45,79 +40,58 @@ export function TestimonialsCarousel({
   }, [index, size]);
 
   return (
-    <section className="m-28 w-full max-w-6xl px-4">
-      <div className="mb-10 flex items-center justify-between">
-        <div className="flex gap-3">
-          <button
-            aria-label="Previous testimonial"
-            onClick={() => go(-1)}
-            className="rounded-xl border px-3 py-3 hover:bg-muted/50 transition"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            aria-label="Next testimonial"
-            onClick={() => go(1)}
-            className="rounded-xl border px-3 py-3 hover:bg-muted/50 transition"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
-      <div
-        className="relative overflow-hidden rounded-2xl border bg-card"
-        style={{ boxShadow: `0 0 18px ${themeColor}` }}
-      >
-        {/* Airy stage */}
-        <div className="relative h-[500px] md:h-[345px]">
-          {TESTIMONIALS.map((t, i) => {
-            const isActive = i === index;
-            const shouldRender = visibleSlides.includes(i);
-            if (!shouldRender) return null;
-
-            return (
-              <article
-                key={`${t.name}-${t.monthYear}-${i}`}
-                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-out
-                  ${isActive ? "opacity-100" : "opacity-0"}
-                `}
-              >
-                <div className="max-w-4xl mx-auto text-center px-6 md:px-12">
-                  <Quote
-                    className="mx-auto mb-8 h-10 w-10 opacity-80"
-                    style={{ color: themeColor }}
-                  />
-                  <p className="text-2xl md:text-[28px] leading-relaxed md:leading-[2.1rem] text-foreground/90">
-                    &ldquo;{t.quote}&rdquo;
+    <section className="w-[calc(100%+3rem)] -mx-6">
+      <div className="bg-zinc-900 border-l-4" style={{ borderColor: themeColor }}>
+        <div className="p-8 md:p-12">
+          <div className="flex justify-between items-center mb-8">
+            <p className="text-xs uppercase tracking-[0.3em] font-mono" style={{ color: themeColor }}>
+              // USER_FEEDBACK
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => go(-1)} className="w-11 h-11 flex items-center justify-center border border-zinc-700 hover:bg-zinc-800 transition">
+                <ChevronLeft className="h-5 w-5 text-zinc-400" />
+              </button>
+              <button onClick={() => go(1)} className="w-11 h-11 flex items-center justify-center border border-zinc-700 hover:bg-zinc-800 transition">
+                <ChevronRight className="h-5 w-5 text-zinc-400" />
+              </button>
+            </div>
+          </div>
+          <div className="relative h-[240px]">
+            {TESTIMONIALS.map((t, i) => {
+              const isActive = i === index;
+              if (!visibleSlides.includes(i)) return null;
+              return (
+                <div
+                  key={`${t.name}-${i}`}
+                  className={`absolute inset-0 flex flex-col justify-center transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`}
+                >
+                  <p className="text-xl md:text-2xl text-zinc-200 font-mono leading-relaxed mb-8 max-w-3xl">
+                    {`> "${t.quote}"`}
                   </p>
-                  <div className="mt-10 text-base md:text-lg">
-                    <span className="font-semibold text-foreground">{t.name}</span>
-                    <span className="text-muted-foreground"> — {t.monthYear}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-grow max-w-12" style={{ backgroundColor: themeColor }} />
+                    <p className="text-zinc-400 font-mono text-sm">
+                      {t.name.toUpperCase()} <span className="text-zinc-600">// {t.monthYear}</span>
+                    </p>
                   </div>
                 </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {/* Minimal dots, widely spaced for breathing room */}
-        <div className="flex items-center justify-center gap-3 px-4 py-8">
-          {TESTIMONIALS.map((_, i) => {
-            const active = i === index;
-            return (
+              );
+            })}
+          </div>
+          <div className="flex gap-2 pt-6">
+            {TESTIMONIALS.map((_, i) => (
               <button
                 key={i}
-                aria-label={`Go to testimonial ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className={`h-2.5 w-2.5 rounded-full transition-all ${active ? "scale-125" : "opacity-60 hover:opacity-100"}`}
-                style={{
-                  backgroundColor: active ? themeColor : "var(--border)",
-                  boxShadow: active ? `0 0 10px ${themeColor}` : "none",
-                }}
-              />
-            );
-          })}
+                className={`min-w-[44px] h-11 flex items-center justify-center transition-all`}
+              >
+                <span
+                  className={`h-2 rounded-full transition-all ${i === index ? "w-8" : "w-3"}`}
+                  style={{ backgroundColor: i === index ? themeColor : "#3f3f46" }}
+                />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>

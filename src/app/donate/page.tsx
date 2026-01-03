@@ -41,20 +41,22 @@ export default function DonatePage() {
         </div>
 
         {/* Call to Action Section */}
-        <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-12 text-center">
-          <h2 className="text-3xl font-bold mb-6">So... wanna chip in?</h2>
-
-          <p className="text-lg mb-8 leading-relaxed">
-            Every dollar helps keep this alive. No ads, no BS, just useful chess training.
+        <div className="bg-neutral-900 border border-neutral-800 rounded-none p-16 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 mb-6">Support the Mission</p>
+          <h2 className="text-4xl font-serif italic text-white mb-6">
+            Care to contribute?
+          </h2>
+          <div className="w-16 h-px bg-neutral-700 mx-auto mb-6"></div>
+          <p className="text-neutral-400 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+            Every contribution sustains free chess training for thousands. No advertisements. No subscriptions. Pure training.
           </p>
-
           <a
             href="https://donate.stripe.com/4gM7sN3Vj4vO2u4dzF4Ja04"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold px-10 py-4 rounded-lg transition-colors text-lg"
+            className="inline-block border border-white text-white px-12 py-4 text-sm uppercase tracking-widest hover:bg-white hover:text-neutral-900 transition-all duration-500"
           >
-            Donate via Stripe 💸
+            Donate via Stripe
           </a>
         </div>
 

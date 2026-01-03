@@ -1,17 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
-  CartesianGrid,
+  AreaChart,
+  Area,
 } from "recharts";
-import { useThemeAccentColor } from "@/lib/hooks/useThemeAccentColor";
 import type { TooltipProps } from "recharts";
 
 interface AccuracyChartCardProps {
@@ -27,218 +23,129 @@ interface AccuracyChartCardProps {
 
 const formatTime = (seconds: number | null | undefined): string => {
   if (!seconds) return "N/A";
-
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-
   if (minutes > 0) {
     return `${minutes}m ${remainingSeconds}s`;
   }
   return `${remainingSeconds}s`;
 };
 
-const TimeTooltip = ({
-  active,
-  payload,
-  label,
-}: TooltipProps<number, string>) => {
+const TimeTooltipDark = ({ active, payload, label }: TooltipProps<number, string>) => {
   if (active && payload?.length) {
     const data = payload[0].payload as AccuracyChartCardProps["accuracyData"][0];
-
     return (
-      <div className="rounded-lg bg-background border p-3 shadow-lg min-w-[180px]">
-        <p className="font-semibold text-lg mb-2">Repeat #{label}</p>
-        <div className="flex justify-between items-center">
-          <span className="text-blue-600 font-medium">Time Taken:</span>
-          <span className="font-bold text-lg">
-            {data.time_taken ? formatTime(data.time_taken) : "N/A"}
-          </span>
-        </div>
+      <div className="rounded-lg bg-zinc-900 border border-zinc-700 p-4 shadow-2xl">
+        <p className="font-light text-zinc-400 text-xs uppercase tracking-widest mb-2">Repeat {label}</p>
+        <p className="text-2xl font-light text-white">{data.time_taken ? formatTime(data.time_taken) : "N/A"}</p>
       </div>
     );
   }
-
   return null;
 };
 
-const AccuracyTooltip = ({
-  active,
-  payload,
-  label,
-}: TooltipProps<number, string>) => {
+const AccuracyTooltipDark = ({ active, payload, label }: TooltipProps<number, string>) => {
   if (active && payload?.length) {
     const data = payload[0].payload as AccuracyChartCardProps["accuracyData"][0];
     const total = data.correct + data.incorrect;
-
+    const accuracy = total > 0 ? ((data.correct / total) * 100).toFixed(1) : "0";
     return (
-      <div className="rounded-lg bg-background border p-3 shadow-lg min-w-[200px]">
-        <p className="font-semibold text-lg mb-3">Repeat #{label}</p>
-
+      <div className="rounded-lg bg-zinc-900 border border-zinc-700 p-4 shadow-2xl min-w-[180px]">
+        <p className="font-light text-zinc-400 text-xs uppercase tracking-widest mb-3">Repeat {label}</p>
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-green-600 font-medium">Correct:</span>
-            <span className="font-bold text-lg">{data.correct}</span>
+          <div className="flex justify-between">
+            <span className="text-emerald-400 text-sm">Correct</span>
+            <span className="text-white font-medium">{data.correct}</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-red-600 font-medium">Incorrect:</span>
-            <span className="font-bold text-lg">{data.incorrect}</span>
+          <div className="flex justify-between">
+            <span className="text-rose-400 text-sm">Incorrect</span>
+            <span className="text-white font-medium">{data.incorrect}</span>
           </div>
         </div>
-
-        <div className="mt-3 pt-2 border-t text-sm text-muted-foreground">
-          <div className="flex justify-between">
-            <span>Accuracy:</span>
-            <span>{total > 0 ? ((data.correct / total) * 100).toFixed(1) : 0}%</span>
-          </div>
+        <div className="mt-3 pt-3 border-t border-zinc-700">
+          <p className="text-zinc-400 text-xs">Accuracy: <span className="text-white">{accuracy}%</span></p>
         </div>
       </div>
     );
   }
-
   return null;
 };
 
+// LUNA - Dark with gradient glow
+const TimeChartLuna = ({ data }: { data: AccuracyChartCardProps["accuracyData"] }) => (
+  <div className="rounded-2xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-6 border border-zinc-800">
+    <div className="flex items-center justify-between mb-6">
+      <h4 className="text-zinc-100 font-light text-lg tracking-wide">Time per Repeat</h4>
+      <span className="text-zinc-500 text-xs uppercase tracking-widest">seconds</span>
+    </div>
+    <div className="h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
+          <defs>
+            <linearGradient id="lunaGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="repeat" stroke="#52525b" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis stroke="#52525b" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<TimeTooltipDark />} />
+          <Area type="monotone" dataKey="time_taken" stroke="#818cf8" strokeWidth={2} fill="url(#lunaGradient)" dot={{ fill: '#818cf8', r: 4, strokeWidth: 0 }} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
 
+// AURORA - Dark with stacked area
+const AccuracyChartAurora = ({ data }: { data: AccuracyChartCardProps["accuracyData"] }) => (
+  <div className="rounded-2xl bg-gradient-to-br from-zinc-950 via-emerald-950/10 to-zinc-950 p-6 border border-zinc-800">
+    <div className="flex items-center justify-between mb-6">
+      <h4 className="text-zinc-100 font-light text-lg tracking-wide">Accuracy Overview</h4>
+      <div className="flex gap-4">
+        <span className="flex items-center gap-2 text-xs"><span className="w-3 h-3 rounded-full bg-emerald-500" /> Correct</span>
+        <span className="flex items-center gap-2 text-xs text-zinc-400"><span className="w-3 h-3 rounded-full bg-rose-500" /> Incorrect</span>
+      </div>
+    </div>
+    <div className="h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
+          <defs>
+            <linearGradient id="auroraCorrect" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity={0.5} />
+              <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="auroraIncorrect" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.5} />
+              <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="repeat" stroke="#52525b" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis stroke="#52525b" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<AccuracyTooltipDark />} />
+          <Area type="monotone" dataKey="correct" stroke="#34d399" strokeWidth={2} fill="url(#auroraCorrect)" />
+          <Area type="monotone" dataKey="incorrect" stroke="#fb7185" strokeWidth={2} fill="url(#auroraIncorrect)" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
 
-export default function AccuracyChartCard({
-  accuracyData,
-}: AccuracyChartCardProps) {
-  const themeColor = useThemeAccentColor();
+export default function AccuracyChartCard({ accuracyData }: AccuracyChartCardProps) {
+  const chartData = accuracyData.map(item => ({ ...item }));
 
-  const chartData = accuracyData.map(item => ({
-    ...item,
-  }));
+  if (accuracyData.length === 0) {
+    return (
+      <div className="rounded-2xl bg-zinc-950 border border-zinc-800 p-8">
+        <p className="text-zinc-400 text-center">No data available for this set.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Time Taken Chart */}
-      <div
-        className="transition-all duration-300"
-        style={{
-          boxShadow: `0 0 3px 0px ${themeColor}`,
-        }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Time Taken per Repeat</span>
-              <span className="text-sm text-muted-foreground font-normal">
-                Total time in seconds
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-[350px]">
-            {accuracyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="repeat"
-                    label={{ value: 'Repeat Index', position: 'insideBottom', offset: -10 }}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    label={{ value: 'Time (seconds)', angle: -90, position: 'insideLeft' }}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip content={<TimeTooltip />} />
-                  <Legend
-                    wrapperStyle={{ paddingTop: '10px' }}
-                    iconType="line"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="time_taken"
-                    stroke="#3b82f6"
-                    strokeWidth={3}
-                    name="Time Taken (s)"
-                    dot={{ fill: '#3b82f6', r: 5 }}
-                    activeDot={{ r: 7 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-muted-foreground text-center">
-                  No time data available for this set.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Accuracy Chart */}
-      <div
-        className="transition-all duration-300"
-        style={{
-          boxShadow: `0 0 3px 0px ${themeColor}`,
-        }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Accuracy per Repeat</span>
-              <span className="text-sm text-muted-foreground font-normal">
-                Correct vs Incorrect count
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-[350px]">
-            {accuracyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="repeat"
-                    label={{ value: 'Repeat Index', position: 'insideBottom', offset: -10 }}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip content={<AccuracyTooltip />} />
-                  <Legend
-                    wrapperStyle={{ paddingTop: '10px' }}
-                    iconType="line"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="correct"
-                    stroke="#22c55e"
-                    strokeWidth={3}
-                    name="Correct"
-                    dot={{ fill: '#22c55e', r: 5 }}
-                    activeDot={{ r: 7 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="incorrect"
-                    stroke="#ef4444"
-                    strokeWidth={3}
-                    name="Incorrect"
-                    dot={{ fill: '#ef4444', r: 5 }}
-                    activeDot={{ r: 7 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-muted-foreground text-center">
-                  No accuracy data available for this set.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <TimeChartLuna data={chartData} />
+      <AccuracyChartAurora data={chartData} />
     </div>
   );
 }

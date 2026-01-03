@@ -40,7 +40,7 @@ export default function LoginButton({
           {showLogout && (
             <button
               onClick={() => signOut()}
-              className={`px-4 py-2 rounded ${buttonClasses}`}
+              className={`px-4 py-3 min-h-[44px] rounded ${buttonClasses}`}
             >
               Logout
             </button>
@@ -49,7 +49,7 @@ export default function LoginButton({
       ) : (
         <button
           onClick={() => signIn("google")}
-          className={`px-4 py-2 rounded ${buttonClasses}`}
+          className={`px-4 py-3 min-h-[44px] rounded ${buttonClasses}`}
         >
           <span className="px-3 whitespace-nowrap">{loginText}</span>
         </button>

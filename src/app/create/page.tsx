@@ -3,10 +3,9 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { Card } from "@/components/ui/card";
-import CreateSetForm from "@/components/create-page/create-set-form";
+import CreateSetFormAltA from "@/components/create-page/create-set-form-alt-a";
 import PuzzleSetCreationProgress from "@/components/create-page/set-creation-progress";
-import ExistingSets from "@/components/create-page/ExistingSets";
+import ExistingSetsAltA from "@/components/create-page/ExistingSetsAltA";
 import { useToast } from "@/lib/hooks/useToast";
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { PUZZLE_THEMES_OVER_10K } from "@/lib/constants/puzzleThemes";
@@ -275,9 +274,9 @@ export default function CreatePuzzleSetPage() {
     const confirmed = await showConfirmDeletePopup();
     if (!confirmed) return;
 
-    const success = await deleteUserSet(setId);
+    const successResult = await deleteUserSet(setId);
 
-    if (success) {
+    if (successResult) {
       setUserSets((prev) => prev.filter((set) => set.set_id !== setId));
     }
   };
@@ -370,15 +369,43 @@ export default function CreatePuzzleSetPage() {
   // Check if free user has reached set limit
   const hasReachedSetLimit = !isPremium && userSets.length >= FREE_TIER_LIMITS.maxSets;
 
+  // Common props for form
+  const formProps = {
+    name,
+    setName,
+    description,
+    setDescription,
+    repeatCount,
+    setRepeatCount,
+    setSize,
+    setSetSize,
+    difficultySliderValue,
+    setDifficultySliderValue,
+    selectedThemes,
+    setSelectedThemes,
+    handleCreateSetButton,
+    isCreatingSet,
+    isPremium,
+    onLockedThemeClick: () => info("Upgrade to Premium to unlock all 21 themes", "Premium Feature"),
+  };
+
+  // Common props for existing sets
+  const existingSetsProps = {
+    sets: userSets,
+    isLoading: isSetsLoading,
+    onDeleteSet: handleSetDelete,
+    isLoggedIn,
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-10">Create Puzzle Set</h1>
 
       {/* Set limit warning for free users */}
       {hasReachedSetLimit && (
-        <div className="mb-8 p-4 rounded-lg bg-[var(--theme-color)]/10 border border-[var(--theme-color)]/30">
+        <div className="mb-8 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
           <div className="flex items-center gap-3">
-            <Crown className="w-6 h-6 text-[var(--theme-color)]" />
+            <Crown className="w-6 h-6 text-red-500" />
             <div className="flex-1">
               <p className="font-medium">You&apos;ve reached the free tier limit of {FREE_TIER_LIMITS.maxSets} puzzle sets</p>
               <p className="text-sm text-muted-foreground">
@@ -387,7 +414,7 @@ export default function CreatePuzzleSetPage() {
             </div>
             <Link
               href="/pricing"
-              className="px-4 py-2 rounded-lg bg-[var(--theme-color)] text-white font-medium hover:bg-[var(--theme-color)]/80 transition-colors"
+              className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-500/80 transition-colors"
             >
               Upgrade
             </Link>
@@ -398,40 +425,23 @@ export default function CreatePuzzleSetPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Create Form Section */}
         <div className="relative">
-          <Card
-            className={
+          <div
+            className={`bg-black/50 border border-red-500/20 p-2 ${
               !isLoggedIn || hasReachedSetLimit
                 ? "blur-sm pointer-events-none opacity-50"
                 : ""
-            }
+            }`}
           >
-            <CreateSetForm
-              name={name}
-              setName={setName}
-              description={description}
-              setDescription={setDescription}
-              repeatCount={repeatCount}
-              setRepeatCount={setRepeatCount}
-              setSize={setSize}
-              setSetSize={setSetSize}
-              difficultySliderValue={difficultySliderValue}
-              setDifficultySliderValue={setDifficultySliderValue}
-              selectedThemes={selectedThemes}
-              setSelectedThemes={setSelectedThemes}
-              handleCreateSetButton={handleCreateSetButton}
-              isCreatingSet={isCreatingSet}
-              isPremium={isPremium}
-              onLockedThemeClick={() => info("Upgrade to Premium to unlock all 21 themes", "Premium Feature")}
-            />
-          </Card>
+            <CreateSetFormAltA {...formProps} />
+          </div>
 
           {!isLoggedIn && (
             <div className="absolute inset-0 flex items-center justify-center">
               <button
                 onClick={() => signIn("google")}
-                className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
+                className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-500/90 transition-colors shadow-lg"
               >
-                You must Log in to create a set
+                Log in to create a set
               </button>
             </div>
           )}
@@ -447,8 +457,8 @@ export default function CreatePuzzleSetPage() {
         </div>
 
         {/* Existing Sets Section */}
-        <div>
-          <ExistingSets sets={userSets} isLoading={isSetsLoading} onDeleteSet={handleSetDelete} isLoggedIn={isLoggedIn} />
+        <div className="bg-black/50 border border-red-500/20 p-2">
+          <ExistingSetsAltA {...existingSetsProps} />
         </div>
       </div>
     </div>

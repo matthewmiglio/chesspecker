@@ -6,48 +6,47 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection({ themeColor }: { themeColor: string }) {
-  const heroImage = "/heros/chess_duel_white.png";
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className="flex flex-col items-center text-center max-w-[55rem] space-y-6">
-      <div className="mt-6 md:mt-16 relative w-82 h-82 md:w-127 md:h-127 transition-transform">
-        <Image
-          src={heroImage}
-          alt="Chess tactics training with ChessPecker - Woodpecker Method for pattern recognition"
-          fill
-          style={{ objectFit: "contain" }}
-          priority
-          className={`transition-opacity duration-700 ease-in-out ${imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-          onLoad={() => setImageLoaded(true)}
-        />
-      </div>
-
-      <h1 className="text-5xl md:text-6xl font-extrabold ">
-        Chess Tactics Training with the <span style={{ color: themeColor }}>Woodpecker Method</span>
-      </h1>
-
-      <p className="text-muted-foreground text-lg md:text-xl px-4 font-semibold">
-        Train Smarter. Play Better.
-      </p>
-
-      {/* Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 mt-4">
-        {/* Start Training (glow wrap) */}
-        <div
-          className="rounded-xl transition-all duration-300"
-          style={{ boxShadow: `0 0 22px ${themeColor}` }}
-        >
-          <Button asChild size="lg" className="rounded-xl shadow-none bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link href="/puzzles">Start Training</Link>
-          </Button>
+    <div className="w-[calc(100%+3rem)] -mx-6">
+      <div className="bg-zinc-900 border-l-4" style={{ borderColor: themeColor }}>
+        <div className="flex flex-col md:flex-row">
+          <div className="flex-1 p-10 md:py-32 md:px-16 space-y-8">
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-[0.3em] font-mono" style={{ color: themeColor }}>
+                // CHESS_TRAINING_SYSTEM
+              </p>
+              <h1 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-wide">
+                Woodpecker<br />Method
+              </h1>
+            </div>
+            <div className="h-px bg-zinc-700 w-24" />
+            <p className="text-zinc-400 text-sm md:text-base font-mono max-w-md">
+              {">"} Train smarter. Play better.<br />
+              {">"} Pattern recognition system active.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button asChild size="lg" className="rounded-none uppercase tracking-wider text-sm" style={{ backgroundColor: themeColor }}>
+                <Link href="/puzzles">Initialize Training</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-none uppercase tracking-wider text-sm border-zinc-600 text-zinc-300">
+                <Link href="/about">Read Docs</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="relative w-full md:w-1/2 h-56 md:h-auto md:min-h-[550px]">
+            <Image
+              src="/high-res/photo-1580541832626-2a7131ee809f.avif"
+              alt="Chess tactics training"
+              fill
+              style={{ objectFit: "cover" }}
+              priority
+              className={`transition-opacity duration-500 ${imageLoaded ? "opacity-90" : "opacity-0"}`}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </div>
         </div>
-
-        {/* Learn More */}
-        <Button asChild variant="outline" size="lg">
-          <Link href="/about">Learn More</Link>
-        </Button>
       </div>
     </div>
   );

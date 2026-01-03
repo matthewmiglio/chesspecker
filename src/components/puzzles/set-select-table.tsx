@@ -2,11 +2,16 @@
 
 import type { ChessPeckerSet } from "@/types/chessPeckerSet";
 import { handleSetSelect } from "@/lib/utils/puzzleHelpers";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+
+const getProgressColor = (percent: number) => {
+  if (percent >= 75) return "rgb(34, 197, 94)";
+  if (percent >= 50) return "rgb(234, 179, 8)";
+  if (percent >= 25) return "rgb(249, 115, 22)";
+  return "rgb(239, 68, 68)";
+};
 
 type SetSelectTableProps = {
   userSets: ChessPeckerSet[];
@@ -55,18 +60,18 @@ export default function SetSelectTable({
   if (isLoading) {
     return (
       <div className="w-[90%] ml-[5%] py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="relative bg-card text-card-foreground rounded-lg border-2 p-6 animate-pulse"
+              className="relative bg-zinc-900 border-l-4 border-zinc-700 p-5 animate-pulse"
             >
-              <div className="mb-4">
-                <div className="h-6 bg-muted rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-muted rounded w-1/2"></div>
+              <div className="mb-3">
+                <div className="h-5 bg-zinc-800 w-3/4 mb-2"></div>
+                <div className="h-3 bg-zinc-800 w-1/2"></div>
               </div>
-              <div className="h-2 bg-muted rounded-full mb-3"></div>
-              <div className="h-4 bg-muted rounded w-2/3"></div>
+              <div className="h-1.5 bg-zinc-800 mb-3"></div>
+              <div className="h-3 bg-zinc-800 w-2/3"></div>
             </div>
           ))}
         </div>
@@ -98,12 +103,12 @@ export default function SetSelectTable({
       ? "grid-cols-1 max-w-xs"
       : sortedSets.length === 2
       ? "grid-cols-1 sm:grid-cols-2 max-w-2xl"
-      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4";
 
   return (
     <div
       className={cn(
-        "w-[90%] ml-[5%] grid gap-6 py-8",
+        "w-[90%] ml-[5%] grid gap-3 py-8",
         gridColsClass
       )}
     >
@@ -116,16 +121,7 @@ export default function SetSelectTable({
           totalPuzzles > 0 ? (solvedPuzzles / totalPuzzles) * 100 : 0;
 
         const isSelected = selectedSetId === set.set_id;
-
-        // Color scheme: red -> orange -> yellow -> green based on progress
-        const progressColor =
-          progressPercent >= 75
-            ? "rgb(34, 197, 94)" // green (75-100%)
-            : progressPercent >= 50
-            ? "rgb(234, 179, 8)" // yellow (50-74%)
-            : progressPercent >= 25
-            ? "rgb(249, 115, 22)" // orange (25-49%)
-            : "rgb(239, 68, 68)"; // red (0-24%)
+        const color = getProgressColor(progressPercent);
 
         return (
           <div
@@ -157,49 +153,51 @@ export default function SetSelectTable({
               }
             }}
             className={cn(
-              "relative bg-card text-card-foreground rounded-lg border-2 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer",
-              isSelected && "shadow-[0_0_25px_rgba(234,179,8,0.9)]"
+              "relative bg-zinc-900 border-l-4 p-5 cursor-pointer transition-all duration-200 hover:bg-zinc-850",
+              isSelected && "bg-zinc-800"
             )}
-            style={{
-              borderColor: progressColor,
-              backgroundColor: `${progressColor}15`,
-            }}
+            style={{ borderColor: isSelected ? "#10b981" : color }}
           >
-            <div className="mb-3">
-              <div className="flex items-start justify-between mb-1">
-                <div className="text-base font-bold leading-tight line-clamp-2 flex-1">
-                  {set.name}
+            {/* Header */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-zinc-200 uppercase tracking-wider truncate font-mono">
+                    {set.name}
+                  </span>
+                  <span className="text-sm flex-shrink-0">{set.elo >= 1200 ? "🔥" : "🧩"}</span>
                 </div>
-                <span className="text-lg ml-2">
-                  {set.elo >= 1200 ? "🔥" : "🧩"}
-                </span>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-600 font-mono mt-1">
+                  ELO {set.elo}
+                </p>
               </div>
-              <div className="text-xs text-muted-foreground">ELO {set.elo}</div>
-            </div>
-
-            <Progress
-              value={progressPercent}
-              className="h-2 rounded-full bg-muted/50"
-              barClassName=""
-              style={{ backgroundColor: progressColor }}
-            />
-
-            <div className="mt-2 text-xs text-muted-foreground">
-              {solvedPuzzles} / {totalPuzzles} ({Math.round(progressPercent)}%)
-            </div>
-
-            <div className="flex justify-end mt-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-destructive"
+              <button
+                className="p-1 text-zinc-700 hover:text-red-500 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSetDelete(set.set_id);
                 }}
               >
                 <Trash2 className="h-4 w-4" />
-              </Button>
+              </button>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="h-1.5 bg-zinc-800 mb-3">
+              <div
+                className="h-full transition-all duration-300"
+                style={{ width: `${progressPercent}%`, backgroundColor: color }}
+              />
+            </div>
+
+            {/* Stats */}
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-zinc-500 font-mono">
+                {solvedPuzzles} / {totalPuzzles}
+              </span>
+              <span className="text-sm font-bold font-mono" style={{ color }}>
+                ({Math.round(progressPercent)}%)
+              </span>
             </div>
           </div>
         );

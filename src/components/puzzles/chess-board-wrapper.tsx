@@ -210,7 +210,7 @@ export default function ChessBoardWrapper({
                 />
               </div>
               <div className="flex-1 text-center">
-                <h2 className="text-3xl font-bold tracking-tight">{puzzleSetName}</h2>
+                <h2 className="text-3xl font-bold tracking-tight">{playerSide === "w" ? "White to move" : "Black to move"}</h2>
               </div>
               <div className="flex-shrink-0 w-[60px]"></div>
             </div>
@@ -230,93 +230,65 @@ export default function ChessBoardWrapper({
           </CardContent>
         </Card>
 
-        {/* Right: Stats & Controls Panel */}
-        <Card className="flex-1 lg:max-w-[35%] p-6">
-          <div className="space-y-6">
-
-            {/* To Move Indicator */}
-            <div className="text-center pb-2 border-b border-border">
-              <span className="text-sm font-medium text-muted-foreground">
-                {playerSide === "w" ? "White" : "Black"} to move
-              </span>
-            </div>
+        {/* Right: Stats & Controls Panel - CARBON Style */}
+        <div className="flex-1 lg:max-w-[35%] bg-zinc-900 border-l-4 p-6" style={{ borderColor: themeColor }}>
+          <div className="space-y-5">
 
             {/* Accuracy Stat Card */}
-            <div
-              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
-              style={{
-                borderColor: getAccuracyColor(),
-                backgroundColor: `${getAccuracyColor()}15`,
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Accuracy</span>
-                <div
-                  className="text-3xl font-bold"
-                  style={{ color: getAccuracyColor() }}
-                >
+            <div className="bg-zinc-800 border-l-2 p-4" style={{ borderColor: getAccuracyColor() }}>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Accuracy</span>
+                <span className="text-3xl font-bold font-mono" style={{ color: getAccuracyColor() }}>
                   {accuracy !== null ? `${accuracy}%` : "N/A"}
-                </div>
+                </span>
               </div>
             </div>
 
             {/* Puzzle Progress Card */}
-            <div
-              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
-              style={{
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              }}
-            >
-              <div className="flex items-center justify-between">
+            <div className="bg-zinc-800 border-l-2 border-blue-500 p-4">
+              <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <PuzzleIcon className="w-5 h-5" style={{ color: 'rgb(59, 130, 246)' }} />
-                  <span className="text-sm text-muted-foreground">Puzzle</span>
+                  <PuzzleIcon className="w-4 h-4 text-blue-500" />
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Puzzle</span>
                 </div>
-                <div className="text-2xl font-bold" style={{ color: 'rgb(59, 130, 246)' }}>
+                <span className="text-2xl font-bold text-blue-400 font-mono">
                   {currentPuzzleIndex} / {selectedSet.size}
-                </div>
+                </span>
               </div>
             </div>
 
             {/* Repeat Progress Card */}
-            <div
-              className="p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg"
-              style={{
-                borderColor: 'rgb(168, 85, 247)',
-                backgroundColor: 'rgba(168, 85, 247, 0.1)',
-              }}
-            >
-              <div className="flex items-center justify-between">
+            <div className="bg-zinc-800 border-l-2 border-purple-500 p-4">
+              <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <RepeatIcon className="w-5 h-5" style={{ color: 'rgb(168, 85, 247)' }} />
-                  <span className="text-sm text-muted-foreground">Repeat</span>
+                  <RepeatIcon className="w-4 h-4 text-purple-500" />
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Repeat</span>
                 </div>
-                <div className="text-2xl font-bold" style={{ color: 'rgb(168, 85, 247)' }}>
+                <span className="text-2xl font-bold text-purple-400 font-mono">
                   {currentRepeatIndex} / {selectedSet.repeats}
-                </div>
+                </span>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-border"></div>
+            <div className="h-px bg-zinc-700" />
 
             {/* Board Theme Selector */}
             <div className="relative">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <span className="text-sm font-medium">Board Theme</span>
+              <div className="flex items-center justify-between p-3 bg-zinc-800">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Board Theme</span>
                 <button
                   onClick={() => setShowThemeDropdown(!showThemeDropdown)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-background border border-border hover:bg-muted transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 border border-zinc-600 hover:bg-zinc-700 transition-colors"
                 >
-                  <Palette className="h-4 w-4" />
-                  <span className="text-sm">{currentTheme.name}</span>
+                  <Palette className="h-3 w-3 text-zinc-400" />
+                  <span className="text-xs text-zinc-300">{currentTheme.name}</span>
                 </button>
               </div>
 
               {/* Dropdown menu */}
               {showThemeDropdown && (
-                <div className="absolute right-0 top-full mt-2 w-full bg-card border border-border rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                <div className="absolute right-0 top-full mt-1 w-full bg-zinc-900 border border-zinc-700 z-10 max-h-64 overflow-y-auto">
                   {BOARD_THEMES.map((theme, index) => (
                     <button
                       key={theme.name}
@@ -324,20 +296,14 @@ export default function ChessBoardWrapper({
                         setBoardThemeIndex?.(index);
                         setShowThemeDropdown(false);
                       }}
-                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors ${
-                        index === boardThemeIndex ? 'bg-muted' : ''
+                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-zinc-800 transition-colors ${
+                        index === boardThemeIndex ? 'bg-zinc-800' : ''
                       }`}
                     >
-                      <span className="text-sm font-medium">{theme.name}</span>
+                      <span className="text-xs text-zinc-300">{theme.name}</span>
                       <div className="flex gap-1">
-                        <div
-                          className="w-6 h-6 rounded border border-border"
-                          style={{ backgroundColor: theme.dark }}
-                        />
-                        <div
-                          className="w-6 h-6 rounded border border-border"
-                          style={{ backgroundColor: theme.light }}
-                        />
+                        <div className="w-5 h-5 border border-zinc-600" style={{ backgroundColor: theme.dark }} />
+                        <div className="w-5 h-5 border border-zinc-600" style={{ backgroundColor: theme.light }} />
                       </div>
                     </button>
                   ))}
@@ -346,53 +312,37 @@ export default function ChessBoardWrapper({
             </div>
 
             {/* Auto Next Puzzle Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-              <span className="text-sm font-medium">Auto Next</span>
+            <div className="flex items-center justify-between p-3 bg-zinc-800">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Auto Next</span>
               <button
                 onClick={() => {
                   setAutoNextPuzzle(!autoNextPuzzle);
                   puzzleSession.setAutoNextPuzzle(!autoNextPuzzle);
                 }}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                style={{
-                  backgroundColor: autoNextPuzzle ? themeColor : 'rgb(156, 163, 175)',
-                  boxShadow: autoNextPuzzle ? `0 0 8px ${themeColor}60` : undefined
-                }}
+                className={`w-11 h-6 rounded-none border border-zinc-600 transition-colors ${autoNextPuzzle ? 'bg-emerald-600' : 'bg-zinc-700'}`}
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 shadow-md ${
-                    autoNextPuzzle ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
+                <span className={`block w-4 h-4 bg-white transform transition-transform ${autoNextPuzzle ? 'translate-x-5' : 'translate-x-1'}`} />
               </button>
             </div>
 
             {/* Auto Show Solution Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-              <span className="text-sm font-medium">Auto Solution</span>
+            <div className="flex items-center justify-between p-3 bg-zinc-800">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Auto Solution</span>
               <button
                 onClick={() => setAutoShowSolution(!autoShowSolution)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                style={{
-                  backgroundColor: autoShowSolution ? themeColor : 'rgb(156, 163, 175)',
-                  boxShadow: autoShowSolution ? `0 0 8px ${themeColor}60` : undefined
-                }}
+                className={`w-11 h-6 rounded-none border border-zinc-600 transition-colors ${autoShowSolution ? 'bg-emerald-600' : 'bg-zinc-700'}`}
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 shadow-md ${
-                    autoShowSolution ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
+                <span className={`block w-4 h-4 bg-white transform transition-transform ${autoShowSolution ? 'translate-x-5' : 'translate-x-1'}`} />
               </button>
             </div>
 
             {/* Hint Button */}
-            <Button
-              variant="outline"
-              className={`w-full ${getHintButtonClasses()}`}
+            <button
+              className="w-full flex items-center justify-center gap-2 p-3 rounded-none border-2 text-white hover:bg-opacity-20 transition-all font-mono text-sm uppercase tracking-wider"
               style={{
-                ...getHintButtonStyle(),
-                borderWidth: '2px',
+                borderColor: showHintHighlight ? 'rgb(244, 67, 54)' : themeColor,
+                backgroundColor: showHintHighlight ? 'rgba(244, 67, 54, 0.15)' : `${themeColor}15`,
+                boxShadow: showHintHighlight ? '0 0 8px rgba(244, 67, 54, 0.4)' : undefined
               }}
               onClick={() => {
                 const move = solution[solvedIndex];
@@ -404,12 +354,12 @@ export default function ChessBoardWrapper({
                 puzzleSession.setHintUsed(true);
               }}
             >
-              <Eye className="h-5 w-5 mr-2" />
-              <span className="font-semibold">Show Hint</span>
-            </Button>
+              <Eye className="h-4 w-4" />
+              Show Hint
+            </button>
 
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Feedback Buttons Overlay */}
