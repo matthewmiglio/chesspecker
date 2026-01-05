@@ -43,6 +43,7 @@ interface Props {
   resetKey?: number; // Optional key to force reset of animation state
   darkSquareColor?: string;
   lightSquareColor?: string;
+  soundEnabled?: boolean;
 }
 
 export default function AnimatedBoard({
@@ -57,9 +58,10 @@ export default function AnimatedBoard({
   resetKey,
   darkSquareColor = '#5994EF',
   lightSquareColor = '#F2F6FA',
+  soundEnabled = true,
 }: Props) {
   const themeColor = useThemeAccentColor();
-  const { play: playSfx } = useSfx();
+  const { play: playSfx } = useSfx(soundEnabled);
   const [game, setGame] = useState(new Chess(fen));
   const [arrows, setArrows] = useState<{ from: Square; to: Square }[]>([]);
   const [arrowStart, setArrowStart] = useState<Square | null>(null);

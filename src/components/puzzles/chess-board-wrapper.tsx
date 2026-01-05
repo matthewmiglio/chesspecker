@@ -1,4 +1,4 @@
-import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Copy, Play, Palette } from "lucide-react";
+import { Eye, Puzzle as PuzzleIcon, Repeat as RepeatIcon, RotateCcw, ArrowRight, Copy, Play, Palette, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedBoard from "@/components/puzzles/chess-board";
@@ -59,6 +59,8 @@ type ChessBoardWrapperProps = {
   resetKey: number;
   boardThemeIndex?: number;
   setBoardThemeIndex?: (index: number) => void;
+  soundEnabled?: boolean;
+  setSoundEnabled?: (enabled: boolean) => void;
 };
 
 export default function ChessBoardWrapper({
@@ -80,6 +82,8 @@ export default function ChessBoardWrapper({
   resetKey,
   boardThemeIndex = 0,
   setBoardThemeIndex,
+  soundEnabled = true,
+  setSoundEnabled,
 }: ChessBoardWrapperProps) {
   const themeColor = useThemeAccentColor();
   const { success, error } = useToast();
@@ -202,6 +206,7 @@ export default function ChessBoardWrapper({
               resetKey={resetKey}
               darkSquareColor={currentTheme.dark}
               lightSquareColor={currentTheme.light}
+              soundEnabled={soundEnabled}
             />
           </CardContent>
         </Card>
@@ -309,6 +314,20 @@ export default function ChessBoardWrapper({
                 className={`w-11 h-6 rounded-none border border-zinc-600 transition-colors ${autoShowSolution ? 'bg-emerald-600' : 'bg-zinc-700'}`}
               >
                 <span className={`block w-4 h-4 bg-white transform transition-transform ${autoShowSolution ? 'translate-x-5' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            {/* Sound Effects Toggle */}
+            <div className="flex items-center justify-between p-3 bg-zinc-800">
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-zinc-400" />
+                <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono">Sound</span>
+              </div>
+              <button
+                onClick={() => setSoundEnabled?.(!soundEnabled)}
+                className={`w-11 h-6 rounded-none border border-zinc-600 transition-colors ${soundEnabled ? 'bg-emerald-600' : 'bg-zinc-700'}`}
+              >
+                <span className={`block w-4 h-4 bg-white transform transition-transform ${soundEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
               </button>
             </div>
 

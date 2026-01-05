@@ -73,6 +73,21 @@ export default function PuzzlesPage() {
   const [autoShowSolution, setAutoShowSolution] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [boardThemeIndex, setBoardThemeIndex] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("chesspecker_sound_enabled");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
+
+  // Persist sound preference to localStorage
+  const handleSetSoundEnabled = (enabled: boolean) => {
+    setSoundEnabled(enabled);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("chesspecker_sound_enabled", String(enabled));
+    }
+  };
 
   const puzzleSession = usePuzzleSession({
     getSelectedSetId: () => selectedSetId,
@@ -228,6 +243,8 @@ export default function PuzzlesPage() {
             resetKey={resetKey}
             boardThemeIndex={boardThemeIndex}
             setBoardThemeIndex={setBoardThemeIndex}
+            soundEnabled={soundEnabled}
+            setSoundEnabled={handleSetSoundEnabled}
           />
         ) : (
           <PuzzleEmptyState

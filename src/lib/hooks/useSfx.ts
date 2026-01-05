@@ -23,8 +23,14 @@ function getAudioElements(): Record<SoundType, HTMLAudioElement> {
   return audioElements!;
 }
 
-export function useSfx() {
+export function useSfx(enabled: boolean = true) {
   const hasInteracted = useRef(false);
+  const enabledRef = useRef(enabled);
+
+  // Keep ref in sync with prop
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
 
   useEffect(() => {
     // Initialize audio elements
@@ -59,6 +65,8 @@ export function useSfx() {
   }, []);
 
   const play = useCallback((type: SoundType) => {
+    if (!enabledRef.current) return;
+
     const audios = getAudioElements();
     if (audios) {
       const audio = audios[type];

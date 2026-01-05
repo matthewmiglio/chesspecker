@@ -26,6 +26,8 @@ type PuzzleBoardAreaProps = {
   resetKey: number;
   boardThemeIndex?: number;
   setBoardThemeIndex?: (index: number) => void;
+  soundEnabled?: boolean;
+  setSoundEnabled?: (enabled: boolean) => void;
 };
 
 export default function PuzzleBoardArea({
@@ -49,6 +51,8 @@ export default function PuzzleBoardArea({
   resetKey,
   boardThemeIndex,
   setBoardThemeIndex,
+  soundEnabled,
+  setSoundEnabled,
 }: PuzzleBoardAreaProps) {
   if (isLoading) {
     return (
@@ -101,6 +105,8 @@ export default function PuzzleBoardArea({
           resetKey={resetKey}
           boardThemeIndex={boardThemeIndex}
           setBoardThemeIndex={setBoardThemeIndex}
+          soundEnabled={soundEnabled}
+          setSoundEnabled={setSoundEnabled}
         />
       )}
     </div>
