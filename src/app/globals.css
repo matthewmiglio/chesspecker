@@ -172,3 +172,229 @@
     animation: shimmer 2s ease-in-out infinite;
   }
 }
+
+/* Blog Content Styling */
+@layer components {
+  /* Blockquotes - Prominent callout style */
+  .prose blockquote {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+    border-left: 4px solid rgb(244, 67, 54);
+    border-radius: 0 8px 8px 0;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .prose blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 4rem;
+    color: rgba(244, 67, 54, 0.3);
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .prose blockquote p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: rgb(212, 212, 216);
+    margin: 0;
+  }
+
+  /* Tables - Distinct styling */
+  .prose table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 2rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgb(63, 63, 70);
+  }
+
+  .prose thead {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(244, 67, 54, 0.1) 100%);
+  }
+
+  .prose th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+    border-bottom: 2px solid rgb(244, 67, 54);
+  }
+
+  .prose td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgb(39, 39, 42);
+    color: rgb(161, 161, 170);
+  }
+
+  .prose tbody tr:hover {
+    background: rgba(244, 67, 54, 0.05);
+  }
+
+  .prose tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Headings with visual distinction */
+  .prose h2 {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .prose h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: rgb(244, 67, 54);
+    border-radius: 2px;
+  }
+
+  .prose h3 {
+    color: rgb(244, 67, 54);
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Lists with better styling */
+  .prose ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+  }
+
+  .prose ul li {
+    position: relative;
+    padding-left: 1.75rem;
+    margin-bottom: 0.75rem;
+    color: rgb(161, 161, 170);
+  }
+
+  .prose ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: rgb(244, 67, 54);
+    font-weight: bold;
+  }
+
+  .prose ol {
+    counter-reset: list-counter;
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+  }
+
+  .prose ol li {
+    position: relative;
+    padding-left: 2.5rem;
+    margin-bottom: 0.75rem;
+    counter-increment: list-counter;
+    color: rgb(161, 161, 170);
+  }
+
+  .prose ol li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid rgb(244, 67, 54);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgb(244, 67, 54);
+  }
+
+  /* Callout boxes - Key takeaway, Warning, Tip, Note, Fix */
+  .prose .callout {
+    background: rgba(39, 39, 42, 0.8);
+    border-left: 4px solid rgb(244, 67, 54);
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.5rem 0;
+  }
+
+  .prose .callout strong:first-child {
+    color: rgb(244, 67, 54);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Warning callout - orange accent */
+  .prose .callout-warning {
+    background: rgba(255, 111, 0, 0.1);
+    border-left-color: rgb(255, 111, 0);
+  }
+
+  .prose .callout-warning strong:first-child {
+    color: rgb(255, 111, 0);
+  }
+
+  /* Tip callout - green accent */
+  .prose .callout-tip {
+    background: rgba(24, 190, 93, 0.1);
+    border-left-color: rgb(24, 190, 93);
+  }
+
+  .prose .callout-tip strong:first-child {
+    color: rgb(24, 190, 93);
+  }
+
+  /* Code blocks styling */
+  .prose code {
+    background: rgba(244, 67, 54, 0.1);
+    color: rgb(244, 67, 54);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .prose pre {
+    background: rgb(24, 24, 27);
+    border: 1px solid rgb(63, 63, 70);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .prose pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  /* Strong text in paragraphs */
+  .prose p strong {
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+  }
+
+  /* Links */
+  .prose a {
+    color: rgb(244, 67, 54);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover {
+    color: rgb(255, 111, 0);
+  }
+}
