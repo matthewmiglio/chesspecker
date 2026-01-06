@@ -7,6 +7,8 @@ export interface BlogPost {
   readTime: string;
   keywords: string[];
   content: string;
+  image: string;
+  author: string;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -17,6 +19,8 @@ export const blogPosts: BlogPost[] = [
     date: "January 1, 2025",
     category: "Training Methods",
     readTime: "8 min read",
+    image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=1200&h=800&fit=crop",
+    author: "Matthew Miglio",
     keywords: ["woodpecker method", "chess tactics", "pattern recognition", "chess training", "tactical drilling"],
     content: `
       <h2>What Is the Woodpecker Method in Chess?</h2>
@@ -87,6 +91,8 @@ export const blogPosts: BlogPost[] = [
     date: "January 3, 2025",
     category: "Training Methods",
     readTime: "7 min read",
+    image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?w=1200&h=800&fit=crop",
+    author: "Matthew Miglio",
     keywords: ["woodpecker method", "random puzzles", "chess tactics practice", "chess improvement", "tactical training"],
     content: `
       <h2>Why Chess Tactics Training Is So Important</h2>
@@ -150,6 +156,8 @@ export const blogPosts: BlogPost[] = [
     date: "January 5, 2025",
     category: "Chess Science",
     readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1560174038-da43ac74f01b?w=1200&h=800&fit=crop",
+    author: "Matthew Miglio",
     keywords: ["pattern recognition", "chess patterns", "tactical vision", "chess improvement", "chess training"],
     content: `
       <h2>What Is Pattern Recognition in Chess?</h2>
@@ -207,6 +215,8 @@ export const blogPosts: BlogPost[] = [
     date: "January 6, 2025",
     category: "Training Tips",
     readTime: "7 min read",
+    image: "https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1200&h=800&fit=crop",
+    author: "Matthew Miglio",
     keywords: ["woodpecker method mistakes", "chess training errors", "tactical training tips", "chess improvement", "puzzle training"],
     content: `
       <h2>Why the Woodpecker Method Gets Misused</h2>
