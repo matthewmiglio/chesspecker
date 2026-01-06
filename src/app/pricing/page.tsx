@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { usePremiumStatus, FREE_TIER_LIMITS } from "@/lib/hooks/usePremiumStatus";
 import { Check, X, Crown, Loader2 } from "lucide-react";
+import PricingStructuredData from "@/components/structured-data/PricingStructuredData";
 
 function PricingContent() {
   const { status: sessionStatus } = useSession();
@@ -105,6 +106,7 @@ function PricingContent() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-background via-background to-background/95">
+      <PricingStructuredData />
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-20">
         {/* Header */}
         <div className="text-center mb-16">

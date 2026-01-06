@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import LoginButton from "./LoginButton";
-import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart, Crown } from "lucide-react";
+import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart, Crown, BookOpen } from "lucide-react";
 import LoginStreakDisplay from "./LoginStreakDisplay";
 
 export default function Navbar() {
@@ -18,6 +18,7 @@ export default function Navbar() {
     { name: "Performance", href: "/dashboard", icon: BarChart3 },
     { name: "Premium", href: "/pricing", icon: Crown },
     { name: "About", href: "/about", icon: Info },
+    { name: "Blog", href: "/blog", icon: BookOpen },
     { name: "Feedback", href: "/feedback", icon: MessageSquare },
     { name: "Donate", href: "/donate", icon: Heart },
   ];

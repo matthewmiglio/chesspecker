@@ -1,9 +1,17 @@
 import { MetadataRoute } from 'next'
 
+// Blog posts for sitemap
+const blogPosts = [
+  'woodpecker-method-explained',
+  'woodpecker-method-vs-random-puzzles',
+  'pattern-recognition-chess',
+  'woodpecker-method-mistakes',
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://chesspecker.org'
-  
-  return [
+
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -29,9 +37,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/pricing`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/dashboard`,
       lastModified: new Date(),
       changeFrequency: 'daily',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
       priority: 0.6,
     },
     {
@@ -46,5 +66,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.4,
     },
-  ]
+    {
+      url: `${baseUrl}/donate`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+  ];
+
+  // Add blog posts to sitemap
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...blogPages];
 }

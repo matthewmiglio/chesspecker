@@ -47,7 +47,7 @@ export default function AboutStructuredData() {
       "url": "https://chesspecker.org"
     },
     "datePublished": "2025-01-01",
-    "dateModified": "2025-01-01",
+    "dateModified": new Date().toISOString().split('T')[0],
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://chesspecker.org/about"

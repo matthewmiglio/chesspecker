@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   publisher: 'ChessPecker',
   alternates: {
     canonical: 'https://chesspecker.org',
+    languages: {
+      'en': 'https://chesspecker.org',
+    },
   },
   formatDetection: {
     email: false,

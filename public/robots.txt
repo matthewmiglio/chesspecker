@@ -3,7 +3,7 @@ Allow: /
 Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
-Disallow: /dashboard/private/
+Disallow: /auth/
 
 # Important pages
 Allow: /
@@ -12,5 +12,8 @@ Allow: /about
 Allow: /create
 Allow: /contact
 Allow: /feedback
+Allow: /pricing
+Allow: /donate
+Allow: /blog
 
 Sitemap: https://chesspecker.org/sitemap.xml

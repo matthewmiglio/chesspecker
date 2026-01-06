@@ -1,6 +1,18 @@
 'use client';
 
 export default function HomeStructuredData() {
+  const webSiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ChessPecker",
+    "url": "https://chesspecker.org",
+    "description": "Chess tactics training platform using the Woodpecker Method",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ChessPecker"
+    }
+  };
+
   const webAppStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -33,6 +45,7 @@ export default function HomeStructuredData() {
     "@type": "Organization",
     "name": "ChessPecker",
     "url": "https://chesspecker.org",
+    "logo": "https://chesspecker.org/og-image.png",
     "description": "Chess tactics training platform using the Woodpecker Method",
     "founder": {
       "@type": "Person",
@@ -40,13 +53,17 @@ export default function HomeStructuredData() {
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "mmiglio.work@gmail.com",
+      "url": "https://chesspecker.org/contact",
       "contactType": "technical support"
     }
   };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteStructuredData) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppStructuredData) }}

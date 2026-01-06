@@ -9,7 +9,6 @@ const personStructuredData = {
   "name": "Matthew Miglio",
   "jobTitle": "Full Stack Developer",
   "description": "Next.js developer specializing in chess applications and AI/ML implementations",
-  "email": "matmigg0804@gmail.com",
   "url": "https://www.matthewmiglio.dev/",
   "sameAs": [
     "https://github.com/matthewmiglio"
