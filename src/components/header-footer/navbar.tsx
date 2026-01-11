@@ -3,19 +3,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import LoginButton from "./LoginButton";
-import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart, Crown, BookOpen } from "lucide-react";
+import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart, Crown, BookOpen, User, Trophy } from "lucide-react";
 import LoginStreakDisplay from "./LoginStreakDisplay";
+import { useUserProfile } from "@/lib/hooks/useUserProfile";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const { hasUsername, loading, profile } = useUserProfile();
+
+  // Show notification badge on Profile only when:
+  // - User is logged in
+  // - Profile has finished loading
+  // - Username is missing
+  const showProfileBadge = session && !loading && profile && !hasUsername;
 
   const navLinks = [
     { name: "Home", href: "/", icon: Home },
     { name: "Practice", href: "/puzzles", icon: Puzzle },
     { name: "Create", href: "/create", icon: Plus },
     { name: "Performance", href: "/dashboard", icon: BarChart3 },
+    { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
+    { name: "Profile", href: "/profile", icon: User, showBadge: showProfileBadge },
     { name: "Premium", href: "/pricing", icon: Crown },
     { name: "About", href: "/about", icon: Info },
     { name: "Blog", href: "/blog", icon: BookOpen },
@@ -44,7 +56,7 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <div className="flex flex-col gap-1 flex-1">
-          {navLinks.map(({ name, href, icon: Icon }) => {
+          {navLinks.map(({ name, href, icon: Icon, showBadge }) => {
             const isActive = pathname === href;
             return (
               <Link
@@ -55,14 +67,25 @@ export default function Navbar() {
                   background: isActive ? 'rgba(239,68,68,0.05)' : 'transparent'
                 }}
               >
-                <Icon
-                  className="w-5 h-5 transition-all duration-700 group-hover:scale-110"
-                  style={{
-                    color: isActive ? '#fca5a5' : '#525252',
-                    filter: isActive ? 'drop-shadow(0 0 8px rgba(239,68,68,0.3))' : 'none'
-                  }}
-                  strokeWidth={1.5}
-                />
+                <div className="relative">
+                  <Icon
+                    className="w-5 h-5 transition-all duration-700 group-hover:scale-110"
+                    style={{
+                      color: isActive ? '#fca5a5' : '#525252',
+                      filter: isActive ? 'drop-shadow(0 0 8px rgba(239,68,68,0.3))' : 'none'
+                    }}
+                    strokeWidth={1.5}
+                  />
+                  {/* Notification badge */}
+                  {showBadge && (
+                    <span
+                      className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"
+                      style={{ boxShadow: '0 0 8px rgba(239,68,68,0.8)' }}
+                    >
+                      1
+                    </span>
+                  )}
+                </div>
                 <span
                   className="text-sm tracking-[0.1em] transition-all duration-700"
                   style={{
@@ -130,7 +153,7 @@ export default function Navbar() {
           }}
         >
           <div className="px-5 py-4 flex flex-col gap-1">
-            {navLinks.map(({ name, href, icon: Icon }) => {
+            {navLinks.map(({ name, href, icon: Icon, showBadge }) => {
               const isActive = pathname === href;
               return (
                 <Link
@@ -142,14 +165,25 @@ export default function Navbar() {
                   }}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Icon
-                    className="w-5 h-5 transition-all duration-500"
-                    style={{
-                      color: isActive ? '#fca5a5' : '#525252',
-                      filter: isActive ? 'drop-shadow(0 0 6px rgba(239,68,68,0.3))' : 'none'
-                    }}
-                    strokeWidth={1.5}
-                  />
+                  <div className="relative">
+                    <Icon
+                      className="w-5 h-5 transition-all duration-500"
+                      style={{
+                        color: isActive ? '#fca5a5' : '#525252',
+                        filter: isActive ? 'drop-shadow(0 0 6px rgba(239,68,68,0.3))' : 'none'
+                      }}
+                      strokeWidth={1.5}
+                    />
+                    {/* Notification badge */}
+                    {showBadge && (
+                      <span
+                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"
+                        style={{ boxShadow: '0 0 8px rgba(239,68,68,0.8)' }}
+                      >
+                        1
+                      </span>
+                    )}
+                  </div>
                   <span
                     className="text-sm tracking-[0.08em] transition-all duration-500"
                     style={{

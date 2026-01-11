@@ -4,6 +4,7 @@
 import { SessionProvider } from "next-auth/react";
 import type { Session } from "next-auth";
 import { ToastProvider } from "@/lib/context/ToastContext";
+import { UserProfileProvider } from "@/lib/context/UserProfileContext";
 
 export function Providers({
   children,
@@ -18,9 +19,11 @@ export function Providers({
       refetchInterval={5 * 60}
       refetchOnWindowFocus={false}
     >
-      <ToastProvider>
-        {children}
-      </ToastProvider>
+      <UserProfileProvider>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </UserProfileProvider>
     </SessionProvider>
   );
 }

@@ -44,3 +44,6 @@ next-env.d.ts
 
 # internal docs
 /docs/
+
+# sql migrations (local only)
+/sql/

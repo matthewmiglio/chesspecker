@@ -3,6 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Crown } from "lucide-react";
 import { usePremiumStatus } from "@/lib/hooks/usePremiumStatus";
+import { useUserProfile } from "@/lib/hooks/useUserProfile";
 
 interface LoginButtonProps {
   loginText?: string;
@@ -15,13 +16,10 @@ export default function LoginButton({
 }: LoginButtonProps) {
   const { data: session } = useSession();
   const { isPremium } = usePremiumStatus();
+  const { displayName } = useUserProfile();
 
   // Always use dark mode styling
   const buttonClasses = "bg-white text-black";
-
-  // Display name: email prefix (before @) or "User"
-  const emailPrefix = session?.user?.email?.split('@')[0];
-  const displayName = emailPrefix || "User";
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
