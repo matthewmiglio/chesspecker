@@ -66,12 +66,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.4,
     },
-    {
-      url: `${baseUrl}/donate`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
-    },
   ];
 
   // Add blog posts to sitemap

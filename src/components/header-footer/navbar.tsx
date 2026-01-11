@@ -5,7 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoginButton from "./LoginButton";
-import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Heart, Crown, BookOpen, User, Trophy } from "lucide-react";
+import { Menu, X, Home, Puzzle, Plus, BarChart3, Info, MessageSquare, Crown, BookOpen, User, Trophy } from "lucide-react";
 import LoginStreakDisplay from "./LoginStreakDisplay";
 import { useUserProfile } from "@/lib/hooks/useUserProfile";
 
@@ -32,7 +32,6 @@ export default function Navbar() {
     { name: "About", href: "/about", icon: Info },
     { name: "Blog", href: "/blog", icon: BookOpen },
     { name: "Feedback", href: "/feedback", icon: MessageSquare },
-    { name: "Donate", href: "/donate", icon: Heart },
   ];
 
   return (
